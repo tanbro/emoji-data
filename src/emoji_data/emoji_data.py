@@ -1,13 +1,26 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+
 import codecs
+import os.path
 import re
+
+from pkg_resources import Requirement, resource_stream
 
 import six
 from six.moves.urllib.parse import urlparse
 from six.moves.urllib.request import urlopen
 
-__all__ = ['EmojiData']
+from . import version
+
+__all__ = ['EmojiData', 'EMOJI_DATA_URL']
+
+
+EMOJI_DATA_URL = 'https://unicode.org/Public/emoji/11.0/emoji-data.txt'
+
+
+PACKAGE = '.'.join(version.__name__.split('.')[:-1])
 
 
 class _EmojiDataMeta(type):
@@ -36,8 +49,6 @@ class _EmojiDataMeta(type):
 
 
 class EmojiData(six.with_metaclass(_EmojiDataMeta)):
-
-    URL = 'https://unicode.org/Public/emoji/11.0/emoji-data.txt'
 
     _ignore_codes = [
         0x0023,  # 1.1  [1] (#️)       number sign
@@ -69,13 +80,18 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
 
     @classmethod
     def initial(cls, url=None, compile_regex_pattern=True):
+        # pylint:disable=too-many-branches
         if url is None:
-            raise NotImplementedError()
-        parsed_url = urlparse(url)
-        if parsed_url.scheme:
-            data_file = urlopen(url)
+            paths = PACKAGE.split('.') + ['data', 'emoji-data.txt']
+            resource_name = os.path.join(*paths)
+            data_file = resource_stream(
+                Requirement.parse(PACKAGE), resource_name)
         else:
-            data_file = codecs.open(url, encoding='UTF-8')
+            parsed_url = urlparse(url)
+            if parsed_url.scheme:
+                data_file = urlopen(url)
+            else:
+                data_file = codecs.open(url, encoding='UTF-8')
         for line in data_file:
             if isinstance(line, bytes):
                 line = codecs.decode(line, 'UTF-8')
