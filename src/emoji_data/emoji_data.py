@@ -6,8 +6,9 @@ import codecs
 import os.path
 import re
 
-import six
 from pkg_resources import Requirement, resource_stream
+
+import six
 from six.moves.urllib.parse import urlparse
 from six.moves.urllib.request import urlopen
 
@@ -79,6 +80,7 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
 
     @classmethod
     def initial(cls, url=None, compile_regex_pattern=True):
+        # pylint:disable=too-many-branches
         if url is None:
             paths = PACKAGE.split('.') + ['data', 'emoji-data.txt']
             resource_name = os.path.join(*paths)
