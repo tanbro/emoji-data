@@ -1,0 +1,73 @@
+# Python CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-python/ for more details
+#
+
+version: 2
+
+references:
+  tests_steps: &tests_steps
+    steps:
+      - checkout
+      - run:
+          name: Install additional pip dependencies
+          command: pip install --user coverage codacy-coverage
+      - run:
+          name: Run setup test
+          command: coverage run setup.py test
+      - store_test_results:
+          path: test-reports
+      - run:
+          name: Upload coverage xml file to codacy
+          command: |
+            coverage xml --include=src/*.py
+            python-codacy-coverage -r coverage.xml
+
+  deploy_steps: &deploy_steps
+    steps:
+      - checkout
+      - run:
+          name: Install additional pip dependencies
+          command: pip install --user wheel twine
+      - run:
+          name: Build and upload dist
+          command: |
+            python setup.py sdist bdist_wheel
+            twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*
+
+jobs:
+  test-python:
+    docker:
+      - image: circleci/python
+    <<: *tests_steps
+
+  test-python2:
+    docker:
+      - image: circleci/python:2
+    <<: *tests_steps
+
+  test-python3:
+    docker:
+      - image: circleci/python:3
+    <<: *tests_steps
+
+  deploy:
+    docker:
+      - image: circleci/python
+    <<: *deploy_steps
+
+workflows:
+  version: 2
+  test-and-deploy: # name of your workflow
+    jobs:
+      - test-python
+      - test-python2
+      - test-python3
+      - deploy:
+          requires:
+            - test-python
+          filters:
+            tags:
+              only: /^(\d+(\.\d+)*)+(\.?(a|b|c|dev|alpha|beta|rc|preview|post)(\d+(\.\d+)*)+)?$/
+            branches:
+              ignore: /.*/
