@@ -14,5 +14,5 @@ class InitialTest(TestCase):
         self.assertGreater(len(EmojiData), 0)
 
     def test_file(self):
-        EmojiData.initial('tests/data/emoji-data.txt')
+        EmojiData.initial('src/emoji_data/data/emoji-data.txt')
         self.assertGreater(len(EmojiData), 0)
