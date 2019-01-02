@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from unittest import TestCase
 
 from emoji_data import EMOJI_DATA_URL, EmojiData
