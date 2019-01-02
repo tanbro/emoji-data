@@ -59,6 +59,7 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
         0x002A,  # 1.1  [1] (*️)       asterisk
     ] + list(range(0x0030, 0x0039 + 1))  # 1.1 [10] (0️..9️)    digit zero..digit nine
 
+    _regex_text = None
     _regex_pattern = None
 
     def __init__(self, code, property_, comments):  # type: (int,str,str)->EmojiData
@@ -169,9 +170,13 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
 
     @classmethod
     def compile_regex_pattern(cls):
-        pat = r'[{}]+'.format(r'|'.join(m.regex for _, m in cls))
-        cls._regex_pattern = re.compile(pat)
+        cls._regex_text = r'[{}]+'.format(r'|'.join(m.regex for _, m in cls))
+        cls._regex_pattern = re.compile(cls._regex_text)
         return cls._regex_pattern
+
+    @classmethod
+    def get_regex_text(cls):  # type: ()->str
+        return cls._regex_text
 
     @classmethod
     def get_regex_pattern(cls):

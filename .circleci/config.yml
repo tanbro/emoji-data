@@ -11,7 +11,7 @@ references:
       - checkout
       - run:
           name: Install additional pip dependencies
-          command: pip install --user coverage codacy-coverage
+          command: sudo pip install coverage codacy-coverage
       - run:
           name: Run setup test
           command: coverage run setup.py test
@@ -28,7 +28,7 @@ references:
       - checkout
       - run:
           name: Install additional pip dependencies
-          command: pip install --user wheel twine
+          command: sudo pip install wheel twine
       - run:
           name: Build and upload dist
           command: |
