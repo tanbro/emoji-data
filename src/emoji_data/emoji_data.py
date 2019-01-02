@@ -74,12 +74,11 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
         return self.char
 
     def __repr__(self):
-        return '<{} hex={} char={!r} property={!r} comments={!r}>'.format(
+        return '<{} hex={} char={!r} property={!r}>'.format(
             type(self).__name__,
             self.hex,
             self.char,
-            self.property_,
-            self.comments
+            self.property_
         )
 
     @classmethod
