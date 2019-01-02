@@ -14,13 +14,17 @@ from six.moves.urllib.request import urlopen
 
 from . import version
 
-__all__ = ['EmojiData', 'EMOJI_DATA_URL']
+__all__ = ['EMOJI_DATA_URL', 'EmojiData', 'EmojiDataFileFormatError']
 
 
 EMOJI_DATA_URL = 'https://unicode.org/Public/emoji/11.0/emoji-data.txt'
 
 
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
+
+
+class EmojiDataFileFormatError(Exception):
+    pass
 
 
 class _EmojiDataMeta(type):
@@ -71,7 +75,7 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
 
     def __repr__(self):
         return '<{} hex={} char={!r} property={!r} comments={!r}>'.format(
-            self.__class__.__name__,
+            type(self).__name__,
             self.hex,
             self.char,
             self.property_,
@@ -81,6 +85,7 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
     @classmethod
     def initial(cls, url=None, compile_regex_pattern=True):  # type: (str,bool)->EmojiData
         # pylint:disable=too-many-branches
+
         if url is None:
             paths = PACKAGE.split('.') + ['data', 'emoji-data.txt']
             resource_name = os.path.join(*paths)
@@ -92,6 +97,7 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
                 data_file = urlopen(url)
             else:
                 data_file = codecs.open(url, encoding='UTF-8')
+
         for line in data_file:
             if not line:
                 continue
@@ -100,23 +106,23 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
             line = line.strip()
             if not line:
                 continue
-            if line.startswith('#'):
-                continue
-            if line.startswith(';'):
+            if line[0] in ('#', ';'):
                 continue
 
             pos = line.find(';')
+            if pos < 0:
+                raise EmojiDataFileFormatError()
             codepoints = [int(s, 16) for s in line[:pos].split('..', 1)]
             code_range = range(codepoints[0], codepoints[-1]+1)
+
             line = line[pos+1:]
 
             pos = line.find('#')
             if pos >= 0:
                 property_ = line[:pos].strip()
-                line = line[pos+1:]
-                comments = line.strip()
+                comments = line[pos+1:].strip()
             else:
-                property_ = None
+                property_ = line.strip()
                 comments = None
 
             for code in code_range:
@@ -147,7 +153,7 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
         return hex(self._code)
 
     @property
-    def char(self):  # type: ()->bytes
+    def char(self):  # type: ()->str
         return six.unichr(self._code)
 
     @classmethod
@@ -155,7 +161,7 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
         return cls[val]
 
     @classmethod
-    def from_char(cls, val):  # type: (bytes)->EmojiData
+    def from_char(cls, val):  # type: (str)->EmojiData
         return cls[ord(val)]
 
     @classmethod
