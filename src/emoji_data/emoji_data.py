@@ -57,14 +57,14 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
 
     _regex_pattern = None
 
-    def __init__(self, code, property_, comments):  # type (int, str, str) -> object
+    def __init__(self, code, property_, comments):  # type: (int,str,str)->EmojiData
         self._code = code
         self._property = property_
         self._comments = comments
-        if code < 0xffff:
-            self._regex = r'\u{:04X}'.format(code)
-        else:
+        if code > 0xffff:
             self._regex = r'\U{:08X}'.format(code)
+        else:
+            self._regex = r'\u{:04X}'.format(code)
 
     def __str__(self):
         return self.char
@@ -79,7 +79,7 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
         )
 
     @classmethod
-    def initial(cls, url=None, compile_regex_pattern=True):
+    def initial(cls, url=None, compile_regex_pattern=True):  # type: (str,bool)->EmojiData
         # pylint:disable=too-many-branches
         if url is None:
             paths = PACKAGE.split('.') + ['data', 'emoji-data.txt']
@@ -93,8 +93,10 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
             else:
                 data_file = codecs.open(url, encoding='UTF-8')
         for line in data_file:
+            if not line:
+                continue
             if isinstance(line, bytes):
-                line = codecs.decode(line, 'UTF-8')
+                line = codecs.decode(line, 'UTF-8')  # type: str
             line = line.strip()
             if not line:
                 continue
@@ -125,15 +127,15 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
             cls.compile_regex_pattern()
 
     @property
-    def code(self):
+    def code(self):  # type: ()->int
         return self._code
 
     @property
-    def property_(self):
+    def property_(self):  # type: ()->str
         return self._property
 
     @property
-    def comments(self):
+    def comments(self):  # type: ()->str
         return self._comments
 
     @property
@@ -141,23 +143,23 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
         return self._regex
 
     @property
-    def hex(self):
+    def hex(self):  # type: ()->str
         return hex(self._code)
 
     @property
-    def char(self):
+    def char(self):  # type: ()->bytes
         return six.unichr(self._code)
 
     @classmethod
-    def from_int(cls, val):
+    def from_int(cls, val):  # type: (int)->EmojiData
         return cls[val]
 
     @classmethod
-    def from_char(cls, val):
+    def from_char(cls, val):  # type: (bytes)->EmojiData
         return cls[ord(val)]
 
     @classmethod
-    def from_hex(cls, val):
+    def from_hex(cls, val):  # type: (str)->EmojiData
         return cls[int(val, 16)]
 
     @classmethod
