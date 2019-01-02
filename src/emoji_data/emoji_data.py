@@ -106,7 +106,7 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
                 continue
 
             pos = line.find(';')
-            codepoints = [int(s, 16) for s in line[:pos].split('..')]
+            codepoints = [int(s, 16) for s in line[:pos].split('..', 1)]
             code_range = range(codepoints[0], codepoints[-1]+1)
             line = line[pos+1:]
 
