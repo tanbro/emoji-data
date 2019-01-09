@@ -1,0 +1,15 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+emoji-data = {editable = true,path = "."}
+pylint = "*"
+autopep8 = "*"
+rope = "*"
+twine = "*"
+
+[packages]
+
+[requires]
