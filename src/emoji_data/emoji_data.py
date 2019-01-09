@@ -18,9 +18,8 @@ __all__ = ['EMOJI_DATA_URL', 'EmojiData', 'EmojiDataFileFormatError']
 
 
 EMOJI_DATA_URL = 'https://unicode.org/Public/emoji/11.0/emoji-data.txt'
-
-
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
+ENCODING = 'utf-8'
 
 
 class EmojiDataFileFormatError(Exception):
@@ -53,6 +52,8 @@ class _EmojiDataMeta(type):
 
 
 class EmojiData(six.with_metaclass(_EmojiDataMeta)):
+    """A Class stores and represents Emoji Characters
+    """
 
     _ignore_codes = [
         0x0023,  # 1.1  [1] (#️)       number sign
@@ -63,6 +64,17 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
     _regex_pattern = None
 
     def __init__(self, code, property_, comments):  # type: (int,str,str)->EmojiData
+        """
+        Parameters
+        ----------
+        code : int
+            Interger value of the Emoji Unicode.
+        property_ : str
+            property of the Emoji.
+        comments: str
+            comments of the Emoji.
+        """
+
         self._code = code
         self._property = property_
         self._comments = comments
@@ -83,7 +95,29 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
         )
 
     @classmethod
-    def initial(cls, url=None, compile_regex_pattern=True):  # type: (str,bool)->EmojiData
+    def initial(cls, url=None, compile_regex_pattern=True):  # type: (str,bool)->None
+        """Initial from a Emoji data file
+
+        .. Important::
+            **MUST** be called before other methods
+
+        .. Tip::
+            Currently, the default emoji data file inside the package was downloaded from <https://unicode.org/Public/emoji/11.0/emoji-data.txt>
+
+        Parameters
+        ----------
+        url : str (default: ``None`` - Using default emoji data file inside the package)
+            URL or File Path of Emoji data file
+
+        compile_regex_pattern : bool (default: ``True``)
+            property of the Emoji.
+
+        Raises
+        ------
+        EmojiDataFileFormatError
+            Invalid format for specified Emoji data file.
+        """
+
         # pylint:disable=too-many-branches
 
         if url is None:
@@ -96,13 +130,13 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
             if parsed_url.scheme:
                 data_file = urlopen(url)
             else:
-                data_file = codecs.open(url, encoding='UTF-8')
+                data_file = codecs.open(url, encoding=ENCODING)
 
         for line in data_file:
             if not line:
                 continue
             if isinstance(line, bytes):
-                line = codecs.decode(line, 'UTF-8')  # type: str
+                line = codecs.decode(line, ENCODING)  # type: str
             line = line.strip()
             if not line:
                 continue
@@ -134,50 +168,152 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
 
     @property
     def code(self):  # type: ()->int
+        """Unicode integer value of the Emoji
+
+        Returns
+        -------
+        int
+        """
+
         return self._code
 
     @property
     def property_(self):  # type: ()->str
+        """Property description text of the Emoji
+
+        Returns
+        -------
+        str
+        """
+
         return self._property
 
     @property
     def comments(self):  # type: ()->str
+        """Comments of the Emoji
+
+        Returns
+        -------
+        str
+        """
+
         return self._comments
 
     @property
     def regex(self):
+        """Regular express for the Emoji
+
+        Returns
+        -------
+        str
+        """
+
         return self._regex
 
     @property
     def hex(self):  # type: ()->str
+        """Hex style text of the Emoji's Unicode
+
+        Returns
+        -------
+        str
+        """
+
         return hex(self._code)
 
     @property
     def char(self):  # type: ()->str
+        """Emoji character
+
+        Returns
+        -------
+        str
+        """
+
         return six.unichr(self._code)
 
     @classmethod
     def from_int(cls, val):  # type: (int)->EmojiData
+        """Return a :class:`EmojiData` object by Emoji Unicode's integer value
+
+        Parameters
+        ----------
+        val : int
+            Integer value of the Emoji's Unicode
+
+        Returns
+        -------
+        EmojiData
+
+        Raises
+        ------
+        KeyError
+            When integer code not found
+        """
+
         return cls[val]
 
     @classmethod
     def from_char(cls, val):  # type: (str)->EmojiData
+        """Return a :class:`EmojiData` object by Emoji Unicode character
+
+        Parameters
+        ----------
+        val : str
+            Emoji character
+
+        Returns
+        -------
+        EmojiData
+
+        Raises
+        ------
+        KeyError
+            When Charactor code not found
+        """
+
         return cls[ord(val)]
 
     @classmethod
     def from_hex(cls, val):  # type: (str)->EmojiData
+        """Return a :class:`EmojiData` object by Emoji Unicode's HEX text
+
+        Parameters
+        ----------
+        val : str
+            Emoji Unicode's HEX
+
+        Returns
+        -------
+        EmojiData
+
+        Raises
+        ------
+        KeyError
+            When Charactor code not found
+        """
+
         return cls[int(val, 16)]
 
     @classmethod
     def compile_regex_pattern(cls):
+        """compile then return a RegEx pattern object with all Emoji.
+        """
+
         cls._regex_text = r'[{}]+'.format(r'|'.join(m.regex for _, m in cls))
         cls._regex_pattern = re.compile(cls._regex_text)
         return cls._regex_pattern
 
     @classmethod
     def get_regex_text(cls):  # type: ()->str
+        """Regular express text with all Emoji
+        """
+
         return cls._regex_text
 
     @classmethod
     def get_regex_pattern(cls):
+        """Return a RegEx pattern object with all Emoji
+        """
+
         return cls._regex_pattern
