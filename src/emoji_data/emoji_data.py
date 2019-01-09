@@ -106,11 +106,17 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
 
         Parameters
         ----------
-        url : str (default: ``None`` - Using default emoji data file inside the package)
+        url : str
+
+            * default: ``None`` - Using default emoji data file inside the package
+
             URL or File Path of Emoji data file
 
-        compile_regex_pattern : bool (default: ``True``)
-            property of the Emoji.
+        compile_regex_pattern : bool
+
+            * default: ``True``
+
+            Whether to compile a RegEx with all Emoji when loaded
 
         Raises
         ------
