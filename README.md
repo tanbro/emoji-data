@@ -1,6 +1,7 @@
 # emoji-data
 
 [![CircleCI](https://circleci.com/gh/tanbro/emoji-data.svg?style=svg)](https://circleci.com/gh/tanbro/emoji-data)
+[![Documentation Status](https://readthedocs.org/projects/emoji-data/badge/?version=latest)](https://emoji-data.readthedocs.io/en/latest/?badge=latest)
 
 A small library, it does:
 
