@@ -174,66 +174,66 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
 
     @property
     def code(self):  # type: ()->int
-        """Unicode integer value of the Emoji
-
+        """
         Returns
         -------
         int
+            Unicode integer value of the Emoji
         """
 
         return self._code
 
     @property
     def property_(self):  # type: ()->str
-        """Property description text of the Emoji
-
+        """
         Returns
         -------
         str
+            Property description text of the Emoji
         """
 
         return self._property
 
     @property
     def comments(self):  # type: ()->str
-        """Comments of the Emoji
-
+        """
         Returns
         -------
         str
+            Comments of the Emoji
         """
 
         return self._comments
 
     @property
     def regex(self):
-        """Regular express for the Emoji
-
+        """
         Returns
         -------
         str
+            Regular express for the Emoji
         """
 
         return self._regex
 
     @property
     def hex(self):  # type: ()->str
-        """Hex style text of the Emoji's Unicode
-
+        """
         Returns
         -------
         str
+            Hex style text of the Emoji's Unicode
         """
 
         return hex(self._code)
 
     @property
     def char(self):  # type: ()->str
-        """Emoji character
-
+        """
         Returns
         -------
         str
+            Emoji character
         """
 
         return six.unichr(self._code)
@@ -250,6 +250,7 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
         Returns
         -------
         EmojiData
+            Object returned
 
         Raises
         ------
@@ -271,6 +272,7 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
         Returns
         -------
         EmojiData
+            Object returned
 
         Raises
         ------
@@ -292,6 +294,7 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
         Returns
         -------
         EmojiData
+            Object returned
 
         Raises
         ------
