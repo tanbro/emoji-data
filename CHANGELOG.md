@@ -2,7 +2,7 @@
 
 ## 0.1.2
 
-- Date: 2019-01-010
+- Date: 2019-01-10
 
 - New
   - Sphinx documentations
