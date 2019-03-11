@@ -171,6 +171,10 @@ class EmojiData(six.with_metaclass(_EmojiDataMeta)):
         if compile_regex_pattern:
             cls.compile_regex_pattern()
 
+    @classmethod
+    def is_emoji(cls, string):
+        return all(ord(c) in cls for c in string)
+
     @property
     def code(self):  # type: ()->int
         """
