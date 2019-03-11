@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## developing
+
+- Upgrade:
+  - Update emoji data file to 12.0
+
 ## 0.1.2
 
 - Date: 2019-01-10

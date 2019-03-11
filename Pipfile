@@ -7,10 +7,10 @@ verify_ssl = true
 emoji-data = {editable = true,path = "."}
 pylint = "*"
 autopep8 = "*"
-rope = "*"
 twine = "*"
 sphinx = "*"
 pytest = "*"
+jupyter = "*"
 
 [packages]
 
