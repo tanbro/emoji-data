@@ -10,6 +10,7 @@ autopep8 = "*"
 rope = "*"
 twine = "*"
 sphinx = "*"
+pytest = "*"
 
 [packages]
 

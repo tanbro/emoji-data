@@ -7,10 +7,9 @@ import os.path
 import re
 
 import six
+from pkg_resources import Requirement, resource_stream
 from six.moves.urllib.parse import urlparse
 from six.moves.urllib.request import urlopen
-
-from pkg_resources import Requirement, resource_stream
 
 from . import version
 
