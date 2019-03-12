@@ -13,7 +13,7 @@ class CharacterTestCase(unittest.TestCase):
         EmojiCharacter.initial()
 
     def test_code_points(self):
-        for code_points, qualified_type in self.test_data:
+        for code_points, _ in self.test_data:
             for code in code_points:
                 self.assertTrue(code in EmojiCharacter)
 
