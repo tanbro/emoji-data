@@ -36,16 +36,6 @@ references:
             twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*
 
 jobs:
-  test-python:
-    docker:
-      - image: circleci/python
-    <<: *tests_steps
-
-  test-python2:
-    docker:
-      - image: circleci/python:2
-    <<: *tests_steps
-
   test-python3:
     docker:
       - image: circleci/python:3
@@ -60,12 +50,10 @@ workflows:
   version: 2
   test-and-deploy: # name of your workflow
     jobs:
-      - test-python
-      - test-python2
       - test-python3
       - deploy:
           requires:
-            - test-python
+            - test-python3
           filters:
             tags:
               only: /^(\d+(\.\d+)*)+(\.?(a|b|c|dev|alpha|beta|rc|preview|post)(\d+(\.\d+)*)+)?$/
