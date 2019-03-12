@@ -11,14 +11,11 @@ from .utils import BaseDictContainer, preproc_line_data
 __all__ = ['EmojiSequence']
 
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
-SEQUENCES_DATAFILE_STREAM = resource_stream(
-    Requirement.parse(PACKAGE),
-    os.path.join(*(PACKAGE.split('.') + ['data', 'emoji-sequences.txt']))
-)
-ZWJ_SEQUENCES_DATAFILE_STREAM = resource_stream(
-    Requirement.parse(PACKAGE),
-    os.path.join(*(PACKAGE.split('.') + ['data', 'emoji-zwj-sequences.txt']))
-)
+
+DATA_FILE_HANDLES = [
+    resource_stream(Requirement.parse(PACKAGE), os.path.join(*(PACKAGE.split('.') + ['data', s])))
+    for s in ('emoji-zwj-sequences.txt', 'emoji-sequences.txt', 'emoji-variation-sequences.txt')
+]
 
 
 class _MetaClass(BaseDictContainer):
@@ -70,8 +67,8 @@ class EmojiSequence(metaclass=_MetaClass):
         if cls._initialed:
             return
         EmojiCharacter.initial()
-        for fp in SEQUENCES_DATAFILE_STREAM, ZWJ_SEQUENCES_DATAFILE_STREAM:
-            for data in fp:  # type: bytes
+        for handle in DATA_FILE_HANDLES:
+            for data in handle:  # type: bytes
                 line = preproc_line_data(data)
                 if not line:
                     continue
@@ -81,11 +78,13 @@ class EmojiSequence(metaclass=_MetaClass):
                 if len(code_points_parts) > 1:
                     for code in range(int(code_points_parts[0], 16), 1 + int(code_points_parts[1], 16)):
                         inst = cls(EmojiCharacter.from_code(code), type_field, description)
-                        cls[inst.string] = inst
+                        if inst.string not in cls:
+                            cls[inst.string] = inst
                 else:
                     chars = (EmojiCharacter.from_code(code) for code in (int(s, 16) for s in code_points.split()))
                     inst = cls(chars, type_field, description)
-                    cls[inst.string] = inst
+                    if inst.string not in cls:
+                        cls[inst.string] = inst
         # build regex
         seqs = sorted((m for _, m in cls), key=lambda x: len(x.codes), reverse=True)  # type: List[EmojiSequence]
         exp = r'|'.join(m.regex for m in seqs)

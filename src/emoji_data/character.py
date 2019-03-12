@@ -7,13 +7,17 @@ from .utils import BaseDictContainer, preproc_line_data
 
 from . import version
 
-__all__ = ['EmojiCharProperty', 'EmojiCharacter']
+__all__ = ['EmojiCharProperty', 'EmojiCharacter', 'TEXT_PRESENTATION_SELECTOR', 'EMOJI_PRESENTATION_SELECTOR']
 
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
 DATAFILE_STREAM = resource_stream(
     Requirement.parse(PACKAGE),
     os.path.join(*(PACKAGE.split('.') + ['data', 'emoji-data.txt']))
 )
+
+TEXT_PRESENTATION_SELECTOR = 0xFE0E
+EMOJI_PRESENTATION_SELECTOR = 0xFE0F
+
 
 IGNORE_CODES = [
     0x0023,  # 1.1  [1] (#️)       number sign
@@ -93,6 +97,9 @@ class EmojiCharacter(metaclass=_MetaClass):
                     cls[code] = cls(code, property_)  # type: EmojiCharacter
                 else:
                     inst.add_property(property_)
+        for code in TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR:
+            if code not in cls:
+                cls[code] = cls(code)
         cls._initial = True
 
     @classmethod
