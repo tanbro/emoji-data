@@ -15,9 +15,9 @@ DATAFILE_STREAM = resource_stream(
 )
 
 IGNORE_CODES = [
-                   0x0023,  # 1.1  [1] (#️)       number sign
-                   0x002A,  # 1.1  [1] (*️)       asterisk
-               ] + list(range(0x0030, 0x0039 + 1))  # 1.1 [10] (0️..9️)    digit zero..digit nine
+    0x0023,  # 1.1  [1] (#️)       number sign
+    0x002A,  # 1.1  [1] (*️)       asterisk
+] + list(range(0x0030, 0x0039 + 1))  # 1.1 [10] (0️..9️)    digit zero..digit nine
 
 
 class EmojiCharProperty(Enum):
@@ -120,16 +120,16 @@ class EmojiCharacter(metaclass=_MetaClass):
         cls._initial = True
 
     @classmethod
-    def is_emoji_char(cls, char: str) -> bool:
+    def is_emoji_char(cls, c: str) -> bool:
         """Check if emoji character
 
-        :param str char: character to check
+        :param str c: character to check
         :return: Whether if emoji character
         :rtype: bool
         """
-        if len(char) != 1:
+        if len(c) != 1:
             raise ValueError('Length of char string should be 1')
-        code = ord(char)
+        code = ord(c)
         return code not in IGNORE_CODES and code in cls
 
     @classmethod
