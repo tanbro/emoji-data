@@ -108,11 +108,11 @@ class EmojiCharacter(metaclass=_MetaClass):
             property_ = EmojiCharProperty(property_text)
             for code in range(int(code_points_parts[0], 16), 1 + int(code_points_parts[-1], 16)):
                 try:
-                    obj = cls[code]  # type: EmojiCharacter
+                    inst = cls[code]  # type: EmojiCharacter
                 except KeyError:
                     cls[code] = cls(code, property_)  # type: EmojiCharacter
                 else:
-                    obj.add_property(property_)
+                    inst.add_property(property_)
         cls._initial = True
 
     @classmethod

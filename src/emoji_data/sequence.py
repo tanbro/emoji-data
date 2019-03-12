@@ -2,6 +2,7 @@
 """
 
 import os
+import re
 import typing as t
 
 from pkg_resources import Requirement, resource_stream
@@ -20,6 +21,8 @@ ZWJ_SEQUENCES_DATAFILE_STREAM = resource_stream(
     Requirement.parse(PACKAGE),
     os.path.join(*(PACKAGE.split('.') + ['data', 'emoji-zwj-sequences.txt']))
 )
+
+TRePattern = type(re.compile(r''))
 
 
 class _MetaClass(type):
@@ -59,6 +62,7 @@ class EmojiSequence(metaclass=_MetaClass):
         self._codes = [m.code for m in self._chars]
         self._text = ''.join(m.string for m in self._chars)
         self._regex = ''.join(m.regex for m in self._chars)
+        self._regex_compiled = re.compile(self._regex)
 
     def __str__(self):
         return self._text
@@ -71,9 +75,16 @@ class EmojiSequence(metaclass=_MetaClass):
         )
 
     _initialed = False
+    pattern = None  # type: TRePattern
+    """Regular express pattern object for all-together Emoji sequences.
+    """
 
     @classmethod
     def initial(cls):
+        """
+
+        :return:
+        """
         if cls._initialed:
             return
         EmojiCharacter.initial()
@@ -94,10 +105,15 @@ class EmojiSequence(metaclass=_MetaClass):
                         inst = cls(EmojiCharacter.from_code(code), type_field, description)
                         cls[inst._text] = inst
                 else:
-                    # codes = (int(s, 16) for s in code_points.split())
                     chars = (EmojiCharacter.from_code(code) for code in (int(s, 16) for s in code_points.split()))
                     inst = cls(chars, type_field, description)
                     cls[inst._text] = inst
+        # build regex
+        seqs = sorted((m for _, m in cls), key=lambda x: len(x.codes), reverse=True)  # type: t.List[EmojiSequence]
+        exp = r'|'.join(m.regex for m in seqs)
+        pat = re.compile(exp)
+        cls.pattern = pat
+        # initialed OK
         cls._initialed = True
 
     @classmethod
@@ -136,6 +152,10 @@ class EmojiSequence(metaclass=_MetaClass):
     @property
     def regex(self) -> str:
         return self._regex
+
+    @property
+    def regex_compiled(self):
+        return self._regex_compiled
 
     @property
     def codes(self) -> t.List[int]:
