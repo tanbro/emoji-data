@@ -3,7 +3,7 @@
 ## developing
 
 - New
-  - Emoji Sequence data and new `EmojiSequece` class
+  - Emoji Sequence data and new `EmojiSequence` class
 
 - Change:
   - Rename `EmojiData` class to `EmojiCharacter`

@@ -10,9 +10,9 @@ A library represents [emoji][] sequences and characters from the data files list
 
 ## How to use
 
-Examples below also in: `notebooks/exmaple.ipynb`
+Examples below also in a [notebook](notebooks/example.ipynb)
 
-Class `EmojiSequence` is most usefule. To use it:
+Class `EmojiSequence` is most useful:
 
 ```python
 from emoji_data import EmojiSequence
@@ -20,7 +20,7 @@ from emoji_data import EmojiSequence
 EmojiSequence.initial()
 ```
 
-`initial()` **MUST** be called - load emoji data files into the class' meta data
+`initial()` **MUST** be called - it loads emoji data files into the class' meta data
 
 ### Iterate print Emojis
 
