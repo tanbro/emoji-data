@@ -31,17 +31,13 @@ setup(
         'setuptools_scm',
         'setuptools_scm_git_archive',
     ],
-
-    install_requires=[
-        'six',
-    ],
-
+    install_requires=[],
     tests_require=[
         'pytest',
     ],
     test_suite='tests',
 
-    python_requires='>=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*',
+    python_requires='>3.4',
 
     package_data={
         '': ['data/*']
@@ -52,10 +48,7 @@ setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',

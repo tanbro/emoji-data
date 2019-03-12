@@ -4,22 +4,12 @@ emoji\_data package
 Submodules
 ----------
 
-emoji\_data.emoji\_data module
-------------------------------
+.. toctree::
 
-.. automodule:: emoji_data.emoji_data
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-emoji\_data.version module
---------------------------
-
-.. automodule:: emoji_data.version
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   emoji_data.character
+   emoji_data.sequence
+   emoji_data.utils
+   emoji_data.version
 
 Module contents
 ---------------
