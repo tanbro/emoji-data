@@ -10,7 +10,7 @@ class CharacterTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.test_data = reload_test_data()
-        EmojiCharacter.load()
+        EmojiCharacter.initial()
 
     def test_code_points(self):
         for code_points, qualified_type in self.test_data:

@@ -70,27 +70,27 @@ class EmojiSequence(metaclass=_MetaClass):
             self._text,
         )
 
-    _loaded = False
+    _initialed = False
 
     @classmethod
-    def load(cls):
-        if cls._loaded:
+    def initial(cls):
+        if cls._initialed:
             return
-        EmojiCharacter.load()
+        EmojiCharacter.initial()
         for ss in SEQUENCES_DATAFILE_STREAM, ZWJ_SEQUENCES_DATAFILE_STREAM:
-            for line in ss:
-                line = line.strip()
-                if not line:
+            for byte_string in ss:  # type: bytes
+                byte_string = byte_string.strip()
+                if not byte_string:
                     continue
-                line = line.decode('utf-8')
-                if line[0] in ('#', ';'):
+                if byte_string[0] in b'#;':
                     continue
+                line = byte_string.decode('utf-8')  # type: str
                 line = line.split('#', 1)[0].strip()
                 code_points, type_field, description = (part.strip() for part in line.split(';', 2))
                 # codes ...
-                parts = code_points.split('..', 1)  # begin..end form
-                if len(parts) > 1:
-                    for code in range(int(parts[0], 16), 1 + int(parts[1], 16)):
+                code_points_parts = code_points.split('..', 1)  # begin..end form
+                if len(code_points_parts) > 1:
+                    for code in range(int(code_points_parts[0], 16), 1 + int(code_points_parts[1], 16)):
                         inst = cls(EmojiCharacter.from_code(code), type_field, description)
                         cls[inst._text] = inst
                 else:
@@ -98,6 +98,7 @@ class EmojiSequence(metaclass=_MetaClass):
                     chars = (EmojiCharacter.from_code(code) for code in (int(s, 16) for s in code_points.split()))
                     inst = cls(chars, type_field, description)
                     cls[inst._text] = inst
+        cls._initialed = True
 
     @classmethod
     def from_text(cls, text):  # type: (str)->EmojiSequence

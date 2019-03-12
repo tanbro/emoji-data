@@ -1,4 +1,4 @@
-"""Characters Property value for the properties listed in the `Emoji Character Properties table <http://www.unicode.org/reports/tr51/#Emoji_Properties>`_
+"""Characters properties for Emoji
 """
 import os
 import typing as t
@@ -61,8 +61,6 @@ class _MetaClass(type):
 
 
 class EmojiCharacter(metaclass=_MetaClass):
-    _loaded = False
-
     def __init__(self, code: int, properties: t.Union[t.List[EmojiCharProperty], EmojiCharProperty] = None):
         """Emoji character with properties listed in the Emoji Character Properties table
 
@@ -91,37 +89,51 @@ class EmojiCharacter(metaclass=_MetaClass):
             self.string,
         )
 
+    _initial = False
+
     @classmethod
-    def load(cls):
-        if cls._loaded:
+    def initial(cls):
+        if cls._initial:
             return
-        for line in DATAFILE_STREAM:
-            line = line.strip()
-            if not line:
+        for byte_string in DATAFILE_STREAM:  # type: bytes
+            byte_string = byte_string.strip()
+            if not byte_string:
                 continue
-            line = line.decode('utf-8')
-            if line[0] in ('#', ';'):
+            if byte_string[0] in b'#;':
                 continue
-            pos = line.find(';')
-            if pos < 0:
-                raise RuntimeError('Can not split codepoints and property')
-            # code-points
-            code_points = [int(s, 16) for s in line[:pos].split('..', 1)]
-            code_range = range(code_points[0], 1 + code_points[-1])
-            line = line[pos + 1:]
-            # properties
-            pos = line.find('#')
-            property_text = line[:pos].strip()
+            line = byte_string.decode('utf-8')  # type: str
+            line = line.split('#', 1)[0].strip()
+            code_points_text, property_text = (part.strip() for part in line.split(';', 1))
+            code_points_parts = code_points_text.split('..', 1)
             property_ = EmojiCharProperty(property_text)
-            # Add to container
-            for code in code_range:
+            for code in range(int(code_points_parts[0], 16), 1 + int(code_points_parts[-1], 16)):
                 try:
-                    obj = cls[code]
+                    obj = cls[code]  # type: EmojiCharacter
                 except KeyError:
-                    cls[code] = cls(code, property_)
+                    cls[code] = cls(code, property_)  # type: EmojiCharacter
                 else:
-                    if property_ not in obj._properties:
-                        obj._properties.append(property_)
+                    obj.add_property(property_)
+        cls._initial = True
+
+    @classmethod
+    def is_emoji_char(cls, char: str) -> bool:
+        if len(char) != 1:
+            raise ValueError('Length of char string should be 1')
+        code = ord(char)
+        return code not in IGNORE_CODES and code in cls
+
+    @classmethod
+    def is_emoji_code(cls, code: int) -> bool:
+        return code not in IGNORE_CODES and code in cls
+
+    @classmethod
+    def is_emoji_hex(cls, hex_str: str) -> bool:
+        code = int(hex_str, 16)
+        return code not in IGNORE_CODES and code in cls
+
+    def add_property(self, val: EmojiCharProperty):
+        if val not in self._properties:
+            self._properties.append(val)
 
     @property
     def code(self) -> int:
@@ -235,19 +247,3 @@ class EmojiCharacter(metaclass=_MetaClass):
             When Charactor code not found
         """
         return cls[int(val, 16)]
-
-    @classmethod
-    def is_emoji_char(cls, char: str) -> bool:
-        if len(char) != 1:
-            raise ValueError('Length of char string should be 1')
-        code = ord(char)
-        return code not in IGNORE_CODES and code in cls
-
-    @classmethod
-    def is_emoji_code(cls, code: int) -> bool:
-        return code not in IGNORE_CODES and code in cls
-
-    @classmethod
-    def is_emoji_hex(cls, hex_str: str) -> bool:
-        code = int(hex_str, 16)
-        return code not in IGNORE_CODES and code in cls

@@ -31,11 +31,7 @@ setup(
         'setuptools_scm',
         'setuptools_scm_git_archive',
     ],
-
-    install_requires=[
-        'six',
-    ],
-
+    install_requires=[],
     tests_require=[
         'pytest',
     ],

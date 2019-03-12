@@ -6,11 +6,7 @@
 
 ---
 
-A very simple small library, it does:
-
-- Load [unicode][] [emoji][] from data file defined in <http://unicode.org/Public/emoji/>.
-- A class holding the data, and representing [emoji][] characters.
-- Regular Express for [emoji][] characters
+A library represents [emoji][] sequences and characters from the data files listed in [Unicode][]® Technical Standard #51([UNICODE EMOJI](http://www.unicode.org/reports/tr51/>))
 
 ---
 
