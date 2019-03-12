@@ -6,6 +6,7 @@ from pkg_resources import Requirement, resource_stream
 
 from . import version
 from .character import EmojiCharacter
+from .utils import BaseDictContainer, preproc_line_data
 
 __all__ = ['EmojiSequence']
 
@@ -20,29 +21,8 @@ ZWJ_SEQUENCES_DATAFILE_STREAM = resource_stream(
 )
 
 
-class _MetaClass(type):
-    def __new__(mcs, name, bases, attrs):
-        mcs._data = dict()
-        return super().__new__(mcs, name, bases, attrs)
-
-    def __setitem__(self, key, value):  # pylint: disable=C0203
-        self._data[key] = value
-
-    def __delitem__(self, key):  # pylint: disable=C0203
-        del self._data[key]
-
-    def __getitem__(self, key):  # pylint: disable=C0203
-        return self._data[key]
-
-    def __contains__(self, key):  # pylint: disable=C0203
-        return key in self._data
-
-    def __iter__(self):  # pylint: disable=bad-mcs-method-argument
-        for k, v in self._data.items():  # pylint: disable=invalid-name
-            yield k, v
-
-    def __len__(self):  # pylint: disable=C0203
-        return len(self._data)
+class _MetaClass(BaseDictContainer):
+    pass
 
 
 class EmojiSequence(metaclass=_MetaClass):
@@ -90,26 +70,22 @@ class EmojiSequence(metaclass=_MetaClass):
         if cls._initialed:
             return
         EmojiCharacter.initial()
-        for ss in SEQUENCES_DATAFILE_STREAM, ZWJ_SEQUENCES_DATAFILE_STREAM:
-            for byte_string in ss:  # type: bytes
-                byte_string = byte_string.strip()
-                if not byte_string:
+        for fp in SEQUENCES_DATAFILE_STREAM, ZWJ_SEQUENCES_DATAFILE_STREAM:
+            for data in fp:  # type: bytes
+                line = preproc_line_data(data)
+                if not line:
                     continue
-                if byte_string[0] in b'#;':
-                    continue
-                line = byte_string.decode('utf-8')  # type: str
-                line = line.split('#', 1)[0].strip()
                 code_points, type_field, description = (part.strip() for part in line.split(';', 2))
                 # codes ...
                 code_points_parts = code_points.split('..', 1)  # begin..end form
                 if len(code_points_parts) > 1:
                     for code in range(int(code_points_parts[0], 16), 1 + int(code_points_parts[1], 16)):
                         inst = cls(EmojiCharacter.from_code(code), type_field, description)
-                        cls[inst._string] = inst
+                        cls[inst.string] = inst
                 else:
                     chars = (EmojiCharacter.from_code(code) for code in (int(s, 16) for s in code_points.split()))
                     inst = cls(chars, type_field, description)
-                    cls[inst._string] = inst
+                    cls[inst.string] = inst
         # build regex
         seqs = sorted((m for _, m in cls), key=lambda x: len(x.codes), reverse=True)  # type: List[EmojiSequence]
         exp = r'|'.join(m.regex for m in seqs)

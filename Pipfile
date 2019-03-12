@@ -5,12 +5,12 @@ verify_ssl = true
 
 [dev-packages]
 emoji-data = {editable = true,path = "."}
+pytest = "*"
 pylint = "*"
 autopep8 = "*"
-twine = "*"
-sphinx = "*"
-pytest = "*"
 jupyter = "*"
+sphinx = "*"
+twine = "*"
 
 [packages]
 

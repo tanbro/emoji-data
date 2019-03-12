@@ -3,6 +3,7 @@ from enum import Enum
 from typing import Union, List, Iterable
 
 from pkg_resources import Requirement, resource_stream
+from .utils import BaseDictContainer, preproc_line_data
 
 from . import version
 
@@ -33,29 +34,8 @@ class EmojiCharProperty(Enum):
     EXTPICT = 'Extended_Pictographic'
 
 
-class _MetaClass(type):
-    def __new__(mcs, name, bases, attrs):
-        mcs._data = {}
-        return super().__new__(mcs, name, bases, attrs)
-
-    def __setitem__(self, key, value):  # pylint: disable=C0203
-        self._data[key] = value
-
-    def __delitem__(self, key):  # pylint: disable=C0203
-        del self._data[key]
-
-    def __getitem__(self, key):  # pylint: disable=C0203
-        return self._data[key]
-
-    def __contains__(self, key):  # pylint: disable=C0203
-        return key in self._data
-
-    def __iter__(self):  # pylint: disable=bad-mcs-method-argument
-        for k, v in self._data.items():  # pylint: disable=invalid-name
-            yield k, v
-
-    def __len__(self):  # pylint: disable=C0203
-        return len(self._data)
+class _MetaClass(BaseDictContainer):
+    pass
 
 
 class EmojiCharacter(metaclass=_MetaClass):
@@ -99,14 +79,10 @@ class EmojiCharacter(metaclass=_MetaClass):
         """
         if cls._initial:
             return
-        for byte_string in DATAFILE_STREAM:  # type: bytes
-            byte_string = byte_string.strip()
-            if not byte_string:
+        for data in DATAFILE_STREAM:  # type: bytes
+            line = preproc_line_data(data)
+            if not line:
                 continue
-            if byte_string[0] in b'#;':
-                continue
-            line = byte_string.decode('utf-8')  # type: str
-            line = line.split('#', 1)[0].strip()
             code_points_text, property_text = (part.strip() for part in line.split(';', 1))
             code_points_parts = code_points_text.split('..', 1)
             property_ = EmojiCharProperty(property_text)
