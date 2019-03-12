@@ -72,12 +72,12 @@ class EmojiCharacter(metaclass=_MetaClass):
             self._regex = r'\U{:08X}'.format(code)
         else:
             self._regex = r'\u{:04X}'.format(code)
-        if properties is None:
-            self._properties = list()
-        elif isinstance(properties, EmojiCharProperty):
-            self._properties = [EmojiCharProperty]
-        elif isinstance(properties, t.Iterable):
-            self._properties = list(properties)
+        self._properties = list()  # type: t.List[EmojiCharProperty]
+        if properties is not None:
+            if isinstance(properties, t.Iterable):
+                self._properties = list(properties)
+            else:
+                self._properties = [properties]
 
     def __str__(self):
         return self.string
