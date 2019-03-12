@@ -34,9 +34,9 @@ class EmojiCharProperty(Enum):
 
 
 class _MetaClass(type):
-    def __new__(cls, name, bases, atts):
-        cls._data = {}
-        return super().__new__(cls, name, bases, atts)
+    def __new__(mcs, name, bases, attrs):
+        mcs._data = {}
+        return super().__new__(mcs, name, bases, attrs)
 
     def __setitem__(self, key, value):  # pylint: disable=C0203
         self._data[key] = value
