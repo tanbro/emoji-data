@@ -2,8 +2,14 @@
 
 ## developing
 
+- New
+  - Emoji Sequence data and new `EmojiSequece` class
+
+- Change:
+  - Rename `EmojiData` class to `EmojiCharacter`
+
 - Upgrade:
-  - Update emoji data file to 12.0
+  - Update emoji data files to 12.0
 
 ## 0.1.2
 

@@ -1,8 +1,6 @@
-"""Characters properties for Emoji
-"""
 import os
-import typing as t
 from enum import Enum
+from typing import Union, List, Iterable
 
 from pkg_resources import Requirement, resource_stream
 
@@ -61,20 +59,20 @@ class _MetaClass(type):
 
 
 class EmojiCharacter(metaclass=_MetaClass):
-    def __init__(self, code: int, properties: t.Union[t.List[EmojiCharProperty], EmojiCharProperty] = None):
-        """Emoji character with properties listed in the Emoji Character Properties table
+    """emoji character — A character that has the Emoji property. These characters are recommended for use as emoji.
 
-        :param code: Integer value(code-point) of the Emoji Unicode.
-        :param properties: Properties of the Emoji Character.
-        """
+    see: http://www.unicode.org/reports/tr51/#Emoji_Characters
+    """
+
+    def __init__(self, code: int, properties: Union[List[EmojiCharProperty], EmojiCharProperty] = None):
         self._code = code
         if code > 0xffff:
             self._regex = r'\U{:08X}'.format(code)
         else:
             self._regex = r'\u{:04X}'.format(code)
-        self._properties = list()  # type: t.List[EmojiCharProperty]
+        self._properties = list()  # type: List[EmojiCharProperty]
         if properties is not None:
-            if isinstance(properties, t.Iterable):
+            if isinstance(properties, Iterable):
                 self._properties = list(properties)
             else:
                 self._properties = [properties]
@@ -93,6 +91,12 @@ class EmojiCharacter(metaclass=_MetaClass):
 
     @classmethod
     def initial(cls):
+        """Initial the class
+
+        Load Emoji Characters and there properties from package data file into class internal dictionary
+
+        .. note:: **MUST** call this before other operations on the class
+        """
         if cls._initial:
             return
         for byte_string in DATAFILE_STREAM:  # type: bytes
@@ -117,6 +121,12 @@ class EmojiCharacter(metaclass=_MetaClass):
 
     @classmethod
     def is_emoji_char(cls, char: str) -> bool:
+        """Check if emoji character
+
+        :param str char: character to check
+        :return: Whether if emoji character
+        :rtype: bool
+        """
         if len(char) != 1:
             raise ValueError('Length of char string should be 1')
         code = ord(char)
@@ -124,10 +134,22 @@ class EmojiCharacter(metaclass=_MetaClass):
 
     @classmethod
     def is_emoji_code(cls, code: int) -> bool:
+        """Check if an unicode integer value emoji character
+
+        :param int code: code to check
+        :return: Whether if emoji character
+        :rtype: bool
+        """
         return code not in IGNORE_CODES and code in cls
 
     @classmethod
     def is_emoji_hex(cls, hex_str: str) -> bool:
+        """Check if an unicode integer hex express emoji character
+
+        :param str hex_str: hex code to check
+        :return: Whether if emoji character
+        :rtype: bool
+        """
         code = int(hex_str, 16)
         return code not in IGNORE_CODES and code in cls
 
@@ -137,113 +159,73 @@ class EmojiCharacter(metaclass=_MetaClass):
 
     @property
     def code(self) -> int:
-        """
-        Returns
-        -------
-        int
-            Unicode integer value of the Emoji
+        """Unicode integer value of the Emoji
+
+        :type: int
         """
         return self._code
 
     @property
-    def properties(self) -> t.List[EmojiCharProperty]:
-        """
-        Returns
-        -------
-        str
-            Property description text of the Emoji
+    def properties(self) -> List[EmojiCharProperty]:
+        """Property description text of the Emoji
+
+        :type: List[EmojiCharProperty]
         """
         return self._properties
 
     @property
-    def regex(self):
-        """
-        Returns
-        -------
-        str
-            Regular express for the Emoji
+    def regex(self) -> str:
+        """Regular express for the Emoji
+
+        :type: str
         """
         return self._regex
 
     @property
     def hex(self) -> str:
-        """
-        Returns
-        -------
-        str
-            Hex style text of the Emoji's Unicode
+        """Hex style text of the Emoji's Unicode
+
+        :type: str
         """
         return hex(self._code)
 
     @property
     def string(self) -> str:
-        """
-        Returns
-        -------
-        str
-            Emoji character
+        """Emoji character string
+
+        :type: string
         """
         return chr(self._code)
 
     @classmethod
     def from_code(cls, val):  # type: (int)->EmojiCharacter
-        """Return a :class:`EmojiChar` object by Emoji Unicode's integer value
+        """Get an :class:`EmojiCharacter` instance by Emoji Unicode's integer value
 
-        Parameters
-        ----------
-        val : int
-            Integer value of the Emoji's Unicode
-
-        Returns
-        -------
-        EmojiCharacter
-            Object returned
-
-        Raises
-        ------
-        KeyError
-            When integer code not found
+        :param int val: Integer value of the Emoji's Unicode
+        :return: Instance returned from the class's internal dictionary
+        :rtype: EmojiCharacter
+        :raises KeyError: When integer code not found in the class' internal dictionary
         """
         return cls[val]
 
     @classmethod
     def from_char(cls, val):  # type: (str)->EmojiCharacter
-        """Return a :class:`EmojiChar` object by Emoji Unicode character
+        """Get an :class:`EmojiCharacter` instance by Emoji Unicode character
 
-        Parameters
-        ----------
-        val : str
-            Emoji character
-
-        Returns
-        -------
-        EmojiCharacter
-            Object returned
-
-        Raises
-        ------
-        KeyError
-            When Charactor code not found
+        :param val: Emoji character
+        :return: Instance returned from the class's internal dictionary
+        :rtype: EmojiCharacter
+        :raises KeyError: When character not found in the class' internal dictionary
         """
         return cls[ord(val)]
 
     @classmethod
     def from_hex(cls, val):  # type: (str)->EmojiCharacter
-        """Return a :class:`EmojiChar` object by Emoji Unicode's HEX text
+        """Get an :class:`EmojiCharacter` instance by Emoji Unicode's HEX string
 
-        Parameters
-        ----------
-        val : str
-            Emoji Unicode's HEX
-
-        Returns
-        -------
-        EmojiCharacter
-            Object returned
-
-        Raises
-        ------
-        KeyError
-            When Charactor code not found
+        :param val: Emoji Unicode's HEX
+        :return: Instance returned from the class's internal dictionary
+        :rtype: EmojiCharacter
+        :raises KeyError: When code not found in the class' internal dictionary
         """
         return cls[int(val, 16)]
