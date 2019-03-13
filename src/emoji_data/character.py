@@ -3,9 +3,9 @@ from enum import Enum
 from typing import Union, List, Iterable
 
 from pkg_resources import Requirement, resource_stream
-from .utils import BaseDictContainer, preproc_line_data
 
 from . import version
+from .utils import BaseDictContainer, read_data_file_stream_iterable
 
 __all__ = ['EmojiCharProperty', 'EmojiCharacter', 'TEXT_PRESENTATION_SELECTOR', 'EMOJI_PRESENTATION_SELECTOR']
 
@@ -48,12 +48,12 @@ class EmojiCharacter(metaclass=_MetaClass):
     see: http://www.unicode.org/reports/tr51/#Emoji_Characters
     """
 
-    def __init__(self, code: int, properties: Union[List[EmojiCharProperty], EmojiCharProperty] = None):
-        self._code = code
-        if code > 0xffff:
-            self._regex = r'\U{:08X}'.format(code)
+    def __init__(self, codepoint: int, properties: Union[List[EmojiCharProperty], EmojiCharProperty] = None):
+        self._codepoint = codepoint
+        if codepoint > 0xffff:
+            self._regex = r'\U{:08X}'.format(codepoint)
         else:
-            self._regex = r'\u{:04X}'.format(code)
+            self._regex = r'\u{:04X}'.format(codepoint)
         self._properties = list()  # type: List[EmojiCharProperty]
         if properties is not None:
             if isinstance(properties, Iterable):
@@ -83,23 +83,22 @@ class EmojiCharacter(metaclass=_MetaClass):
         """
         if cls._initial:
             return
-        for data in DATAFILE_STREAM:  # type: bytes
-            line = preproc_line_data(data)
+        for line in read_data_file_stream_iterable(DATAFILE_STREAM):  # type: str
             if not line:
                 continue
-            code_points_text, property_text = (part.strip() for part in line.split(';', 1))
-            code_points_parts = code_points_text.split('..', 1)
+            cps, property_text = (part.strip() for part in line.split(';', 1))
+            cps_parts = cps.split('..', 1)
             property_ = EmojiCharProperty(property_text)
-            for code in range(int(code_points_parts[0], 16), 1 + int(code_points_parts[-1], 16)):
+            for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):  # pylint:disable=invalid-name
                 try:
-                    inst = cls[code]  # type: EmojiCharacter
+                    inst = cls[cp]  # type: EmojiCharacter
                 except KeyError:
-                    cls[code] = cls(code, property_)  # type: EmojiCharacter
+                    cls[cp] = cls(cp, property_)  # type: EmojiCharacter
                 else:
                     inst.add_property(property_)
-        for code in TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR:
-            if code not in cls:
-                cls[code] = cls(code)
+        for cp in TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR:  # pylint:disable=invalid-name
+            if cp not in cls:
+                cls[cp] = cls(cp)
         cls._initial = True
 
     @classmethod
@@ -141,12 +140,12 @@ class EmojiCharacter(metaclass=_MetaClass):
             self._properties.append(val)
 
     @property
-    def code(self) -> int:
+    def codepoint(self) -> int:
         """Unicode integer value of the Emoji
 
         :type: int
         """
-        return self._code
+        return self._codepoint
 
     @property
     def properties(self) -> List[EmojiCharProperty]:
@@ -170,7 +169,7 @@ class EmojiCharacter(metaclass=_MetaClass):
 
         :type: str
         """
-        return hex(self._code)
+        return hex(self._codepoint)
 
     @property
     def string(self) -> str:
@@ -178,10 +177,10 @@ class EmojiCharacter(metaclass=_MetaClass):
 
         :type: string
         """
-        return chr(self._code)
+        return chr(self._codepoint)
 
     @classmethod
-    def from_code(cls, val):  # type: (int)->EmojiCharacter
+    def from_codepoint(cls, val):  # type: (int)->EmojiCharacter
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode's integer value
 
         :param int val: Integer value of the Emoji's Unicode

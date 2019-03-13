@@ -15,7 +15,7 @@ class SequenceTestCase(unittest.TestCase):
     def test_code_points(self):
         for code_points, qualified_type in self.test_data:
             if qualified_type == 'fully-qualified':
-                EmojiSequence.from_codes(code_points)
+                EmojiSequence.from_codepoints(code_points)
 
 
 if __name__ == '__main__':

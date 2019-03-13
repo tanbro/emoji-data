@@ -1,4 +1,5 @@
 import os
+from typing import BinaryIO, Iterator
 
 from pkg_resources import Requirement, resource_stream
 
@@ -11,15 +12,21 @@ TEST_DATAFILE_STREAM = resource_stream(
 )
 
 
+def read_data_file_stream_iterable(handle: BinaryIO) -> Iterator[str]:
+    for line_bytes in handle:
+        line_text = ''
+        line_bytes = line_bytes.strip()
+        if line_bytes:
+            if line_bytes[0] not in b'#;':
+                line_text = line_bytes.decode('utf-8').split('#', 1)[0].strip()
+        yield line_text
+
+
 def reload_test_data():
     result = []
     TEST_DATAFILE_STREAM.seek(0)
-    for line in TEST_DATAFILE_STREAM:
-        line = line.strip()
+    for line in read_data_file_stream_iterable(TEST_DATAFILE_STREAM):
         if not line:
-            continue
-        line = line.decode('utf-8')
-        if line[0] in ('#', ';'):
             continue
         line = line.split('#', 1)[0].strip()
         code_points, qualified_type = (part.strip() for part in line.split(';', 1))
@@ -28,15 +35,6 @@ def reload_test_data():
             qualified_type
         ))
     return result
-
-
-def preproc_line_data(data: bytes) -> str:
-    data = data.strip()
-    if not data:
-        return ''
-    if data[0] in b'#;':
-        return ''
-    return data.decode('utf-8').split('#', 1)[0].strip()
 
 
 class BaseDictContainer(type):
