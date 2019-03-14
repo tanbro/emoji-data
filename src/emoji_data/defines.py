@@ -8,6 +8,14 @@ from .character import (EmojiCharacter, EmojiCharProperty, TEXT_PRESENTATION_SEL
                         REGIONAL_INDICATORS, TAGS, EMOJI_KEYCAP, ZWJ)
 from .utils import code_point_to_regex
 
+__all__ = ['patterns', 'is_default_emoji_presentation_character', 'is_default_text_presentation_character',
+           'is_emoji_character', 'is_emoji_core_sequence', 'is_emoji_flag_sequence', 'is_emoji_keycap_sequence',
+           'is_emoji_modifier', 'is_emoji_modifier_base', 'is_emoji_modifier_sequence',
+           'is_emoji_presentation_selector', 'is_emoji_presentation_sequence', 'is_emoji_sequence',
+           'is_emoji_tag_sequence', 'is_emoji_zwj_element', 'is_emoji_zwj_sequence', 'is_regional_indicator',
+           'is_tag_base', 'is_tag_spec', 'is_tag_term', 'is_text_presentation_selector',
+           'is_text_presentation_sequence']
+
 emoji_character = r'[{0}]'.format(''.join(m.regex for m in EmojiCharacter))
 
 default_emoji_presentation_character = r'[{0}]'.format(
