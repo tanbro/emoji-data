@@ -6,10 +6,10 @@ from pkg_resources import Requirement, resource_stream
 
 from . import version
 from .types import BaseDictContainer
-from .utils import read_data_file_iterable
+from .utils import read_data_file_iterable, code_point_to_regex
 
 __all__ = ['EmojiCharProperty', 'EmojiCharacter', 'TEXT_PRESENTATION_SELECTOR', 'EMOJI_PRESENTATION_SELECTOR',
-           'EMOJI_KEYCAP', 'IGNORE_CODE_POINTS']
+           'EMOJI_KEYCAP', 'REGIONAL_INDICATORS', 'TAGS', 'ZWJ', 'IGNORE_CODE_POINTS']
 
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
 DATAFILE_STREAM = resource_stream(
@@ -20,6 +20,10 @@ DATAFILE_STREAM = resource_stream(
 TEXT_PRESENTATION_SELECTOR = 0xFE0E
 EMOJI_PRESENTATION_SELECTOR = 0xFE0F
 EMOJI_KEYCAP = 0x20E3
+ZWJ = 0x200D
+
+REGIONAL_INDICATORS = list(range(0x1F1E6, 0x1F1FF + 1))
+TAGS = list(range(0xE0020, 0xE007F + 1))
 
 IGNORE_CODE_POINTS = [
                          0x0023,  # 1.1  [1] (#️)       number sign
@@ -56,10 +60,8 @@ class EmojiCharacter(metaclass=_MetaClass):
                  comments: Union[List[str], str] = None,
                  ):
         self._code_point = code_point
-        if code_point > 0xffff:
-            self._regex = r'\U{:08X}'.format(code_point)
-        else:
-            self._regex = r'\u{:04X}'.format(code_point)
+        self._string = chr(self._code_point)
+        self._regex = code_point_to_regex(code_point)
         #
         self._properties = list()  # type: List[EmojiCharProperty]
         if properties is not None:
@@ -76,7 +78,7 @@ class EmojiCharacter(metaclass=_MetaClass):
                 self._comments = [comments]
 
     def __str__(self):
-        return self.string
+        return self._string
 
     def __repr__(self):
         return '<{} hex={} char={!r}>'.format(
@@ -116,24 +118,6 @@ class EmojiCharacter(metaclass=_MetaClass):
                 cls[cp] = cls(cp)
         # OK!
         cls._initial = True
-
-    @classmethod
-    def is_emoji_character(cls, val: Union[str, int]) -> bool:
-        """Check if a **single** character belong to Emoji characters
-
-        :param str val: character to check. Could be a single string, hex string, or integer
-        :return: Whether if emoji character
-        :rtype: bool
-        """
-        if isinstance(val, str):
-            val = val.strip()
-            if len(val) < 2:
-                cp = ord(val)
-            else:
-                cp = int(val, 16)
-        else:
-            cp = int(val)
-        return cp not in IGNORE_CODE_POINTS and cp in cls
 
     def add_property(self, val: EmojiCharProperty):
         if val not in self._properties:
@@ -187,12 +171,12 @@ class EmojiCharacter(metaclass=_MetaClass):
     def string(self) -> str:
         """Emoji character string
 
-        :type: string
+        :type: str
         """
-        return chr(self._code_point)
+        return self._string
 
     @classmethod
-    def from_single_string(cls, value):  # type: (str)->EmojiCharacter
+    def from_string(cls, value):  # type: (str)->EmojiCharacter
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode character
 
         :param value: Emoji character
@@ -215,3 +199,6 @@ class EmojiCharacter(metaclass=_MetaClass):
             return cls[value]
         else:
             return cls[int(value, 16)]
+
+
+EmojiCharacter.initial()

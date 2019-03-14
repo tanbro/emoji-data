@@ -38,3 +38,10 @@ def reload_test_data():
             qualified_type
         ))
     return result
+
+
+def code_point_to_regex(code_point: int) -> str:
+    if code_point > 0xffff:
+        return r'\U{:08X}'.format(code_point)
+    else:
+        return r'\u{:04X}'.format(code_point)

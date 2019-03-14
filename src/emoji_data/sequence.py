@@ -263,3 +263,6 @@ class EmojiSequence(metaclass=_MetaClass):
         :type: List[int]
         """
         return self._code_points
+
+
+EmojiSequence.initial()
