@@ -3,6 +3,14 @@
 ## developing
 
 - New
+  - Include `emoji-variations-sequences.txt`
+  - unqualified Emoji in regex pattern
+
+## 0.1.3
+
+- Date: 2019-01-12
+
+- New
   - Importing Emoji Sequence data and new `EmojiSequence` class
 
 - Change:
