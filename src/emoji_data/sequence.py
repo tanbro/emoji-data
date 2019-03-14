@@ -5,7 +5,8 @@ from typing import Union, List, Iterable
 from pkg_resources import Requirement, resource_stream
 
 from . import version
-from .character import EmojiCharacter
+from .character import EmojiCharacter, TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP, \
+    IGNORE_CODE_POINTS
 from .types import BaseDictContainer
 from .utils import read_data_file_iterable
 
@@ -17,6 +18,8 @@ DATA_FILE_HANDLES = [
     resource_stream(Requirement.parse(PACKAGE), os.path.join(*(PACKAGE.split('.') + ['data', s])))
     for s in ('emoji-zwj-sequences.txt', 'emoji-sequences.txt', 'emoji-variation-sequences.txt')
 ]
+
+REGEX_KEYCAP = re.compile(r'^[0-9#*]\uFE0F\u20E3$')
 
 
 class _MetaClass(BaseDictContainer):
@@ -31,6 +34,7 @@ class EmojiSequence(metaclass=_MetaClass):
 
     def __init__(self,
                  code_points: Union[Iterable[int], int],
+                 qualified: bool,
                  type_field: str = '',
                  description: str = '',
                  comment: str = ''):
@@ -38,6 +42,7 @@ class EmojiSequence(metaclass=_MetaClass):
             self._code_points = list(code_points)
         else:
             self._code_points = [code_points]
+        self._qualified = qualified
         self._string = ''.join(chr(n) for n in self._code_points)
         self._characters = [EmojiCharacter.from_hex(n) for n in self._code_points]
         self._type_field = type_field.strip()
@@ -92,16 +97,32 @@ class EmojiSequence(metaclass=_MetaClass):
                 cps_parts = cps.split('..', 1)  # begin..end form
                 if len(cps_parts) > 1:  # A range of single char emoji-seq
                     for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[1], 16)):  # pylint:disable=invalid-name
-                        inst = cls(cp, type_field, description, comment)
+                        inst = cls(cp, True, type_field, description, comment)  # type: EmojiSequence
                         if inst.string not in cls:
                             cls[inst.string] = inst
                 else:
                     code_points = [int(cp, 16) for cp in cps.split()]
-                    inst = cls(code_points, type_field, description, comment)
-                    if inst.string not in cls:
-                        cls[inst.string] = inst
+                    inst = cls(code_points, True, type_field, description, comment)
+                    text = inst.string
+                    if text not in cls:
+                        cls[text] = inst
+                    # Emoji=Seq ends with emoji/text selector could avoid those, if other parts is not *#1-9
+                    if code_points[-1] in (TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR):
+                        trimmed_code_points = code_points[:-1]
+                        if not all(n in IGNORE_CODE_POINTS for n in trimmed_code_points):
+                            # Add another new EmojiSequence !!!
+                            inst = cls(trimmed_code_points, False, type_field, description,
+                                       comment)  # type: EmojiSequence
+                            if inst.string not in cls:
+                                cls[inst.string] = inst
+                    # emoji keycap sequence — A sequence of the following form: [0-9#*] \x{FE0F 20E3}
+                    elif re.match(REGEX_KEYCAP, text):
+                        trimmed_code_points = [code_points[0], EMOJI_KEYCAP]
+                        inst = cls(trimmed_code_points, False, type_field, description, comment)  # type: EmojiSequence
+                        if inst.string not in cls:
+                            cls[inst.string] = inst
         # build regex
-        seqs = sorted((m for _, m in cls), key=lambda x: len(x.codepoints), reverse=True)  # type: List[EmojiSequence]
+        seqs = sorted((m for _, m in cls), key=lambda x: len(x.code_points), reverse=True)  # type: List[EmojiSequence]
         exp = r'|'.join(m.regex for m in seqs)
         pat = re.compile(exp)
         cls.pattern = pat
@@ -124,7 +145,8 @@ class EmojiSequence(metaclass=_MetaClass):
         try:
             return cls[text]
         except KeyError:
-            raise KeyError('[{}]({!r})'.format(' '.join(hex(ord(c)).upper() for c in text), text))
+            code_points_text = ' '.join('{:04X}'.format(ord(c)) for c in text)
+            raise KeyError('[{}]({!r})'.format(code_points_text, text))
 
     @classmethod
     def from_characters(cls, characters):  # type: (Iterable[EmojiCharacter])->EmojiSequence
@@ -139,31 +161,19 @@ class EmojiSequence(metaclass=_MetaClass):
         return cls.from_text(text)
 
     @classmethod
-    def from_codepoints(cls, values):  # type: (Iterable[int])->EmojiSequence
-        """Get an :class:`EmojiSequence` instance by a list of unicode integer value
-
-        :param Iterable[int] values: List of code points
-        :return: Instance returned from the class's internal dictionary
-        :rtype: EmojiSequence
-        :raises KeyError: When passed-in value not found in the class' internal dictionary
-        """
-        text = ''.join(EmojiCharacter.from_hex(m).string for m in values)
-        return cls.from_text(text)
-
-    @classmethod
     def from_hex(cls, *args):  # type: (Union[str, int, Iterable[str], Iterable[int]])->EmojiSequence
         """Get an :class:`EmojiSequence` instance by a **space separated** unicode hex string
 
         :param Union[str, Iterable[str]] args: Hex string(s)
 
-            *. When ONLY ONE args passed in, it could be:
-              *. A **space separated** hex string
-              *. A single unicode code-point integer
-              *. An iterable object with single unicode's hex string as it's members
-              *. An iterable object with single unicode's code-point integer as it's members
-            *. When MORE THAN ONE args passed in, every member of args could be:
-              *. A single unicode's hex string
-              *. A single unicode's integer value
+            - When ONLY ONE args passed in, it could be:
+              - one or more code points in hex format string, separated by spaces
+              - one code point integer
+              - An iterable object whose members are code point in hex format string
+              - An iterable object whose members are code point integer
+            - When MORE THAN ONE args passed in, every member of args could be:
+              - one code point in hex format string
+              - one code point integer
 
         :return: Instance returned from the class's internal dictionary
         :rtype: EmojiSequence
@@ -185,7 +195,27 @@ class EmojiSequence(metaclass=_MetaClass):
         return cls.from_characters(EmojiCharacter.from_hex(m) for m in args)
 
     @property
+    def qualified(self):
+        """ If it'a fully-qualified emoji
+
+        :type: bool
+        """
+        return self._qualified
+
+    @property
     def type_field(self):
+        """A convenience for parsing the emoji sequence files, and is not intended to be maintained as a property.
+
+        one of the following:
+
+        - `Basic_Emoji`
+        - `Emoji_Keycap_Sequence`
+        - `Emoji_Flag_Sequence`
+        - `Emoji_Tag_Sequence`
+        - `Emoji_Modifier_Sequence`
+
+        :type: str
+        """
         return self._type_field
 
     @property
@@ -227,7 +257,7 @@ class EmojiSequence(metaclass=_MetaClass):
         return self._regex_compiled
 
     @property
-    def codepoints(self) -> List[int]:
+    def code_points(self) -> List[int]:
         """List of unicode integer value of the characters who make up Emoji Sequence
 
         :type: List[int]

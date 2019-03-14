@@ -6,6 +6,9 @@
   - Include `emoji-variations-sequences.txt`
   - unqualified Emoji in regex pattern
 
+- Change
+  - Re-structure and re-name in many places
+
 ## 0.1.3
 
 - Date: 2019-01-12

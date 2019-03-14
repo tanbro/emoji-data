@@ -9,7 +9,7 @@ from .types import BaseDictContainer
 from .utils import read_data_file_iterable
 
 __all__ = ['EmojiCharProperty', 'EmojiCharacter', 'TEXT_PRESENTATION_SELECTOR', 'EMOJI_PRESENTATION_SELECTOR',
-           'EMOJI_KEYCAP']
+           'EMOJI_KEYCAP', 'IGNORE_CODE_POINTS']
 
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
 DATAFILE_STREAM = resource_stream(
@@ -21,10 +21,10 @@ TEXT_PRESENTATION_SELECTOR = 0xFE0E
 EMOJI_PRESENTATION_SELECTOR = 0xFE0F
 EMOJI_KEYCAP = 0x20E3
 
-IGNORE_CODES = [
-                   0x0023,  # 1.1  [1] (#️)       number sign
-                   0x002A,  # 1.1  [1] (*️)       asterisk
-               ] + list(range(0x0030, 0x0039 + 1))  # 1.1 [10] (0️..9️)    digit zero..digit nine
+IGNORE_CODE_POINTS = [
+                         0x0023,  # 1.1  [1] (#️)       number sign
+                         0x002A,  # 1.1  [1] (*️)       asterisk
+                     ] + list(range(0x0030, 0x0039 + 1))  # 1.1 [10] (0️..9️)    digit zero..digit nine
 
 
 class EmojiCharProperty(Enum):
@@ -114,6 +114,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         for cp in TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP:  # pylint:disable=invalid-name
             if cp not in cls:
                 cls[cp] = cls(cp)
+        # OK!
         cls._initial = True
 
     @classmethod
@@ -132,7 +133,7 @@ class EmojiCharacter(metaclass=_MetaClass):
                 cp = int(val, 16)
         else:
             cp = int(val)
-        return cp not in IGNORE_CODES and cp in cls
+        return cp not in IGNORE_CODE_POINTS and cp in cls
 
     def add_property(self, val: EmojiCharProperty):
         if val not in self._properties:
