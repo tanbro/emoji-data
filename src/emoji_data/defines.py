@@ -16,18 +16,18 @@ __all__ = ['patterns', 'is_default_emoji_presentation_character', 'is_default_te
            'is_tag_base', 'is_tag_spec', 'is_tag_term', 'is_text_presentation_selector',
            'is_text_presentation_sequence']
 
-emoji_character = r'[{0}]'.format(''.join(m.regex for m in EmojiCharacter))
+emoji_character = r'[{0}]'.format(''.join(m.regex for _, m in EmojiCharacter))
 
 default_emoji_presentation_character = r'[{0}]'.format(
     ''.join(
-        m.regex for m in EmojiCharacter
+        m.regex for _, m in EmojiCharacter
         if EmojiCharProperty.EPRES in m.properties
     )
 )
 
 default_text_presentation_character = r'[{0}]'.format(
     ''.join(
-        m.regex for m in EmojiCharacter
+        m.regex for _, m in EmojiCharacter
         if EmojiCharProperty.EPRES not in m.properties
     )
 )
@@ -42,29 +42,31 @@ emoji_presentation_sequence = r'({0}{1})'.format(emoji_character, emoji_presenta
 
 emoji_modifier = r'[{0}]'.format(
     ''.join(
-        m.regex for m in EmojiCharacter
+        m.regex for _, m in EmojiCharacter
         if EmojiCharProperty.EMOD in m.properties
     )
 )
 
 emoji_modifier_base = r'[{0}]'.format(
     ''.join(
-        m.regex for m in EmojiCharacter
+        m.regex for _, m in EmojiCharacter
         if EmojiCharProperty.EBASE in m.properties
     )
 )
 
 emoji_modifier_sequence = r'({}{})'.format(emoji_modifier_base, emoji_modifier)
 
-regional_indicator = r'[{0[0]}-{0[-1]}]'.format([code_point_to_regex(n) for n in REGIONAL_INDICATORS[0]])
+regional_indicator = r'[{}-{}]'.format(
+    *(code_point_to_regex(n) for n in (REGIONAL_INDICATORS[0], REGIONAL_INDICATORS[-1]))
+)
 
 emoji_flag_sequence = r'({0}{0})'.format(regional_indicator)
 
 tag_base = r'({}|{}|{})'.format(emoji_character, emoji_modifier_sequence, emoji_presentation_sequence)
 
-tag_spec = r'[{0[0]}-{0[-2]}]'.format([code_point_to_regex(n) for n in TAGS[0]])
+tag_spec = r'[{}-{}]'.format(*(code_point_to_regex(n) for n in (TAGS[0], TAGS[-2])))
 
-tag_term = r'{0[-1]}'.format([code_point_to_regex(n) for n in TAGS[0]])
+tag_term = r'{}'.format(code_point_to_regex(TAGS[-1]))
 
 emoji_tag_sequence = r'({}{}{})'.format(tag_base, tag_spec, tag_term)
 
