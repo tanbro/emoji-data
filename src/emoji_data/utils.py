@@ -1,43 +1,47 @@
 import os
-from typing import BinaryIO, Iterator, Tuple
+from typing import Iterable, Tuple, Union, TextIO
 
-from pkg_resources import Requirement, resource_stream
+from pkg_resources import Requirement, resource_filename
 
 from emoji_data import version
 
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
-TEST_DATAFILE_STREAM = resource_stream(
+DATAFILE_TEST = resource_filename(
     Requirement.parse(PACKAGE),
     os.path.join(*(PACKAGE.split('.') + ['data', 'emoji-test.txt']))
 )
 
 
-def read_data_file_iterable(handle: BinaryIO) -> Iterator[Tuple[str, str]]:
-    for line_bytes in handle:
-        content = ''
-        comment = ''
-        line_bytes = line_bytes.strip()
-        if line_bytes:
-            if line_bytes[0] not in b'#;':
-                parts = [s.strip() for s in line_bytes.decode('utf-8').split('#', 1)]
-                content = parts[0]
-                if len(parts):
-                    comment = parts[1]
+def read_data_file_iterable(handle: TextIO) -> Iterable[Tuple[str, str]]:
+    for line in handle:
+        content = comment = ''
+        line = line.strip()
+        if not line:
+            continue
+        if line[0] in '#;':
+            continue
+        parts = [s.strip() for s in line.split('#', 1)]
+        content = parts[0]
+        if not content:
+            continue
+        try:
+            comment = parts[1]
+        except IndexError:
+            pass
         yield content, comment
 
 
-def reload_test_data():
-    result = []
-    TEST_DATAFILE_STREAM.seek(0)
-    for content, _ in read_data_file_iterable(TEST_DATAFILE_STREAM):
-        if not content:
-            continue
-        code_points, qualified_type = (part.strip() for part in content.split(';', 1))
-        result.append((
-            [int(s, 16) for s in code_points.split()],
-            qualified_type
-        ))
-    return result
+def code_points_to_string(code_points: Union[int, str, Iterable[int], Iterable[str]]) -> str:
+    if isinstance(code_points, str):
+        return ''.join(chr(int(s, 16)) for s in code_points.split())
+    if isinstance(code_points, int):
+        return chr(code_points)
+    if isinstance(code_points, Iterable):
+        if all(isinstance(m, str) for m in code_points):
+            return ''.join(chr(int(s, 16)) for s in code_points)
+        if all(isinstance(m, int) for m in code_points):
+            return ''.join(chr(n) for n in code_points)
+    raise TypeError('Type of argument `code_points` is invalid.')
 
 
 def code_point_to_regex(code_point: int) -> str:

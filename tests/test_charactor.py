@@ -1,7 +1,15 @@
+import os
 import unittest
 
-from emoji_data.character import EmojiCharacter
-from emoji_data.utils import reload_test_data
+from pkg_resources import Requirement, resource_filename
+
+from emoji_data import EmojiCharacter, is_emoji_character, code_points_to_string
+from emoji_data.utils import read_data_file_iterable
+
+DATAFILE_TEST = resource_filename(
+    Requirement.parse('emoji_data'),
+    os.path.join('emoji_data', 'data', 'emoji-test.txt')
+)
 
 
 class CharacterTestCase(unittest.TestCase):
@@ -9,13 +17,14 @@ class CharacterTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.test_data = reload_test_data()
-        EmojiCharacter.initial()
+        with open(DATAFILE_TEST) as fp:
+            for content, _ in read_data_file_iterable(fp):
+                cls.test_data.append([s.strip() for s in content.split(';', 1)])
 
     def test_code_points(self):
         for code_points, _ in self.test_data:
-            for code in code_points:
-                self.assertTrue(code in EmojiCharacter)
+            s = code_points_to_string(code_points)
+            self.assertTrue(all(is_emoji_character(c) for c in s))
 
 
 if __name__ == '__main__':

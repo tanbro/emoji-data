@@ -1,18 +1,18 @@
 import os
 from enum import Enum
-from typing import Union, List, Iterable
+from typing import Iterable, List, Union
 
-from pkg_resources import Requirement, resource_stream
+from pkg_resources import Requirement, resource_filename
 
 from . import version
 from .types import BaseDictContainer
-from .utils import read_data_file_iterable, code_point_to_regex
+from .utils import code_point_to_regex, read_data_file_iterable
 
 __all__ = ['EmojiCharProperty', 'EmojiCharacter', 'TEXT_PRESENTATION_SELECTOR', 'EMOJI_PRESENTATION_SELECTOR',
            'EMOJI_KEYCAP', 'REGIONAL_INDICATORS', 'TAGS', 'ZWJ', 'IGNORE_CODE_POINTS']
 
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
-DATAFILE_STREAM = resource_stream(
+DATA_FILE = resource_filename(
     Requirement.parse(PACKAGE),
     os.path.join(*(PACKAGE.split('.') + ['data', 'emoji-data.txt']))
 )
@@ -26,9 +26,9 @@ REGIONAL_INDICATORS = list(range(0x1F1E6, 0x1F1FF + 1))
 TAGS = list(range(0xE0020, 0xE007F + 1))
 
 IGNORE_CODE_POINTS = [
-                         0x0023,  # 1.1  [1] (#️)       number sign
-                         0x002A,  # 1.1  [1] (*️)       asterisk
-                     ] + list(range(0x0030, 0x0039 + 1))  # 1.1 [10] (0️..9️)    digit zero..digit nine
+    0x0023,  # 1.1  [1] (#️)       number sign
+    0x002A,  # 1.1  [1] (*️)       asterisk
+] + list(range(0x0030, 0x0039 + 1))  # 1.1 [10] (0️..9️)    digit zero..digit nine
 
 
 class EmojiCharProperty(Enum):
@@ -99,23 +99,22 @@ class EmojiCharacter(metaclass=_MetaClass):
         """
         if cls._initial:
             return
-        for content, comment in read_data_file_iterable(DATAFILE_STREAM):
-            if not content:
-                continue
-            cps, property_text = (part.strip() for part in content.split(';', 1))
-            cps_parts = cps.split('..', 1)
-            property_ = EmojiCharProperty(property_text)
-            for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):  # pylint:disable=invalid-name
-                try:
-                    inst = cls[cp]  # type: EmojiCharacter
-                except KeyError:
-                    cls[cp] = cls(cp, property_, comment)  # type: EmojiCharacter
-                else:
-                    inst.add_property(property_)
-                    inst.add_comment(comment)
-        for cp in TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP:  # pylint:disable=invalid-name
-            if cp not in cls:
-                cls[cp] = cls(cp)
+        with open(DATA_FILE, encoding='utf-8') as fp:
+            for content, comment in read_data_file_iterable(fp):
+                cps, property_text = (part.strip() for part in content.split(';', 1))
+                cps_parts = cps.split('..', 1)
+                property_ = EmojiCharProperty(property_text)
+                for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):  # pylint:disable=invalid-name
+                    try:
+                        inst = cls[cp]  # type: EmojiCharacter
+                    except KeyError:
+                        cls[cp] = cls(cp, property_, comment)  # type: EmojiCharacter
+                    else:
+                        inst.add_property(property_)
+                        inst.add_comment(comment)
+            for cp in TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP:  # pylint:disable=invalid-name
+                if cp not in cls:
+                    cls[cp] = cls(cp)
         # OK!
         cls._initial = True
 

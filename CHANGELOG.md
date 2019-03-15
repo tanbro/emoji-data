@@ -3,11 +3,13 @@
 ## developing
 
 - New
+  - Load emojis from `emoji-test.txt`
   - Include `emoji-variations-sequences.txt`
-  - unqualified Emoji in regex pattern
+  - `defines` module: many regular expresses according to <http://www.unicode.org/reports/tr51/#Definitions>
 
 - Change
-  - Re-structure and re-name in many places
+  - Many renamings
+  - Some modifications of test-case
 
 ## 0.1.3
 
