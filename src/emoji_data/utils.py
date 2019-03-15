@@ -1,5 +1,5 @@
 import os
-from typing import Iterable, Tuple, Union, TextIO
+from typing import Iterable, TextIO, Tuple, Union
 
 from pkg_resources import Requirement, resource_filename
 
@@ -47,5 +47,4 @@ def code_points_to_string(code_points: Union[int, str, Iterable[int], Iterable[s
 def code_point_to_regex(code_point: int) -> str:
     if code_point > 0xffff:
         return r'\U{:08X}'.format(code_point)
-    else:
-        return r'\u{:04X}'.format(code_point)
+    return r'\u{:04X}'.format(code_point)

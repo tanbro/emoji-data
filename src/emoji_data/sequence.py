@@ -33,7 +33,7 @@ class _MetaClass(BaseDictContainer):
     pass
 
 
-class EmojiSequence(metaclass=_MetaClass):
+class EmojiSequence(metaclass=_MetaClass):  # pylint: disable=too-many-instance-attributes,too-many-arguments
     """Emoji and Text Presentation Sequences used to represent emoji
 
     see: http://www.unicode.org/reports/tr51/#Emoji_Variation_Sequences
@@ -79,7 +79,7 @@ class EmojiSequence(metaclass=_MetaClass):
     """
 
     @classmethod
-    def initial(cls):
+    def initial(cls):  # pylint:disable=too-many-locals
         """Initial the class
 
         Load Emoji Characters and there properties, the sequences from package data file into class internal dictionary

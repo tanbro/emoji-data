@@ -196,8 +196,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         """
         if isinstance(value, int):
             return cls[value]
-        else:
-            return cls[int(value, 16)]
+        return cls[int(value, 16)]
 
 
 EmojiCharacter.initial()
