@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## developing
+## 0.1.4
 
 - New
   - Load emojis from `emoji-test.txt`
