@@ -1,12 +1,11 @@
 import os
 import re
-from typing import Union, List, Iterable
+from typing import Dict, Iterable, List, Union
 
-from pkg_resources import Requirement, resource_stream
+from pkg_resources import Requirement, resource_filename
 
 from . import version
-from .character import EmojiCharacter, TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP, \
-    IGNORE_CODE_POINTS
+from .character import EmojiCharacter
 from .types import BaseDictContainer
 from .utils import read_data_file_iterable
 
@@ -14,19 +13,27 @@ __all__ = ['EmojiSequence']
 
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
 
-DATA_FILE_HANDLES = [
-    resource_stream(Requirement.parse(PACKAGE), os.path.join(*(PACKAGE.split('.') + ['data', s])))
-    for s in ('emoji-zwj-sequences.txt', 'emoji-sequences.txt', 'emoji-variation-sequences.txt')
-]
 
-REGEX_KEYCAP = re.compile(r'^[0-9#*]\uFE0F\u20E3$')
+def _data_file_name(name):
+    return resource_filename(
+        Requirement.parse(PACKAGE),
+        os.path.join(*(PACKAGE.split('.') + ['data', name]))
+    )
+
+
+DATA_FILES = {
+    'zwj-sequences': _data_file_name('emoji-zwj-sequences.txt'),
+    'sequences': _data_file_name('emoji-sequences.txt'),
+    'variation-sequences': _data_file_name('emoji-variation-sequences.txt'),
+    'test': _data_file_name('emoji-test.txt')
+}  # type: Dict[str, str]
 
 
 class _MetaClass(BaseDictContainer):
     pass
 
 
-class EmojiSequence(metaclass=_MetaClass):
+class EmojiSequence(metaclass=_MetaClass):  # pylint: disable=too-many-instance-attributes,too-many-arguments
     """Emoji and Text Presentation Sequences used to represent emoji
 
     see: http://www.unicode.org/reports/tr51/#Emoji_Variation_Sequences
@@ -34,7 +41,7 @@ class EmojiSequence(metaclass=_MetaClass):
 
     def __init__(self,
                  code_points: Union[Iterable[int], int],
-                 qualified: bool,
+                 status: str = '',
                  type_field: str = '',
                  description: str = '',
                  comment: str = ''):
@@ -42,7 +49,7 @@ class EmojiSequence(metaclass=_MetaClass):
             self._code_points = list(code_points)
         else:
             self._code_points = [code_points]
-        self._qualified = qualified
+        self._status = status.strip()
         self._string = ''.join(chr(n) for n in self._code_points)
         self._characters = [EmojiCharacter.from_hex(n) for n in self._code_points]
         self._type_field = type_field.strip()
@@ -50,14 +57,6 @@ class EmojiSequence(metaclass=_MetaClass):
         self._description = description
         # regex
         self._regex = r''
-        # TODO: S(SelectorKeycap|Selector)?
-        # 这样的形式： [数字*#] + selector + keycap, 此时 seq, seq + selector 都是合理的 unqualified 格式！
-        # if self._codepoints[-1] in (EMOJI_PRESENTATION_SELECTOR, TEXT_PRESENTATION_SELECTOR):
-        #     if not all(not EmojiCharacter.is_emoji_character(cp) for cp in self._codepoints[:-1]):
-        #         self._regex = r'{}({})?'.format(
-        #             ''.join(m.regex for m in self._characters[:-1]),
-        #             self._characters[-1].regex
-        #         )
         if not self._regex:
             self._regex = ''.join(m.regex for m in self._characters)
         self._regex_compiled = re.compile(self._regex)
@@ -66,10 +65,12 @@ class EmojiSequence(metaclass=_MetaClass):
         return self._string
 
     def __repr__(self):
-        return '<{} codes={} text={!r}>'.format(
-            type(self).__name__,
-            self._code_points,
+        return '<{} code_points={!r} status={!r}, string={!r}, description={!r}>'.format(
+            type(self).__qualname__,
+            ' '.join('{:04X}'.format(n) for n in self._code_points),
+            self._status,
             self._string,
+            self._description
         )
 
     _initialed = False
@@ -78,7 +79,7 @@ class EmojiSequence(metaclass=_MetaClass):
     """
 
     @classmethod
-    def initial(cls):
+    def initial(cls):  # pylint:disable=too-many-locals
         """Initial the class
 
         Load Emoji Characters and there properties, the sequences from package data file into class internal dictionary
@@ -88,39 +89,37 @@ class EmojiSequence(metaclass=_MetaClass):
         if cls._initialed:
             return
         EmojiCharacter.initial()
-        for file_index, handle in enumerate(DATA_FILE_HANDLES):
-            for content, comment in read_data_file_iterable(handle):
-                if not content:
-                    continue
-                cps, type_field, description = (part.strip() for part in content.split(';', 2))
-                # codes ...
-                cps_parts = cps.split('..', 1)  # begin..end form
-                if len(cps_parts) > 1:  # A range of single char emoji-seq
-                    for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[1], 16)):  # pylint:disable=invalid-name
-                        inst = cls(cp, True, type_field, description, comment)  # type: EmojiSequence
-                        if inst.string not in cls:
-                            cls[inst.string] = inst
-                else:
-                    code_points = [int(cp, 16) for cp in cps.split()]
-                    inst = cls(code_points, True, type_field, description, comment)
-                    text = inst.string
-                    if text not in cls:
-                        cls[text] = inst
-                    # Emoji=Seq ends with emoji/text selector could avoid those, if other parts is not *#1-9
-                    if code_points[-1] in (TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR):
-                        trimmed_code_points = code_points[:-1]
-                        if not all(n in IGNORE_CODE_POINTS for n in trimmed_code_points):
-                            # Add another new EmojiSequence !!!
-                            inst = cls(trimmed_code_points, False, type_field, description,
-                                       comment)  # type: EmojiSequence
-                            if inst.string not in cls:
-                                cls[inst.string] = inst
-                    # emoji keycap sequence — A sequence of the following form: [0-9#*] \x{FE0F 20E3}
-                    elif re.match(REGEX_KEYCAP, text):
-                        trimmed_code_points = [code_points[0], EMOJI_KEYCAP]
-                        inst = cls(trimmed_code_points, False, type_field, description, comment)  # type: EmojiSequence
-                        if inst.string not in cls:
-                            cls[inst.string] = inst
+        for data_name, data_file in DATA_FILES.items():
+            with open(data_file, encoding='utf-8') as fp:
+                for content, comment in read_data_file_iterable(fp):
+                    if data_name == 'test':
+                        cps, status = (part.strip() for part in content.split(';', 1))
+                        code_points = [int(cp, 16) for cp in cps.split()]
+                        inst = cls(code_points, status=status, comment=comment)
+                        s = inst.string
+                        try:
+                            existed_inst = cls[s]
+                        except KeyError:
+                            cls[s] = inst
+                        else:
+                            existed_inst.status = status
+                    else:
+                        cps, type_field, description = (part.strip() for part in content.split(';', 2))
+                        # codes ...
+                        try:
+                            cp_head, cp_tail = cps.split('..', 1)  # begin..end form
+                        except ValueError:
+                            code_points = [int(cp, 16) for cp in cps.split()]
+                            inst = cls(code_points, type_field, '', description, comment)  # type: EmojiSequence
+                            text = inst.string
+                            if text not in cls:
+                                cls[text] = inst
+                        else:
+                            # A range of single char emoji-seq
+                            for cp in range(int(cp_head, 16), 1 + int(cp_tail, 16)):  # pylint:disable=invalid-name
+                                inst = cls(cp, type_field, '', description, comment)  # type: EmojiSequence
+                                if inst.string not in cls:
+                                    cls[inst.string] = inst
         # build regex
         seqs = sorted((m for _, m in cls), key=lambda x: len(x.code_points), reverse=True)  # type: List[EmojiSequence]
         exp = r'|'.join(m.regex for m in seqs)
@@ -195,14 +194,6 @@ class EmojiSequence(metaclass=_MetaClass):
         return cls.from_characters(EmojiCharacter.from_hex(m) for m in args)
 
     @property
-    def qualified(self):
-        """ If it'a fully-qualified emoji
-
-        :type: bool
-        """
-        return self._qualified
-
-    @property
     def type_field(self):
         """A convenience for parsing the emoji sequence files, and is not intended to be maintained as a property.
 
@@ -225,6 +216,14 @@ class EmojiSequence(metaclass=_MetaClass):
     @property
     def comment(self):
         return self._comment
+
+    @property
+    def status(self):
+        return self._status
+
+    @status.setter
+    def status(self, value):
+        self._status = value
 
     @property
     def characters(self) -> List[EmojiCharacter]:
@@ -263,3 +262,6 @@ class EmojiSequence(metaclass=_MetaClass):
         :type: List[int]
         """
         return self._code_points
+
+
+EmojiSequence.initial()
