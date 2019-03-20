@@ -49,10 +49,10 @@ jobs:
     <<: *tests_steps
 
   deploy:
-    docker: circleci/python
+    docker:
+      - image: circleci/python
     <<: *deploy_steps
 
-      - image:
 workflows:
   version: 2
   test-and-deploy: # name of your workflow
