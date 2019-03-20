@@ -64,5 +64,3 @@ workflows:
           filters:
             tags:
               only: /^(\d+(\.\d+)*)+(\.?(a|b|c|dev|alpha|beta|rc|preview|post)(\d+(\.\d+)*)+)?$/
-            branches:
-              ignore: /.*/

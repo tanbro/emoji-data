@@ -2,6 +2,7 @@ version.py
 *.lock
 cc-test-reporter
 /test-reports/
+.fuse_hidden*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
