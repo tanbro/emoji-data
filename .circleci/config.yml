@@ -64,6 +64,5 @@ workflows:
           filters:
             tags:
               only: /^(\d+(\.\d+)*)+(\.?(a|b|c|alpha|beta|rc|preview|post)(\d+(\.\d+)*)+)?$/
-            branchs:
+            branches:
               only: /^master$/
-
