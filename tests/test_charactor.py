@@ -3,7 +3,7 @@ import unittest
 
 from pkg_resources import Requirement, resource_filename
 
-from emoji_data import EmojiCharacter, is_emoji_character, code_points_to_string
+from emoji_data import code_points_to_string, is_emoji_character
 from emoji_data.utils import read_data_file_iterable
 
 DATAFILE_TEST = resource_filename(

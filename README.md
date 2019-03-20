@@ -6,15 +6,15 @@
 
 ---
 
-A library represents [emoji][] sequences and characters from the data files listed in [Unicode][]® Technical Standard #51([UNICODE EMOJI](http://www.unicode.org/reports/tr51/>))
+A library represents emoji sequences and characters in [Unicode® Technical Standard #51 Data Files](http://www.unicode.org/reports/tr51/#Data_Files_Table)
 
 ## How to use
 
-Examples below also in a [notebook](notebooks/example.ipynb)
+Examples below are also in a [notebook](notebooks/example.ipynb)
 
 Class `EmojiSequence` is most useful:
 
-### Iterate print Emojis
+### Iterate Emojis
 
 ```python
 from emoji_data import EmojiSequence
@@ -35,7 +35,7 @@ Output:
      <EmojiSequence code_points='1F468 200D 1F467' status='fully-qualified', string='👨\u200d👧', description='family: man, girl'>,
      ...]
 
-### Check if hex list represents an Emoji
+### Convert HEX to Emoji
 
 ```python
 from emoji_data import EmojiSequence
@@ -87,7 +87,7 @@ Output:
     True
     True
 
-### Search Emojis inside texts
+### Search Emojis in text
 
 ```python
 from emoji_data import EmojiSequence

@@ -3,10 +3,10 @@ import unittest
 
 from pkg_resources import Requirement, resource_filename
 
-from emoji_data import (EmojiSequence, QualifiedType, detect_qualified,
-                        is_emoji_character, is_emoji_flag_sequence,
-                        is_emoji_keycap_sequence, is_emoji_modifier_sequence,
-                        code_points_to_string)
+from emoji_data import (EmojiSequence, QualifiedType, code_points_to_string,
+                        detect_qualified, is_emoji_character,
+                        is_emoji_flag_sequence, is_emoji_keycap_sequence,
+                        is_emoji_modifier_sequence)
 from emoji_data.utils import read_data_file_iterable
 
 DATAFILE_TEST = resource_filename(

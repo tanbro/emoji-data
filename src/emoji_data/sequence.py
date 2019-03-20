@@ -14,7 +14,7 @@ __all__ = ['EmojiSequence']
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
 
 
-def _data_file_name(name):
+def _get_data_file_name(name):
     return resource_filename(
         Requirement.parse(PACKAGE),
         os.path.join(*(PACKAGE.split('.') + ['data', name]))
@@ -22,10 +22,10 @@ def _data_file_name(name):
 
 
 DATA_FILES = {
-    'zwj-sequences': _data_file_name('emoji-zwj-sequences.txt'),
-    'sequences': _data_file_name('emoji-sequences.txt'),
-    'variation-sequences': _data_file_name('emoji-variation-sequences.txt'),
-    'test': _data_file_name('emoji-test.txt')
+    'zwj-sequences': _get_data_file_name('emoji-zwj-sequences.txt'),
+    'sequences': _get_data_file_name('emoji-sequences.txt'),
+    'variation-sequences': _get_data_file_name('emoji-variation-sequences.txt'),
+    'test': _get_data_file_name('emoji-test.txt')
 }  # type: Dict[str, str]
 
 
@@ -82,9 +82,7 @@ class EmojiSequence(metaclass=_MetaClass):  # pylint: disable=too-many-instance-
     def initial(cls):  # pylint:disable=too-many-locals
         """Initial the class
 
-        Load Emoji Characters and there properties, the sequences from package data file into class internal dictionary
-
-        .. note:: **MUST** call this before other operations on the class
+        Load Emoji Sequences from package data file into class internal dictionary
         """
         if cls._initialed:
             return
@@ -132,11 +130,11 @@ class EmojiSequence(metaclass=_MetaClass):  # pylint: disable=too-many-instance-
     def from_text(cls, text):  # type: (str)->EmojiSequence
         """Get an :class:`EmojiSequence` instance by text
 
-        :param text: Pass-in text
-        :return: Instance returned from the class's internal dictionary
+        :param str text: Emoji string
+        :return: Instance from internal dictionary
         :rtype: EmojiSequence
         :raises RuntimeError: When non-emoji character in text
-        :raises KeyError: When passed-in value not found in the class' internal dictionary
+        :raises KeyError: When passed-in value not found in internal dictionary
         """
         text = text.strip()
         if not all(ord(s) in EmojiCharacter for s in text):
@@ -151,26 +149,29 @@ class EmojiSequence(metaclass=_MetaClass):  # pylint: disable=too-many-instance-
     def from_characters(cls, characters):  # type: (Iterable[EmojiCharacter])->EmojiSequence
         """Get an :class:`EmojiSequence` instance by :class:`EmojiCharacter` object or list
 
-        :param Iterable[EmojiCharacter] characters: Pass-in object or list/iterable
-        :return: Instance returned from the class's internal dictionary
+        :param Iterable[EmojiCharacter] characters: Single or iterable object of :class:`EmojiCharacter`, composing the sequence
+        :return: Instance from internal dictionary
         :rtype: EmojiSequence
-        :raises KeyError: When passed-in value not found in the class' internal dictionary
+        :raises KeyError: When passed-in value not found in internal dictionary
         """
         text = ''.join(m.string for m in characters)
         return cls.from_text(text)
 
     @classmethod
     def from_hex(cls, *args):  # type: (Union[str, int, Iterable[str], Iterable[int]])->EmojiSequence
-        """Get an :class:`EmojiSequence` instance by a **space separated** unicode hex string
+        """Get an :class:`EmojiSequence` instance by unicode code point(s)
 
-        :param Union[str, Iterable[str]] args: Hex string(s)
+        :param Union[str,Iterable[str]] args: Hex string(s)
 
             - When ONLY ONE args passed in, it could be:
+
               - one or more code points in hex format string, separated by spaces
               - one code point integer
               - An iterable object whose members are code point in hex format string
               - An iterable object whose members are code point integer
+
             - When MORE THAN ONE args passed in, every member of args could be:
+
               - one code point in hex format string
               - one code point integer
 

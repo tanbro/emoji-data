@@ -12,6 +12,7 @@ __all__ = ['EmojiCharProperty', 'EmojiCharacter', 'TEXT_PRESENTATION_SELECTOR', 
            'EMOJI_KEYCAP', 'REGIONAL_INDICATORS', 'TAGS', 'ZWJ']
 
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
+
 DATA_FILE = resource_filename(
     Requirement.parse(PACKAGE),
     os.path.join(*(PACKAGE.split('.') + ['data', 'emoji-data.txt']))
@@ -21,7 +22,6 @@ TEXT_PRESENTATION_SELECTOR = 0xFE0E
 EMOJI_PRESENTATION_SELECTOR = 0xFE0F
 EMOJI_KEYCAP = 0x20E3
 ZWJ = 0x200D
-
 REGIONAL_INDICATORS = list(range(0x1F1E6, 0x1F1FF + 1))
 TAGS = list(range(0xE0020, 0xE007F + 1))
 
@@ -88,9 +88,7 @@ class EmojiCharacter(metaclass=_MetaClass):
     def initial(cls):
         """Initial the class
 
-        Load Emoji Characters and there properties from package data file into class internal dictionary
-
-        .. note:: **MUST** call this before other operations on the class
+        Load Emoji Characters and it's properties from package data file into class internal dictionary
         """
         if cls._initial:
             return
@@ -181,15 +179,15 @@ class EmojiCharacter(metaclass=_MetaClass):
         return cls[ord(value)]
 
     @classmethod
-    def from_hex(cls, value):  # type: (Union[int, str, bytes])->EmojiCharacter
+    def from_hex(cls, value):  # type: (Union[int, str])->EmojiCharacter
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode integer value or it's hex string
 
-        :param value: Emoji Unicode, either integer value or hex string
+        :param Union[int, str] value: Emoji Unicode, either integer value or hex string
         :return: Instance returned from the class's internal dictionary
         :rtype: EmojiCharacter
         :raises KeyError: When code not found in the class' internal dictionary
         """
-        if isinstance(value, (str, bytes)):
+        if isinstance(value, str):
             return cls[int(value, 16)]
         return cls[int(value)]
 

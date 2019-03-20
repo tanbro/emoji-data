@@ -13,7 +13,7 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
 
-    description='emoji-data from Unicode® Emoji',
+    description='A library represents emoji sequences and characters in Unicode® Technical Standard #51 Data Files',
     url='https://github.com/tanbro/emoji-data',
     author='liu xue yan',
     author_email='liu_xue_yan@foxmail.com',
@@ -32,9 +32,7 @@ setup(
         'setuptools_scm_git_archive',
     ],
     install_requires=[],
-    tests_require=[
-        'pytest',
-    ],
+    tests_require=['pytest'],
     test_suite='tests',
 
     python_requires='>3.4',
@@ -45,12 +43,12 @@ setup(
 
     classifiers=[
         'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
-        # Specify the Python versions you support here. In particular, ensure
-        # that you indicate whether you support Python 2, Python 3 or both.
+        'Topic :: Text Processing :: Unicode :: Emoji',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
 )
