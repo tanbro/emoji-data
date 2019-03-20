@@ -27,13 +27,10 @@ setup(
         'write_to': 'src/emoji_data/version.py',
     },
     setup_requires=[
-        'pytest-runner',
         'setuptools_scm',
         'setuptools_scm_git_archive',
     ],
     install_requires=[],
-    tests_require=['pytest'],
-    test_suite='tests',
 
     python_requires='>3.4',
 

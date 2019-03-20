@@ -27,13 +27,6 @@ references:
             coverage run --source=src setup.py test
             # upload test report to Code Climate using `after-build`
             ./cc-test-reporter after-build --coverage-input-type coverage.py --exit-code $?
-      - store_test_results:
-          path: test-reports
-      - run:
-          name: Upload coverage xml file to codacy
-          command: |
-            coverage xml --include=src/*.py
-            python-codacy-coverage -r coverage.xml
 
   deploy_steps: &deploy_steps
     steps:
