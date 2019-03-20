@@ -9,7 +9,7 @@ from .types import BaseDictContainer
 from .utils import code_point_to_regex, read_data_file_iterable
 
 __all__ = ['EmojiCharProperty', 'EmojiCharacter', 'TEXT_PRESENTATION_SELECTOR', 'EMOJI_PRESENTATION_SELECTOR',
-           'EMOJI_KEYCAP', 'REGIONAL_INDICATORS', 'TAGS', 'ZWJ', 'IGNORE_CODE_POINTS']
+           'EMOJI_KEYCAP', 'REGIONAL_INDICATORS', 'TAGS', 'ZWJ']
 
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
 DATA_FILE = resource_filename(
@@ -24,11 +24,6 @@ ZWJ = 0x200D
 
 REGIONAL_INDICATORS = list(range(0x1F1E6, 0x1F1FF + 1))
 TAGS = list(range(0xE0020, 0xE007F + 1))
-
-IGNORE_CODE_POINTS = [
-    0x0023,  # 1.1  [1] (#️)       number sign
-    0x002A,  # 1.1  [1] (*️)       asterisk
-] + list(range(0x0030, 0x0039 + 1))  # 1.1 [10] (0️..9️)    digit zero..digit nine
 
 
 class EmojiCharProperty(Enum):
@@ -178,7 +173,7 @@ class EmojiCharacter(metaclass=_MetaClass):
     def from_string(cls, value):  # type: (str)->EmojiCharacter
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode character
 
-        :param value: Emoji character
+        :param str value: Emoji character
         :return: Instance returned from the class's internal dictionary
         :rtype: EmojiCharacter
         :raises KeyError: When character not found in the class' internal dictionary
@@ -186,7 +181,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         return cls[ord(value)]
 
     @classmethod
-    def from_hex(cls, value):  # type: (Union[int, str])->EmojiCharacter
+    def from_hex(cls, value):  # type: (Union[int, str, bytes])->EmojiCharacter
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode integer value or it's hex string
 
         :param value: Emoji Unicode, either integer value or hex string
@@ -194,9 +189,9 @@ class EmojiCharacter(metaclass=_MetaClass):
         :rtype: EmojiCharacter
         :raises KeyError: When code not found in the class' internal dictionary
         """
-        if isinstance(value, int):
-            return cls[value]
-        return cls[int(value, 16)]
+        if isinstance(value, (str, bytes)):
+            return cls[int(value, 16)]
+        return cls[int(value)]
 
 
 EmojiCharacter.initial()

@@ -199,11 +199,11 @@ class EmojiSequence(metaclass=_MetaClass):  # pylint: disable=too-many-instance-
 
         one of the following:
 
-        - `Basic_Emoji`
-        - `Emoji_Keycap_Sequence`
-        - `Emoji_Flag_Sequence`
-        - `Emoji_Tag_Sequence`
-        - `Emoji_Modifier_Sequence`
+        - `"Basic_Emoji"`
+        - `"Emoji_Keycap_Sequence"`
+        - `"Emoji_Flag_Sequence"`
+        - `"Emoji_Tag_Sequence"`
+        - `"Emoji_Modifier_Sequence"`
 
         :type: str
         """
