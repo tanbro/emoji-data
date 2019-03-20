@@ -25,6 +25,8 @@ references:
             ./cc-test-reporter before-build
             # run unit test cases with coverage
             coverage run --source=src setup.py test
+            # generate an XML report of coverage results
+            coverage xml
             # upload test report to Code Climate using `after-build`
             ./cc-test-reporter after-build --coverage-input-type coverage.py --exit-code $?
 
