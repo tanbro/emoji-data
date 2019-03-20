@@ -1,8 +1,12 @@
 # emoji-data
 
 [![CircleCI](https://circleci.com/gh/tanbro/emoji-data.svg?style=svg)](https://circleci.com/gh/tanbro/emoji-data)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c37877dfc4184233917fec36a827c47c)](https://app.codacy.com/app/tanbro/emoji-data?utm_source=github.com&utm_medium=referral&utm_content=tanbro/emoji-data&utm_campaign=Badge_Grade_Dashboard)
 [![Documentation Status](https://readthedocs.org/projects/emoji-data/badge/?version=latest)](https://emoji-data.readthedocs.io/en/latest/?badge=latest)
+[![PyPI](https://img.shields.io/pypi/v/emoji-data.svg)](https://pypi.org/project/emoji-data/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/emoji-data.svg)](https://pypi.org/project/emoji-data/)
+[![PyPI - Format](https://img.shields.io/pypi/format/emoji-data.svg)](https://pypi.org/project/emoji-data/)
+[![Maintainability](https://api.codeclimate.com/v1/badges/cf25d6c557b7f7924cab/maintainability)](https://codeclimate.com/github/tanbro/emoji-data/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/cf25d6c557b7f7924cab/test_coverage)](https://codeclimate.com/github/tanbro/emoji-data/test_coverage)
 
 ---
 

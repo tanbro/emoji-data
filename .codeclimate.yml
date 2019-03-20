@@ -1,0 +1,6 @@
+plugins:
+  markdownlint:
+    enabled: true
+  bandit:
+    enabled: true
+
