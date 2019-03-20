@@ -10,22 +10,22 @@ references:
     steps:
       - checkout
       - run:
-          name: Install additional pip dependencies
+          name: Setup dependencies
           command: sudo pip install coverage
       - run:
           name: Setup Code Climate test-reporter
           command: |
-          # download test reporter as a static binary
+            # download test reporter as a static binary
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
       - run:
           name: Run tests
           command: |
-          # notify Code Climate of a pending test report using `before-build`
+            # notify Code Climate of a pending test report using `before-build`
             ./cc-test-reporter before-build
-          # run unit test cases with coverage
+            # run unit test cases with coverage
             coverage run --source=src setup.py test
-          # upload test report to Code Climate using `after-build`
+            # upload test report to Code Climate using `after-build`
             ./cc-test-reporter after-build --coverage-input-type coverage.py --exit-code $?
       - store_test_results:
           path: test-reports
