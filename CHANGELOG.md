@@ -2,7 +2,17 @@
 
 ## 0.1.5
 
-Developing ...
+Developing..
+
+- Change:
+  - Rename module `defines` to `definitions`
+
+- Misc
+  - Replace Codacy with CodeClimate
+  - Fix Circle CI deployment problem
+
+- Unit test:
+  - Drop `pytest`, now use `unittest` in stdlib
 
 ## 0.1.4
 
