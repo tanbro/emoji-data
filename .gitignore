@@ -1,5 +1,6 @@
 version.py
 *.lock
+cc-test-reporter
 /test-reports/
 
 # Byte-compiled / optimized / DLL files
