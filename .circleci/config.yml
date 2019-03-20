@@ -57,7 +57,7 @@ workflows:
   version: 2
   test-and-deploy: # name of your workflow
     jobs:
-      - test:
+      - test
       - deploy:
           requires:
             - test
