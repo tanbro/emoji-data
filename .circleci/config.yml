@@ -10,7 +10,7 @@ references:
     steps:
       - checkout
       - run:
-          name: Setup dependencies
+          name: Setup dependencies of test
           command: sudo pip install coverage
       - run:
           name: Setup Code Climate test-reporter
@@ -34,7 +34,7 @@ references:
     steps:
       - checkout
       - run:
-          name: Install additional pip dependencies
+          name: Setup dependencies of deployment
           command: sudo pip install wheel twine
       - run:
           name: Build and upload dist
@@ -43,7 +43,7 @@ references:
             twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*
 
 jobs:
-  test-python3:
+  test:
     docker:
       - image: circleci/python:3
     <<: *tests_steps
@@ -57,10 +57,13 @@ workflows:
   version: 2
   test-and-deploy: # name of your workflow
     jobs:
-      - test-python3
+      - test
       - deploy:
           requires:
-            - test-python3
+            - test
           filters:
             tags:
-              only: /^(\d+(\.\d+)*)+(\.?(a|b|c|dev|alpha|beta|rc|preview|post)(\d+(\.\d+)*)+)?$/
+              only: /^(\d+(\.\d+)*)+(\.?(a|b|c|alpha|beta|rc|preview|post)(\d+(\.\d+)*)+)?$/
+            branchs:
+              only: /^master$/
+
