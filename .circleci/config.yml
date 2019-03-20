@@ -58,9 +58,6 @@ workflows:
   test-and-deploy: # name of your workflow
     jobs:
       - test:
-        filters:
-          tags:
-            only: /.*/
       - deploy:
           requires:
             - test
