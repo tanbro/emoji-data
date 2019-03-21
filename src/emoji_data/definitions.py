@@ -27,103 +27,125 @@ class QualifiedType(Enum):
     UNQUALIFIED = 'unqualified'
 
 
-RX_EMOJI_CHARACTER = r'[{0}]'.format(''.join(m.regex for _, m in EmojiCharacter))
+_RE = dict()
 
-RX_DEFAULT_EMOJI_PRESENTATION_CHARACTER = r'[{0}]'.format(
-    ''.join(
-        m.regex for _, m in EmojiCharacter
-        if EmojiCharProperty.EPRES in m.properties
-    )
-)
+_RE.update({'RE_EMOJI_CHARACTER': r'[' + ''.join(m.regex for _, m in EmojiCharacter) + r']'})
 
-RX_DEFAULT_TEXT_PRESENTATION_CHARACTER = r'[{0}]'.format(
-    ''.join(
-        m.regex for _, m in EmojiCharacter
-        if EmojiCharProperty.EPRES not in m.properties
-    )
-)
+_RE.update({
+    'RE_DEFAULT_EMOJI_PRESENTATION_CHARACTER':
+        r'['
+        + ''.join(
+            m.regex for _, m in EmojiCharacter
+            if EmojiCharProperty.EPRES in m.properties
+        )
+        + r']'
+})
 
-RX_TEXT_PRESENTATION_SELECTOR = r'{0}'.format(code_point_to_regex(TEXT_PRESENTATION_SELECTOR))
+_RE.update({
+    'RE_DEFAULT_TEXT_PRESENTATION_CHARACTER':
+        r'['
+        + ''.join(
+            m.regex for _, m in EmojiCharacter
+            if EmojiCharProperty.EPRES not in m.properties
+        )
+        + r']'
+})
 
-RX_TEXT_PRESENTATION_SEQUENCE = r'({0}{1})'.format(RX_EMOJI_CHARACTER, TEXT_PRESENTATION_SELECTOR)
+_RE.update({'RE_TEXT_PRESENTATION_SELECTOR': code_point_to_regex(TEXT_PRESENTATION_SELECTOR)})
 
-RX_EMOJI_PRESENTATION_SELECTOR = r'{0}'.format(code_point_to_regex(EMOJI_PRESENTATION_SELECTOR))
+_RE.update({'RE_TEXT_PRESENTATION_SEQUENCE': r'({RE_EMOJI_CHARACTER}{RE_TEXT_PRESENTATION_SELECTOR})'.format(**_RE)})
 
-RX_EMOJI_PRESENTATION_SEQUENCE = r'({}{})'.format(RX_EMOJI_CHARACTER, EMOJI_PRESENTATION_SELECTOR)
+_RE.update({'RE_EMOJI_PRESENTATION_SELECTOR': code_point_to_regex(EMOJI_PRESENTATION_SELECTOR)})
 
-RX_EMOJI_MODIFIER = r'[{}]'.format(
-    ''.join(
-        m.regex for _, m in EmojiCharacter
-        if EmojiCharProperty.EMOD in m.properties
-    )
-)
+_RE.update({'RE_EMOJI_PRESENTATION_SEQUENCE': r'({RE_EMOJI_CHARACTER}{RE_EMOJI_PRESENTATION_SELECTOR})'.format(**_RE)})
 
-RX_EMOJI_MODIFIER_BASE = r'[{}]'.format(
-    ''.join(
-        m.regex for _, m in EmojiCharacter
-        if EmojiCharProperty.EBASE in m.properties
-    )
-)
+_RE.update({
+    'RE_EMOJI_MODIFIER':
+        r'['
+        + ''.join(
+            m.regex for _, m in EmojiCharacter
+            if EmojiCharProperty.EMOD in m.properties
+        )
+        + r']'
+})
 
-RX_EMOJI_MODIFIER_SEQUENCE = r'({}{})'.format(RX_EMOJI_MODIFIER_BASE, RX_EMOJI_MODIFIER)
+_RE.update({
+    'RE_EMOJI_MODIFIER_BASE':
+        r'['
+        + ''.join(
+            m.regex for _, m in EmojiCharacter
+            if EmojiCharProperty.EBASE in m.properties
+        )
+        + r']'
+})
 
-RX_REGIONAL_INDICATOR = r'[{}-{}]'.format(
-    *(code_point_to_regex(n) for n in (REGIONAL_INDICATORS[0], REGIONAL_INDICATORS[-1]))
-)
+_RE.update({'RE_EMOJI_MODIFIER_SEQUENCE': r'({RE_EMOJI_MODIFIER_BASE}{RE_EMOJI_MODIFIER})'.format(**_RE)})
 
-RX_EMOJI_FLAG_SEQUENCE = r'({0}{0})'.format(RX_REGIONAL_INDICATOR)
+_RE.update({
+    'RE_REGIONAL_INDICATOR':
+        r'['
+        + code_point_to_regex(REGIONAL_INDICATORS[0])
+        + r'-'
+        + code_point_to_regex(REGIONAL_INDICATORS[-1])
+        + r']'
+})
 
-RX_TAG_BASE = r'({}|{}|{})'.format(RX_EMOJI_CHARACTER, RX_EMOJI_MODIFIER_SEQUENCE, RX_EMOJI_PRESENTATION_SEQUENCE)
+_RE.update({'RE_EMOJI_FLAG_SEQUENCE': r'({RE_REGIONAL_INDICATOR}{RE_REGIONAL_INDICATOR})'.format(**_RE)})
 
-RX_TAG_SPEC = r'[{}-{}]'.format(*(code_point_to_regex(n) for n in (TAGS[0], TAGS[-2])))
+_RE.update({
+    'RE_TAG_BASE':
+        r'({RE_EMOJI_CHARACTER}|{RE_EMOJI_MODIFIER_SEQUENCE}|{RE_EMOJI_PRESENTATION_SEQUENCE})'.format(**_RE)
+})
 
-RX_TAG_TERM = r'{}'.format(code_point_to_regex(TAGS[-1]))
+_RE.update({
+    'RE_TAG_SPEC':
+        r'['
+        + code_point_to_regex(TAGS[0])
+        + r'-'
+        + code_point_to_regex(TAGS[-2])
+        + r']'
+})
 
-RX_EMOJI_TAG_SEQUENCE = r'({}{}{})'.format(RX_TAG_BASE, RX_TAG_SPEC, RX_TAG_TERM)
+_RE.update({'RE_TAG_TERM': code_point_to_regex(TAGS[-1])})
 
-RX_EMOJI_KEYCAP_SEQUENCE = r'([0-9#*]{}{})'.format(
-    *(code_point_to_regex(n) for n in (EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP))
-)
+_RE.update({'RE_EMOJI_TAG_SEQUENCE': r'({RE_TAG_BASE}{RE_TAG_SPEC}{RE_TAG_TERM})'.format(**_RE)})
 
-RX_EMOJI_CORE_SEQUENCE = r'({}|{}|{}|{}|{})'.format(
-    RX_EMOJI_CHARACTER, RX_EMOJI_PRESENTATION_SEQUENCE, RX_EMOJI_KEYCAP_SEQUENCE, RX_EMOJI_MODIFIER_SEQUENCE, RX_EMOJI_FLAG_SEQUENCE
-)
+_RE.update({
+    'RE_EMOJI_KEYCAP_SEQUENCE':
+        r'([0-9#*]{}{})'.format(
+            *(code_point_to_regex(n) for n in (EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP))
+        )
+})
 
-RX_EMOJI_ZWJ_ELEMENT = r'({}|{}|{})'.format(
-    RX_EMOJI_CHARACTER, RX_EMOJI_PRESENTATION_SEQUENCE, RX_EMOJI_MODIFIER_SEQUENCE
-)
+_RE.update({
+    'RE_EMOJI_CORE_SEQUENCE':
+        r'('
+        r'{RE_EMOJI_CHARACTER}'
+        r'|{RE_EMOJI_PRESENTATION_SEQUENCE}'
+        r'|{RE_EMOJI_KEYCAP_SEQUENCE}'
+        r'|{RE_EMOJI_MODIFIER_SEQUENCE}'
+        r'|{RE_EMOJI_FLAG_SEQUENCE}'
+        r')'.format(**_RE)
+})
 
-RX_EMOJI_ZWJ_SEQUENCE = r'({0}({1}{0})+)'.format(
-    RX_EMOJI_ZWJ_ELEMENT, code_point_to_regex(ZWJ)
-)
+_RE.update({
+    'RE_EMOJI_ZWJ_ELEMENT':
+        r'({RE_EMOJI_CHARACTER}|{RE_EMOJI_PRESENTATION_SEQUENCE}|{RE_EMOJI_MODIFIER_SEQUENCE})'.format(**_RE)
+})
 
-RX_EMOJI_SEQUENCE = r'({}|{}|{})'.format(
-    RX_EMOJI_CORE_SEQUENCE, RX_EMOJI_ZWJ_SEQUENCE, RX_EMOJI_TAG_SEQUENCE
-)
+_RE.update({
+    'RE_EMOJI_ZWJ_SEQUENCE':
+        r'({RE_EMOJI_ZWJ_ELEMENT}({0}{RE_EMOJI_ZWJ_ELEMENT})+)'.format(
+            code_point_to_regex(ZWJ), **_RE
+        )
+})
 
-EMOJI_PATTERNS = {
-    'EMOJI_CHARACTER': re.compile(RX_EMOJI_CHARACTER),
-    'DEFAULT_EMOJI_PRESENTATION_CHARACTER': re.compile(RX_DEFAULT_EMOJI_PRESENTATION_CHARACTER),
-    'DEFAULT_TEXT_PRESENTATION_CHARACTER': re.compile(RX_DEFAULT_TEXT_PRESENTATION_CHARACTER),
-    'TEXT_PRESENTATION_SELECTOR': re.compile(RX_TEXT_PRESENTATION_SELECTOR),
-    'TEXT_PRESENTATION_SEQUENCE': re.compile(RX_TEXT_PRESENTATION_SEQUENCE),
-    'EMOJI_PRESENTATION_SELECTOR': re.compile(RX_EMOJI_PRESENTATION_SELECTOR),
-    'EMOJI_PRESENTATION_SEQUENCE': re.compile(RX_EMOJI_PRESENTATION_SEQUENCE),
-    'EMOJI_MODIFIER': re.compile(RX_EMOJI_MODIFIER),
-    'EMOJI_MODIFIER_BASE': re.compile(RX_EMOJI_MODIFIER_BASE),
-    'EMOJI_MODIFIER_SEQUENCE': re.compile(RX_EMOJI_MODIFIER_SEQUENCE),
-    'REGIONAL_INDICATOR': re.compile(RX_REGIONAL_INDICATOR),
-    'EMOJI_FLAG_SEQUENCE': re.compile(RX_EMOJI_FLAG_SEQUENCE),
-    'TAG_BASE': re.compile(RX_TAG_BASE),
-    'TAG_SPEC': re.compile(RX_TAG_SPEC),
-    'TAG_TERM': re.compile(RX_TAG_TERM),
-    'EMOJI_TAG_SEQUENCE': re.compile(RX_EMOJI_TAG_SEQUENCE),
-    'EMOJI_KEYCAP_SEQUENCE': re.compile(RX_EMOJI_KEYCAP_SEQUENCE),
-    'EMOJI_CORE_SEQUENCE': re.compile(RX_EMOJI_CORE_SEQUENCE),
-    'EMOJI_ZWJ_ELEMENT': re.compile(RX_EMOJI_ZWJ_ELEMENT),
-    'EMOJI_ZWJ_SEQUENCE': re.compile(RX_EMOJI_ZWJ_SEQUENCE),
-    'EMOJI_SEQUENCE': re.compile(RX_EMOJI_SEQUENCE)
-}
+_RE.update({
+    'RE_EMOJI_SEQUENCE':
+        r'({RE_EMOJI_CORE_SEQUENCE}|{RE_EMOJI_ZWJ_SEQUENCE}|{RE_EMOJI_TAG_SEQUENCE})'.format(**_RE)
+})
+
+EMOJI_PATTERNS = {k[3:]: re.compile(v) for k, v in _RE.items()}
 
 
 def is_emoji_character(c: str) -> bool:
