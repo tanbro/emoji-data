@@ -17,7 +17,7 @@ class CharacterTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        with open(DATAFILE_TEST) as fp:
+        with open(DATAFILE_TEST, encoding='utf-8') as fp:
             for content, _ in read_data_file_iterable(fp):
                 cls.test_data.append([s.strip() for s in content.split(';', 1)])
 
