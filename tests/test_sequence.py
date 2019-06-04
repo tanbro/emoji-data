@@ -82,16 +82,16 @@ class SequencePatternTestCase(unittest.TestCase):
             m = EmojiSequence.pattern.search(s, m.end())
         self.assertEqual(cnt, 3)
 
-    def test_sigle_multichar_emoji(self):
+    def test_single_multichar_emoji(self):
         s = '☺️'
         self.assertEqual(len(s), 2)
         self.assertIsNotNone(EmojiSequence.pattern.match(s))
 
-    def test_sigle_multichar_emoji_started_text(self):
+    def test_single_multichar_emoji_started_text(self):
         s = '☺️ 也是笑脸'
         self.assertIsNotNone(EmojiSequence.pattern.match(s))
 
-    def test_sigle_multichar_emoji_in_text(self):
+    def test_single_multichar_emoji_in_text(self):
         s = '这个☺️也是笑脸'
         self.assertIsNone(EmojiSequence.pattern.match(s))
         m = EmojiSequence.pattern.search(s)
