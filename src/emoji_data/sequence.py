@@ -61,6 +61,9 @@ class EmojiSequence(metaclass=_MetaClass):  # pylint: disable=too-many-instance-
             self._regex = ''.join(m.regex for m in self._characters)
         self._regex_compiled = re.compile(self._regex)
 
+    def __len__(self):
+        return len(self._code_points)
+
     def __str__(self):
         return self._string
 
