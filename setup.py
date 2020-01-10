@@ -36,7 +36,7 @@ setup(
 
     classifiers=[
         'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
-        'Topic :: Text Processing :: Unicode :: Emoji',
+        'Topic :: Text Processing',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
     ],
