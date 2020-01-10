@@ -7,6 +7,9 @@
 - Add
   - `EmojiSequence.__len__`
 
+- Misc
+  - remove invalid value for classifiers
+
 ## 0.1.5
 
 - Change:
