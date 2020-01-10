@@ -20,9 +20,14 @@ class SequenceTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        with open(DATAFILE_TEST) as fp:
+        with open(DATAFILE_TEST, encoding='utf-8') as fp:
             for content, _ in read_data_file_iterable(fp):
                 cls.test_data.append([s.strip() for s in content.split(';', 1)])
+
+    def test_len(self):
+        for code_points, *_ in self.test_data:
+            obj = EmojiSequence.from_hex(code_points)
+            self.assertEqual(len(code_points.split()), len(obj))
 
     def test_status(self):
         for code_points, status in self.test_data:
@@ -33,7 +38,7 @@ class SequenceTestCase(unittest.TestCase):
                 self.assertEqual(detect_qualified(s), QualifiedType(status))
 
     def test_type_field(self):
-        for code_points, _ in self.test_data:
+        for code_points, *_ in self.test_data:
             obj = EmojiSequence.from_hex(code_points)  # type: EmojiSequence
             s = obj.string
             if obj.type_field == 'Basic_Emoji':
@@ -57,11 +62,11 @@ class SequencePatternTestCase(unittest.TestCase):
         ):
             self.assertIsNone(EmojiSequence.pattern.match(s))
 
-    def test_single_1char_emoji(self):
+    def test_single_one_char_emoji(self):
         s = '😀'
         self.assertIsNotNone(EmojiSequence.pattern.match(s))
 
-    def test_1char_emoji_started_text(self):
+    def test_one_char_emoji_started_text(self):
         s = '😀笑脸'
         self.assertIsNotNone(EmojiSequence.pattern.match(s))
         self.assertIsNotNone(EmojiSequence.pattern.search(s))
@@ -73,7 +78,7 @@ class SequencePatternTestCase(unittest.TestCase):
         self.assertIsNotNone(m)
         self.assertEqual(m.span(), (2, 3))
 
-    def test_many_1char_emoji_in_text(self):
+    def test_many_one_char_emoji_in_text(self):
         s = '1😛 2😛 3😛'
         cnt = 0
         m = EmojiSequence.pattern.search(s)
@@ -82,23 +87,23 @@ class SequencePatternTestCase(unittest.TestCase):
             m = EmojiSequence.pattern.search(s, m.end())
         self.assertEqual(cnt, 3)
 
-    def test_sigle_multichar_emoji(self):
+    def test_single_multi_chars_emoji(self):
         s = '☺️'
         self.assertEqual(len(s), 2)
         self.assertIsNotNone(EmojiSequence.pattern.match(s))
 
-    def test_sigle_multichar_emoji_started_text(self):
+    def test_single_multichars_emoji_started_text(self):
         s = '☺️ 也是笑脸'
         self.assertIsNotNone(EmojiSequence.pattern.match(s))
 
-    def test_sigle_multichar_emoji_in_text(self):
+    def test_single_multi_chars_emoji_in_text(self):
         s = '这个☺️也是笑脸'
         self.assertIsNone(EmojiSequence.pattern.match(s))
         m = EmojiSequence.pattern.search(s)
         self.assertIsNotNone(m)
         self.assertEqual(m.span(), (2, 4))
 
-    def test_many_multichar_emoji_in_text(self):
+    def test_many_multi_chars_emoji_in_text(self):
         s = '1☺️ 2☺️ 3☺️'
         cnt = 0
         m = EmojiSequence.pattern.search(s)
@@ -107,7 +112,7 @@ class SequencePatternTestCase(unittest.TestCase):
             m = EmojiSequence.pattern.search(s, m.end())
         self.assertEqual(cnt, 3)
 
-    def test_many_multichar_emoji_in_multiline_text(self):
+    def test_many_multi_chars_emoji_in_multiline_text(self):
         s = '1☺️ {0}2☺️ {0}3☺️'.format(os.linesep)
         cnt = 0
         m = EmojiSequence.pattern.search(s)

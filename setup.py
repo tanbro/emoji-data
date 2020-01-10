@@ -1,10 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""
-setuptools script file
-"""
-
 from setuptools import setup, find_packages
 
 setup(
@@ -32,7 +28,7 @@ setup(
     ],
     install_requires=[],
 
-    python_requires='>3.4',
+    python_requires='>=3.5',
 
     package_data={
         '': ['data/*']
@@ -43,9 +39,5 @@ setup(
         'Topic :: Text Processing :: Unicode :: Emoji',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
     ],
 )

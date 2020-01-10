@@ -1,8 +1,13 @@
 # CHANGELOG
 
-## 0.1.5
+## 0.1.6
 
-Developing..
+- Date: 2010-01-10
+
+- Add
+  - `EmojiSequence.__len__`
+
+## 0.1.5
 
 - Change:
   - Rename module `defines` to `definitions`
