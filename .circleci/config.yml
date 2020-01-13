@@ -6,7 +6,7 @@
 version: 2
 
 references:
-  tests_steps: &tests_steps
+  test_steps: &test_steps
     steps:
       - checkout
       - run:
@@ -19,12 +19,15 @@ references:
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
       - run:
-          name: Run tests
+          name: Install package in editable mode
+          command: sudo pip install -e .
+      - run:
+          name: Run coverage unit test
           command: |
             # notify Code Climate of a pending test report using `before-build`
             ./cc-test-reporter before-build
             # run unit test cases with coverage
-            coverage run --source=src setup.py test
+            coverage run -m unittest
             # generate an XML report of coverage results
             coverage xml
             # upload test report to Code Climate using `after-build`
@@ -45,8 +48,8 @@ references:
 jobs:
   test:
     docker:
-      - image: circleci/python:3
-    <<: *tests_steps
+      - image: circleci/python
+    <<: *test_steps
 
   deploy:
     docker:
