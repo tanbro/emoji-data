@@ -11,7 +11,7 @@ references:
       - checkout
       - run:
           name: Install developing package
-          command: sudo pip install --editable ".[all]"
+          command: sudo pip install --editable ."
       - run:
           name: Setup dependencies of test
           command: |
