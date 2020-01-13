@@ -13,7 +13,7 @@ references:
           name: Install developing package
           command: sudo pip install --editable .
       - run:
-          name: Setup dependencies of test
+          name: Setup codeclimate reporter
           command: |
             # install coverage
             sudo pip install coverage
@@ -36,8 +36,8 @@ references:
     steps:
       - checkout
       - run:
-          name: Setup dependencies of deployment
-          command: sudo pip install wheel twine
+          name: Install PyPI packaging tools
+          command: sudo pip install --upgrade wheel twine
       - run:
           name: Build and upload dist
           command: |
