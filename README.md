@@ -8,13 +8,11 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/cf25d6c557b7f7924cab/maintainability)](https://codeclimate.com/github/tanbro/emoji-data/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/cf25d6c557b7f7924cab/test_coverage)](https://codeclimate.com/github/tanbro/emoji-data/test_coverage)
 
----
-
 A library represents emoji sequences and characters in [Unicode® Technical Standard #51 Data Files](http://www.unicode.org/reports/tr51/#Data_Files_Table)
 
 ## How to use
 
-Examples below are also in a [notebook](notebooks/example.ipynb)
+Examples below are also in a [notebook](notebooks/example)
 
 Class `EmojiSequence` is most useful:
 
@@ -114,8 +112,6 @@ True
 ------
 [0 : 2] : 9⃣
 ```
-
----
 
 [unicode]: https://unicode.org/
 [emoji]: https://unicode.org/emoji/index.html
