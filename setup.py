@@ -16,19 +16,20 @@ setup(
     license='AGPLv3+',
     keywords='emoji unicode',
 
+    setup_requires=[
+        'setuptools_scm',
+        'setuptools_scm_git_archive',
+    ],
     use_scm_version={
         # guess-next-dev:	automatically guesses the next development version (default)
         # post-release:	generates post release versions (adds postN)
         'version_scheme': 'guess-next-dev',
         'write_to': 'src/emoji_data/version.py',
     },
-    setup_requires=[
-        'setuptools_scm',
-        'setuptools_scm_git_archive',
-    ],
-    install_requires=[],
 
     python_requires='>=3.5',
+
+    install_requires=[],
 
     package_data={
         '': ['data/*']
