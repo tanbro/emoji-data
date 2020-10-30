@@ -232,15 +232,15 @@ def is_emoji_sequence(s: str) -> bool:
     return EMOJI_PATTERNS['EMOJI_SEQUENCE'].fullmatch(s) is not None
 
 
-def is_qualified_emoji_character(s: str, i: int) -> bool:
+def is_qualified_emoji_character(i: int, s: str) -> bool:
     """An emoji character in a string that
 
     - (a) has default emoji presentation or
     - (b) is the first character in an emoji modifier sequence or
     - (c) is not a default emoji presentation character, but is the first character in an emoji presentation sequence.
 
-    :param str s: string
     :param int i: index of the character in the string to check if qualified
+    :param str s: the string where the character in it
     :return: True of False
     :rtype: bool
 
@@ -257,11 +257,20 @@ def is_qualified_emoji_character(s: str, i: int) -> bool:
 
 
 def detect_qualified(s: str) -> QualifiedType:
+    """Detect qualified type of emoji string
+
+    - fully-qualified emoji — A qualified emoji character, or an emoji sequence in which each emoji character is qualified.
+    - minimally-qualified emoji — An emoji sequence in which the first character is qualified but the sequence is not fully qualified.
+    - unqualified emoji — An emoji that is neither fully-qualified nor minimally qualified.
+
+    :param str s: string to detect
+    :retype: QualifiedType
+    """
     s = s.strip()
     if not all(is_emoji_character(c) for c in s):
         raise ValueError('Not every character of `s` is Emoji character')
     if is_emoji_sequence(s):
-        if all(is_qualified_emoji_character(s, i) for i, _ in enumerate(s)):
+        if all(is_qualified_emoji_character(i, s) for i in range(len(s))):
             return QualifiedType.FULLY_QUALIFIED
         if is_qualified_emoji_character(s, 0):
             return QualifiedType.MINIMALLY_QUALIFIED

@@ -5,16 +5,22 @@
 
 version: 2
 
-references:
-  tests_steps: &tests_steps
+
+jobs:
+
+  test:
+    docker:
+      - image: circleci/python
     steps:
       - checkout
       - run:
-          name: Setup dependencies of test
-          command: sudo pip install coverage
+          name: Install developing package
+          command: sudo pip install --editable .
       - run:
-          name: Setup Code Climate test-reporter
+          name: Setup tests
           command: |
+            # install coverage
+            sudo pip install --upgrade pytest coverage
             # download test reporter as a static binary
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
@@ -24,34 +30,26 @@ references:
             # notify Code Climate of a pending test report using `before-build`
             ./cc-test-reporter before-build
             # run unit test cases with coverage
-            coverage run --source=src setup.py test
+            coverage run -m pytest --junitxml=test-results/junit.xml
             # generate an XML report of coverage results
             coverage xml
             # upload test report to Code Climate using `after-build`
             ./cc-test-reporter after-build --coverage-input-type coverage.py --exit-code $?
-
-  deploy_steps: &deploy_steps
-    steps:
-      - checkout
-      - run:
-          name: Setup dependencies of deployment
-          command: sudo pip install wheel twine
-      - run:
-          name: Build and upload dist
-          command: |
-            python setup.py sdist bdist_wheel
-            twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*
-
-jobs:
-  test:
-    docker:
-      - image: circleci/python:3
-    <<: *tests_steps
+      - store_test_results:
+          path: test-results
 
   deploy:
     docker:
       - image: circleci/python
-    <<: *deploy_steps
+    steps:
+      - checkout
+      - run:
+          command: |
+            if python setup.py --version | grep -x -P "^\d+(\.\d+)*(\.?(a|b|rc|post)\d+(\.\d+)*)?$" ; then
+              sudo pip install --upgrade wheel twine
+              python setup.py sdist bdist_wheel
+              twine upload -u ${PYPI_USER} -p ${PYPI_PASSWORD} dist/*
+            fi
 
 workflows:
   version: 2
@@ -63,6 +61,6 @@ workflows:
             - test
           filters:
             tags:
-              only: /^\d+(\.\d+)*(\.?(a|b|rc|post)\d+(\.\d+)*)?/
+              only: /^v[0-9].+/
             branches:
               ignore: /.*/

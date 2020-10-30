@@ -2,7 +2,7 @@
 
 ## 0.1.6
 
-- Date: 2010-01-10
+- Date: 2020-01-10
 
 - Add
   - `EmojiSequence.__len__`
