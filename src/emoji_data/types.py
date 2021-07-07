@@ -1,23 +1,23 @@
 class BaseDictContainer(type):
-    def __new__(mcs, name, bases, attrs):  # pylint:disable=bad-mcs-classmethod-argument
-        mcs._data = dict()
-        return super().__new__(mcs, name, bases, attrs)
+    def __new__(cls, name, bases, attrs):
+        cls._data = dict()
+        return super().__new__(cls, name, bases, attrs)
 
-    def __setitem__(self, key, value):  # pylint: disable=C0203
+    def __setitem__(self, key, value):
         self._data[key] = value
 
-    def __delitem__(self, key):  # pylint: disable=C0203
+    def __delitem__(self, key):
         del self._data[key]
 
-    def __getitem__(self, key):  # pylint: disable=C0203
+    def __getitem__(self, key):
         return self._data[key]
 
-    def __contains__(self, key):  # pylint: disable=C0203
+    def __contains__(self, key):
         return key in self._data
 
-    def __iter__(self):  # pylint: disable=bad-mcs-method-argument
-        for k, v in self._data.items():  # pylint: disable=invalid-name
+    def __iter__(self):
+        for k, v in self._data.items():
             yield k, v
 
-    def __len__(self):  # pylint: disable=C0203
+    def __len__(self):
         return len(self._data)

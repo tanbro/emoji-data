@@ -16,13 +16,13 @@ DATAFILE_TEST = resource_filename(
 
 
 class SequenceTestCase(unittest.TestCase):
-    test_data = []
+    test_data = []  # type: list[tuple[str,str]]
 
     @classmethod
     def setUpClass(cls):
         with open(DATAFILE_TEST, encoding='utf-8') as fp:
             for content, _ in read_data_file_iterable(fp):
-                cls.test_data.append([s.strip() for s in content.split(';', 1)])
+                cls.test_data.append(tuple(s.strip() for s in content.split(';', 1)))  # type: ignore
 
     def test_len(self):
         for code_points, *_ in self.test_data:

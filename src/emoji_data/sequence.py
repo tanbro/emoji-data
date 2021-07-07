@@ -33,7 +33,7 @@ class _MetaClass(BaseDictContainer):
     pass
 
 
-class EmojiSequence(metaclass=_MetaClass):  # pylint: disable=too-many-instance-attributes,too-many-arguments
+class EmojiSequence(metaclass=_MetaClass):
     """Emoji and Text Presentation Sequences used to represent emoji
 
     see: http://www.unicode.org/reports/tr51/#Emoji_Variation_Sequences
@@ -77,12 +77,13 @@ class EmojiSequence(metaclass=_MetaClass):  # pylint: disable=too-many-instance-
         )
 
     _initialed = False
-    pattern = None
+
+    pattern = re.compile(r'')
     """Compiled regular express pattern object for all-together Emoji sequences.
     """
 
     @classmethod
-    def initial(cls):  # pylint:disable=too-many-locals
+    def initial(cls):
         """Initial the class
 
         Load Emoji Sequences from package data file into class internal dictionary
@@ -91,7 +92,7 @@ class EmojiSequence(metaclass=_MetaClass):  # pylint: disable=too-many-instance-
             return
         EmojiCharacter.initial()
         for data_name, data_file in DATA_FILES.items():
-            with open(data_file, encoding='utf-8') as fp:
+            with open(data_file, encoding='utf8') as fp:
                 for content, comment in read_data_file_iterable(fp):
                     if data_name == 'test':
                         cps, status = (part.strip() for part in content.split(';', 1))
@@ -117,88 +118,87 @@ class EmojiSequence(metaclass=_MetaClass):  # pylint: disable=too-many-instance-
                                 cls[text] = inst
                         else:
                             # A range of single char emoji-seq
-                            for cp in range(int(cp_head, 16), 1 + int(cp_tail, 16)):  # pylint:disable=invalid-name
+                            for cp in range(int(cp_head, 16), 1 + int(cp_tail, 16)):
                                 inst = cls(cp, type_field, '', description, comment)  # type: EmojiSequence
                                 if inst.string not in cls:
                                     cls[inst.string] = inst
         # build regex
-        seqs = sorted((m for _, m in cls), key=lambda x: len(x.code_points), reverse=True)  # type: List[EmojiSequence]
-        exp = r'|'.join(m.regex for m in seqs)
-        pat = re.compile(exp)
-        cls.pattern = pat
+        ss = sorted((m for _, m in cls), key=lambda x: len(x.code_points), reverse=True)  # type: List[EmojiSequence]
+        exp = r'|'.join(m.regex for m in ss)
+        cls.pattern = re.compile(exp)
         # initialed OK
         cls._initialed = True
 
     @classmethod
-    def from_text(cls, text):  # type: (str)->EmojiSequence
+    def from_text(cls, value):  # type: (str)->EmojiSequence
         """Get an :class:`EmojiSequence` instance by text
 
-        :param str text: Emoji string
+        :param str value: Emoji string
         :return: Instance from internal dictionary
         :rtype: EmojiSequence
         :raises RuntimeError: When non-emoji character in text
         :raises KeyError: When passed-in value not found in internal dictionary
         """
-        text = text.strip()
-        if not all(ord(s) in EmojiCharacter for s in text):
+        value = value.strip()
+        if not all(ord(s) in EmojiCharacter for s in value):
             raise RuntimeError('Not all characters in the text is Emoji character.')
         try:
-            return cls[text]
+            return cls[value]
         except KeyError:
-            code_points_text = ' '.join('{:04X}'.format(ord(c)) for c in text)
-            raise KeyError('[{}]({!r})'.format(code_points_text, text))
+            code_points_text = ' '.join('{:04X}'.format(ord(c)) for c in value)
+            raise KeyError('[{}]({!r})'.format(code_points_text, value))
 
     @classmethod
-    def from_characters(cls, characters):  # type: (Iterable[EmojiCharacter])->EmojiSequence
+    def from_emoji_character(cls, value):  # type: (Union[EmojiCharacter, Iterable[EmojiCharacter]])->EmojiSequence
         """Get an :class:`EmojiSequence` instance by :class:`EmojiCharacter` object or list
 
-        :param Iterable[EmojiCharacter] characters: Single or iterable object of :class:`EmojiCharacter`, composing the sequence
+        :param value: Single or iterable object of :class:`EmojiCharacter`, composing the sequence
         :return: Instance from internal dictionary
         :rtype: EmojiSequence
         :raises KeyError: When passed-in value not found in internal dictionary
         """
-        text = ''.join(m.string for m in characters)
-        return cls.from_text(text)
+        if isinstance(value, EmojiCharacter):
+            s = value.string
+        elif isinstance(value, Iterable):
+            s = ''.join(m.string for m in value)
+        else:
+            raise TypeError('Argument `value` must be one of `EmojiCharacter` or `Iterable[EmojiCharacter]`')
+        return cls.from_text(s)
 
     @classmethod
-    def from_hex(cls, *args):  # type: (Union[str, int, Iterable[str], Iterable[int]])->EmojiSequence
+    def from_hex(cls, value):  # type: (Union[str, int, Iterable[str], Iterable[int]])->EmojiSequence
         """Get an :class:`EmojiSequence` instance by unicode code point(s)
 
-        :param Union[str,Iterable[str]] args: Hex string(s)
+        :type value: Union[str, int, Iterable[str], Iterable[int]]
+        :param value: A single or sequence of HEX string/code.
 
-            - When ONLY ONE args passed in, it could be:
+            - it could be:
 
               - one or more code points in hex format string, separated by spaces
               - one code point integer
               - An iterable object whose members are code point in hex format string
               - An iterable object whose members are code point integer
 
-            - When MORE THAN ONE args passed in, every member of args could be:
-
-              - one code point in hex format string
-              - one code point integer
-
         :return: Instance returned from the class's internal dictionary
         :rtype: EmojiSequence
 
         :raises KeyError: When passed-in value not found in the class' internal dictionary
         """
-        if len(args) == 1:
-            arg0 = args[0]
-            if isinstance(arg0, str):
-                args = arg0.split()
-            elif isinstance(arg0, int):
-                args = [arg0]
-            elif isinstance(arg0, Iterable):
-                args = arg0
-            else:
-                raise TypeError(
-                    'The single `args` should be `str`, `int`, `Iterable[str]`, `Iterable[int]`'
-                )
-        return cls.from_characters(EmojiCharacter.from_hex(m) for m in args)
+        cps_list = list()  # type: Iterable[str] | Iterable[int]
+        if isinstance(value, str):
+            cps_list = value.split()
+        elif isinstance(value, int):
+            cps_list = [value]
+        elif isinstance(value, Iterable):
+            cps_list = value
+        else:
+            raise TypeError(
+                'The `args` should be one of `str`, `int`, or a sequence of that'
+            )
+        return cls.from_emoji_character(EmojiCharacter.from_hex(cp) for cp in cps_list)
 
     @property
-    def type_field(self):
+    def type_field(self) -> str:
         """A convenience for parsing the emoji sequence files, and is not intended to be maintained as a property.
 
         one of the following:
@@ -214,19 +214,19 @@ class EmojiSequence(metaclass=_MetaClass):  # pylint: disable=too-many-instance-
         return self._type_field
 
     @property
-    def description(self):
+    def description(self) -> str:
         return self._description
 
     @property
-    def comment(self):
+    def comment(self) -> str:
         return self._comment
 
     @property
-    def status(self):
+    def status(self) -> str:
         return self._status
 
     @status.setter
-    def status(self, value):
+    def status(self, value: str):
         self._status = value
 
     @property

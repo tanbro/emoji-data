@@ -65,12 +65,12 @@ class EmojiCharacter(metaclass=_MetaClass):
             else:
                 self._properties = [properties]
         #
-        self._comments = list()  # type: List[EmojiCharProperty]
+        self._comments = list()  # type: List[str]
         if comments is not None:
-            if isinstance(comments, Iterable):
-                self._comments = list(comments)
-            else:
+            if isinstance(comments, str):
                 self._comments = [comments]
+            elif isinstance(comments, Iterable):
+                self._comments = [s for s in comments if isinstance(s, str)]
 
     def __str__(self):
         return self._string
@@ -82,7 +82,7 @@ class EmojiCharacter(metaclass=_MetaClass):
             self.string,
         )
 
-    _initial = False
+    _initialed = False
 
     @classmethod
     def initial(cls):
@@ -90,26 +90,26 @@ class EmojiCharacter(metaclass=_MetaClass):
 
         Load Emoji Characters and it's properties from package data file into class internal dictionary
         """
-        if cls._initial:
+        if cls._initialed:
             return
-        with open(DATA_FILE, encoding='utf-8') as fp:
+        with open(DATA_FILE, encoding='utf8') as fp:
             for content, comment in read_data_file_iterable(fp):
                 cps, property_text = (part.strip() for part in content.split(';', 1))
                 cps_parts = cps.split('..', 1)
                 property_ = EmojiCharProperty(property_text)
-                for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):  # pylint:disable=invalid-name
+                for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):
                     try:
                         inst = cls[cp]  # type: EmojiCharacter
                     except KeyError:
-                        cls[cp] = cls(cp, property_, comment)  # type: EmojiCharacter
+                        cls[cp] = cls(cp, property_, comment)
                     else:
                         inst.add_property(property_)
                         inst.add_comment(comment)
-            for cp in TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP:  # pylint:disable=invalid-name
+            for cp in TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP:
                 if cp not in cls:
                     cls[cp] = cls(cp)
         # OK!
-        cls._initial = True
+        cls._initialed = True
 
     def add_property(self, val: EmojiCharProperty):
         if val not in self._properties:
