@@ -22,7 +22,7 @@ Print first 5 emoji sequence objects:
 
 ```python
 >>> from emoji_data import EmojiSequence
->>> for (s, seq), *_ in zip(EmojiSequence, range(5)):
+>>> for (s, seq), *_ in zip(EmojiSequence.items(), range(5)):
 >>>     print(s, repr(seq))
 👨‍❤️‍👨 <EmojiSequence code_points='1F468 200D 2764 FE0F 200D 1F468' status='fully-qualified', string='👨\u200d❤️\u200d👨', description='couple with heart: man, man'>
 👨‍❤️‍💋‍👨 <EmojiSequence code_points='1F468 200D 2764 FE0F 200D 1F48B 200D 1F468' status='fully-qualified', string='👨\u200d❤️\u200d💋\u200d👨', description='kiss: man, man'>
@@ -82,8 +82,6 @@ True
 ```python
 >>> from emoji_data import EmojiSequence
 
->>> pat = EmojiSequence.pattern
-
 >>> strings = [
 >>>     "First:👨🏻‍⚕️. Second:👨🏻.",
 >>>     "The two emojis 👨‍👨‍👧👨‍👨‍👧‍👧 are long. Today is a 🌞⛈️ day, I am 😀.",
@@ -92,11 +90,8 @@ True
 >>> ]
 
 >>> for s in strings:
->>>     m = pat.search(s)
->>>     while m:
->>>         assert m.group() in EmojiSequence
->>>         print('[{} : {}] : {}'.format(m.start(), m.end(), m.group()))
->>>         m = pat.search(s, m.end())
+>>>     for es, begin, end in EmojiSequence.iter_find(s):
+>>>         print('[{} : {}] : {}'.format(begin, end, es))
 >>>     print('------')
 [6 : 11] : 👨🏻‍⚕️
 [20 : 22] : 👨🏻

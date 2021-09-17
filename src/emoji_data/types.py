@@ -1,23 +1,22 @@
 class BaseDictContainer(type):
     def __new__(cls, name, bases, attrs):
-        cls._data = dict()
+        cls.__data__ = dict()
         return super().__new__(cls, name, bases, attrs)
 
     def __setitem__(self, key, value):
-        self._data[key] = value
+        self.__data__[key] = value
 
     def __delitem__(self, key):
-        del self._data[key]
+        del self.__data__[key]
 
     def __getitem__(self, key):
-        return self._data[key]
+        return self.__data__[key]
 
     def __contains__(self, key):
-        return key in self._data
+        return key in self.__data__
 
     def __iter__(self):
-        for k, v in self._data.items():
-            yield k, v
+        yield from self.__data__
 
     def __len__(self):
-        return len(self._data)
+        return len(self.__data__)

@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 0.2 (developing)
+
+- Changes:
+  - Iterator of `EmojiCharacter` and `EmojiSequence` now return only keys, no more key-value pairs
+
+- Add:
+  - `release` method for `EmojiCharacter` and `EmojiSequence`
+  - `values()` and `items()` method for `EmojiCharacter` and `EmojiSequence`
+
 ## 0.1.6
 
 - Date: 2020-01-10

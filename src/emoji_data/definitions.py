@@ -29,13 +29,13 @@ class QualifiedType(Enum):
 
 _RE = dict()
 
-_RE.update({'RE_EMOJI_CHARACTER': r'[' + ''.join(m.regex for _, m in EmojiCharacter) + r']'})
+_RE.update({'RE_EMOJI_CHARACTER': r'[' + ''.join(m.regex for m in EmojiCharacter.values()) + r']'})
 
 _RE.update({
     'RE_DEFAULT_EMOJI_PRESENTATION_CHARACTER':
         r'['
         + ''.join(
-            m.regex for _, m in EmojiCharacter
+            m.regex for m in EmojiCharacter.values()
             if EmojiCharProperty.EPRES in m.properties
         )
         + r']'
@@ -45,7 +45,7 @@ _RE.update({
     'RE_DEFAULT_TEXT_PRESENTATION_CHARACTER':
         r'['
         + ''.join(
-            m.regex for _, m in EmojiCharacter
+            m.regex for m in EmojiCharacter.values()
             if EmojiCharProperty.EPRES not in m.properties
         )
         + r']'
@@ -63,7 +63,7 @@ _RE.update({
     'RE_EMOJI_MODIFIER':
         r'['
         + ''.join(
-            m.regex for _, m in EmojiCharacter
+            m.regex for m in EmojiCharacter.values()
             if EmojiCharProperty.EMOD in m.properties
         )
         + r']'
@@ -73,7 +73,7 @@ _RE.update({
     'RE_EMOJI_MODIFIER_BASE':
         r'['
         + ''.join(
-            m.regex for _, m in EmojiCharacter
+            m.regex for m in EmojiCharacter.values()
             if EmojiCharProperty.EBASE in m.properties
         )
         + r']'

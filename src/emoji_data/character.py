@@ -1,6 +1,6 @@
 import os
 from enum import Enum
-from typing import Iterable, List, Union
+from typing import Iterable, List, Tuple, Union
 
 from pkg_resources import Requirement, resource_filename
 
@@ -110,6 +110,27 @@ class EmojiCharacter(metaclass=_MetaClass):
                     cls[cp] = cls(cp)
         # OK!
         cls._initialed = True
+
+    @classmethod
+    def release(cls):
+        if not cls._initialed:
+            return
+        keys = list(cls)
+        for k in keys:
+            del cls[k]
+        cls._initialed = False
+
+    @classmethod
+    def items(cls):  # type: ()->Iterable[Tuple[int, EmojiCharacter]]
+        """Return an iterator of all code-point -> emoji-character pairs of the class
+        """
+        return ((k, cls[k]) for k in cls)
+
+    @classmethod
+    def values(cls):  # type: ()->Iterable[EmojiCharacter]
+        """Return an iterator of all emoji-characters of the class
+        """
+        return (cls[k] for k in cls)
 
     def add_property(self, val: EmojiCharProperty):
         if val not in self._properties:

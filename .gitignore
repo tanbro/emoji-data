@@ -1,6 +1,7 @@
 version.py
 *.lock
 cc-test-reporter
+tmp/
 /test-reports/
 /test-results/
 .fuse_hidden*
