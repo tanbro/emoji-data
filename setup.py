@@ -32,7 +32,7 @@ setup(
     install_requires=[],
 
     package_data={
-        '': ['data/*']
+        'emoji_data': ['data/*']
     },
 
     classifiers=[

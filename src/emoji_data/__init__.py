@@ -5,5 +5,5 @@ A library represents emoji sequences and characters in `Unicode® Technical Stan
 from .character import *
 from .definitions import *
 from .sequence import *
-from .utils import code_points_to_string, code_point_to_regex
+from .utils import *
 from .version import version as __version__

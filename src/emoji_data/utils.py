@@ -1,5 +1,7 @@
 from typing import Iterable, TextIO, Tuple, Union
 
+__all__ = ['code_points_to_string', 'code_point_to_regex']
+
 
 def read_data_file_iterable(handle: TextIO) -> Iterable[Tuple[str, str]]:
     for line in handle:

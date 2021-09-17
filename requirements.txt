@@ -4,8 +4,6 @@ sphinx
 recommonmark
 nbsphinx
 coverage
-pytest
 ipython
 notebook
 autopep8
-pylint
