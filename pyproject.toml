@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "emoji-data"
+description = "A library represents emoji sequences and characters in Unicode® Technical Standard #51 Data Files"
+readme = "README.md"
+authors = [
+  {name = "liu xue yan", email = "liu_xue_yan@foxmail.com"},
+]
+
+requires-python = ">=3.7"
+
+keywords = ["emoji", "unicode"]
+
+license = {text = "AGPLv3+"}
+
+
+classifiers = [
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Topic :: Text Processing",
+    "Programming Language :: Python :: 3",
+]
+
+dynamic = ["version"]
+
+[project.urls]
+homepage = "https://github.com/tanbro/emoji-data"
+repository = "https://github.com/tanbro/emoji-data.git"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"emoji_data.data" = ["*.txt"]
+
+[tool.setuptools_scm]
+write_to = "src/emoji_data/version.py"

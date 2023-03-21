@@ -107,6 +107,3 @@ True
 ------
 [0 : 2] : 9⃣
 ```
-
-[unicode]: https://unicode.org/
-[emoji]: https://unicode.org/emoji/index.html

@@ -1,8 +1,7 @@
+import importlib.resources
 import os
 import re
 from typing import Dict, Iterable, List, Tuple, Union
-
-from pkg_resources import Requirement, resource_filename
 
 from . import version
 from .character import EmojiCharacter
@@ -11,22 +10,16 @@ from .utils import read_data_file_iterable
 
 __all__ = ['EmojiSequence']
 
+
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
 
 
-def _get_data_file_name(name):
-    return resource_filename(
-        Requirement.parse(PACKAGE),
-        os.path.join(*(PACKAGE.split('.') + ['data', name]))
-    )
-
-
 DATA_FILES = {
-    'zwj-sequences': _get_data_file_name('emoji-zwj-sequences.txt'),
-    'sequences': _get_data_file_name('emoji-sequences.txt'),
-    'variation-sequences': _get_data_file_name('emoji-variation-sequences.txt'),
-    'test': _get_data_file_name('emoji-test.txt')
-}  # type: Dict[str, str]
+    'zwj-sequences': 'emoji-zwj-sequences.txt',
+    'sequences': 'emoji-sequences.txt',
+    'variation-sequences': 'emoji-variation-sequences.txt',
+    'test': 'emoji-test.txt',
+}
 
 
 class _MetaClass(BaseDictContainer):
@@ -92,7 +85,7 @@ class EmojiSequence(metaclass=_MetaClass):
             return
         EmojiCharacter.initial()
         for data_name, data_file in DATA_FILES.items():
-            with open(data_file, encoding='utf8') as fp:
+            with importlib.resources.open_text(f'{PACKAGE}.data', data_file) as fp:
                 for content, comment in read_data_file_iterable(fp):
                     if data_name == 'test':
                         cps, status = (part.strip() for part in content.split(';', 1))
