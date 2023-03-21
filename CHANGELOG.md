@@ -2,7 +2,11 @@
 
 ## 0.2 (developing)
 
+- Update:
+  - Emoji version 15.0
+
 - Changes:
+  - New `pyproject.toml` setup
   - Iterator of `EmojiCharacter` and `EmojiSequence` now return only keys, no more key-value pairs
 
 - Add:
