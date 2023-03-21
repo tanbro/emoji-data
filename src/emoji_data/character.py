@@ -45,8 +45,8 @@ class EmojiCharacter(metaclass=_MetaClass):
 
     def __init__(self,
                  code_point: int,
-                 properties: Union[List[EmojiCharProperty], EmojiCharProperty] = None,
-                 comments: Union[List[str], str] = None,
+                 properties: Union[List[EmojiCharProperty], EmojiCharProperty, None] = None,
+                 comments: Union[List[str], str, None] = None,
                  ):
         self._code_point = code_point
         self._string = chr(self._code_point)
