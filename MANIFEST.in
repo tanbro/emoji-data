@@ -15,6 +15,7 @@ prune examples
 prune data
 prune log
 prune logs
+prune notebooks
 prune out
 prune output
 prune requires

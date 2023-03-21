@@ -1,9 +1,0 @@
-wheel
-twine
-sphinx
-recommonmark
-nbsphinx
-coverage
-ipython
-notebook
-autopep8

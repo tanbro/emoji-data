@@ -1,8 +1,6 @@
-import os
+import importlib.resources
 from enum import Enum
 from typing import Iterable, List, Tuple, Union
-
-from pkg_resources import Requirement, resource_filename
 
 from . import version
 from .types import BaseDictContainer
@@ -13,10 +11,6 @@ __all__ = ['EmojiCharProperty', 'EmojiCharacter', 'TEXT_PRESENTATION_SELECTOR', 
 
 PACKAGE = '.'.join(version.__name__.split('.')[:-1])
 
-DATA_FILE = resource_filename(
-    Requirement.parse(PACKAGE),
-    os.path.join(*(PACKAGE.split('.') + ['data', 'emoji-data.txt']))
-)
 
 TEXT_PRESENTATION_SELECTOR = 0xFE0E
 EMOJI_PRESENTATION_SELECTOR = 0xFE0F
@@ -92,7 +86,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         """
         if cls._initialed:
             return
-        with open(DATA_FILE, encoding='utf8') as fp:
+        with importlib.resources.open_text(f'{PACKAGE}.data', 'emoji-data.txt') as fp:
             for content, comment in read_data_file_iterable(fp):
                 cps, property_text = (part.strip() for part in content.split(';', 1))
                 cps_parts = cps.split('..', 1)
