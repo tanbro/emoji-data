@@ -3,10 +3,6 @@
 [![CircleCI](https://github.com/tanbro/emoji-data/actions/workflows/python-package.yml/badge.svg)](https://github.com/tanbro/emoji-data/actions/workflows/python-package.yml)
 [![Documentation Status](https://readthedocs.org/projects/emoji-data/badge/?version=latest)](https://emoji-data.readthedocs.io/en/latest/?badge=latest)
 [![PyPI](https://img.shields.io/pypi/v/emoji-data.svg)](https://pypi.org/project/emoji-data/)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/emoji-data.svg)](https://pypi.org/project/emoji-data/)
-[![PyPI - Format](https://img.shields.io/pypi/format/emoji-data.svg)](https://pypi.org/project/emoji-data/)
-[![Maintainability](https://api.codeclimate.com/v1/badges/cf25d6c557b7f7924cab/maintainability)](https://codeclimate.com/github/tanbro/emoji-data/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/cf25d6c557b7f7924cab/test_coverage)](https://codeclimate.com/github/tanbro/emoji-data/test_coverage)
 
 A library represents emoji sequences and characters in [Unicode® Technical Standard #51 Data Files](http://www.unicode.org/reports/tr51/#Data_Files_Table)
 
