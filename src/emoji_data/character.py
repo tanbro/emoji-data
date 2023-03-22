@@ -45,26 +45,34 @@ class EmojiCharacter(metaclass=_MetaClass):
 
     def __init__(self,
                  code_point: int,
-                 properties: Union[List[EmojiCharProperty], EmojiCharProperty, None] = None,
-                 comments: Union[List[str], str, None] = None,
+                 properties: Union[Iterable[EmojiCharProperty], EmojiCharProperty, None] = None,
+                 comments: Union[Iterable[str], str, None] = None,
                  ):
         self._code_point = code_point
         self._string = chr(self._code_point)
         self._regex = code_point_to_regex(code_point)
         #
-        self._properties = list()  # type: List[EmojiCharProperty]
-        if properties is not None:
-            if isinstance(properties, Iterable):
-                self._properties = list(properties)
-            else:
-                self._properties = [properties]
+        if properties is None:
+            self._properties: List[EmojiCharProperty] = list()
+        elif isinstance(properties, EmojiCharProperty):
+            self._properties = [properties]
+        elif isinstance(properties, Iterable):
+            self._properties = list(properties)
+        else:
+            raise TypeError(
+                f'Argument `properties` expects `EmojiCharProperty`, `Iterable[EmojiCharProperty]`, or `None`, but actual {type(properties)}'
+            )
         #
-        self._comments = list()  # type: List[str]
-        if comments is not None:
-            if isinstance(comments, str):
-                self._comments = [comments]
-            elif isinstance(comments, Iterable):
-                self._comments = [s for s in comments if isinstance(s, str)]
+        if comments is None:
+            self._comments: List[str] = list()
+        elif isinstance(comments, str):
+            self._comments = [comments]
+        elif isinstance(comments, Iterable):
+            self._comments = [s for s in comments if isinstance(s, str)]
+        else:
+            raise TypeError(
+                f'Argument `comments` expects `str`, `Iterable[str]`, or `None`, but actual {type(comments)}'
+            )
 
     def __str__(self):
         return self._string
@@ -93,7 +101,7 @@ class EmojiCharacter(metaclass=_MetaClass):
                 property_ = EmojiCharProperty(property_text)
                 for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):
                     try:
-                        inst = cls[cp]  # type: EmojiCharacter
+                        inst = cls[cp]
                     except KeyError:
                         cls[cp] = cls(cp, property_, comment)
                     else:
@@ -115,13 +123,13 @@ class EmojiCharacter(metaclass=_MetaClass):
         cls._initialed = False
 
     @classmethod
-    def items(cls):  # type: ()->Iterable[Tuple[int, EmojiCharacter]]
+    def items(cls) -> Iterable[Tuple[int, 'EmojiCharacter']]:
         """Return an iterator of all code-point -> emoji-character pairs of the class
         """
         return ((k, cls[k]) for k in cls)
 
     @classmethod
-    def values(cls):  # type: ()->Iterable[EmojiCharacter]
+    def values(cls) -> Iterable['EmojiCharacter']:
         """Return an iterator of all emoji-characters of the class
         """
         return (cls[k] for k in cls)
@@ -183,7 +191,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         return self._string
 
     @classmethod
-    def from_string(cls, value):  # type: (str)->EmojiCharacter
+    def from_string(cls, value: str) -> 'EmojiCharacter':
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode character
 
         :param str value: Emoji character
@@ -194,7 +202,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         return cls[ord(value)]
 
     @classmethod
-    def from_hex(cls, value):  # type: (Union[int, str])->EmojiCharacter
+    def from_hex(cls, value: Union[int, str]) -> 'EmojiCharacter':
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode integer value or it's hex string
 
         :param Union[int, str] value: Emoji Unicode, either integer value or hex string
