@@ -8,8 +8,6 @@ from .utils import code_point_to_regex, read_data_file_iterable, resources_files
 __all__ = ['EmojiCharProperty', 'EmojiCharacter', 'TEXT_PRESENTATION_SELECTOR', 'EMOJI_PRESENTATION_SELECTOR',
            'EMOJI_KEYCAP', 'REGIONAL_INDICATORS', 'TAGS', 'ZWJ']
 
-PACKAGE = '.'.join(version.__name__.split('.')[:-1])
-
 
 TEXT_PRESENTATION_SELECTOR = 0xFE0E
 EMOJI_PRESENTATION_SELECTOR = 0xFE0F
@@ -93,7 +91,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         """
         if cls._initialed:
             return
-        with resources_files(PACKAGE).joinpath('data', 'emoji-data.txt').open(encoding='utf8') as fp:
+        with resources_files(version.__package__).joinpath('data', 'emoji-data.txt').open(encoding='utf8') as fp:
             for content, comment in read_data_file_iterable(fp):
                 cps, property_text = (part.strip() for part in content.split(';', 1))
                 cps_parts = cps.split('..', 1)

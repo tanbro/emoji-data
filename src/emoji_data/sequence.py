@@ -9,9 +9,6 @@ from .utils import read_data_file_iterable, resources_files
 __all__ = ['EmojiSequence']
 
 
-PACKAGE = '.'.join(version.__name__.split('.')[:-1])
-
-
 DATA_FILES = {
     'zwj-sequences': 'emoji-zwj-sequences.txt',
     'sequences': 'emoji-sequences.txt',
@@ -83,7 +80,7 @@ class EmojiSequence(metaclass=_MetaClass):
             return
         EmojiCharacter.initial()
         for data_name, data_file in DATA_FILES.items():
-            with resources_files(PACKAGE).joinpath('data', data_file).open(encoding='utf8') as fp:
+            with resources_files(version.__package__).joinpath('data', data_file).open(encoding='utf8') as fp:
                 for content, comment in read_data_file_iterable(fp):
                     if data_name == 'test':
                         cps, status = (part.strip() for part in content.split(';', 1))
@@ -285,7 +282,7 @@ class EmojiSequence(metaclass=_MetaClass):
         return list(cls.iter_find(s))
 
     @classmethod
-    def iter_find(cls, s):  # type: (str) ->  Iterable[Tuple[EmojiSequence, int, int]]
+    def iter_find(cls, s: str) -> Iterable[Tuple['EmojiSequence', int, int]]:
         """Return an iterator which yields all emoji sequences in a string, without actually storing them all simultaneously.
 
         Item of the iterator is a 3-member tuple:
