@@ -78,7 +78,7 @@ jobs:
       - name: Upload dist to artifact
         uses: actions/upload-artifact@v3
         with:
-          name: pyyaml_include-dist-${{ needs.check-pep440.outputs.version }}
+          name: emoji_data-dist-${{ needs.check-pep440.outputs.version }}
           path: dist
           if-no-files-found: error
           retention-days: 1
@@ -91,7 +91,7 @@ jobs:
       - name: Download dist from artifact
         uses: actions/download-artifact@v3
         with:
-          name: pyyaml_include-dist-${{needs.check-pep440.outputs.version}}
+          name: emoji_data-dist-${{needs.check-pep440.outputs.version}}
           path: dist
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@release/v1
