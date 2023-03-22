@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 0.2 (developing)
+## 0.2
 
 - Update:
   - Emoji version 15.0
