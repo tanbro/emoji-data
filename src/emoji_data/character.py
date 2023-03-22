@@ -1,6 +1,10 @@
-import importlib.resources
 from enum import Enum
 from typing import Iterable, List, Tuple, Union
+
+try:
+    import importlib.resources as importlib_resources
+except ImportError:
+    import importlib_resources  # type: ignore
 
 from . import version
 from .types import BaseDictContainer
@@ -94,7 +98,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         """
         if cls._initialed:
             return
-        with importlib.resources.open_text(f'{PACKAGE}.data', 'emoji-data.txt') as fp:
+        with importlib_resources.files(PACKAGE).joinpath('data', 'emoji-data.txt').open(encoding='utf8') as fp:
             for content, comment in read_data_file_iterable(fp):
                 cps, property_text = (part.strip() for part in content.split(';', 1))
                 cps_parts = cps.split('..', 1)

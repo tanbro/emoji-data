@@ -1,6 +1,10 @@
-import importlib.resources
 import re
 from typing import Iterable, List, Tuple, Union
+
+try:
+    import importlib.resources as importlib_resources
+except ImportError:
+    import importlib_resources  # type: ignore
 
 from . import version
 from .character import EmojiCharacter
@@ -84,7 +88,7 @@ class EmojiSequence(metaclass=_MetaClass):
             return
         EmojiCharacter.initial()
         for data_name, data_file in DATA_FILES.items():
-            with importlib.resources.open_text(f'{PACKAGE}.data', data_file) as fp:
+            with importlib_resources.files(PACKAGE).joinpath('data', data_file).open(encoding='utf8') as fp:
                 for content, comment in read_data_file_iterable(fp):
                     if data_name == 'test':
                         cps, status = (part.strip() for part in content.split(';', 1))

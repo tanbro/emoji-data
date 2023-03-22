@@ -12,6 +12,11 @@ authors = [
 
 requires-python = ">=3.7"
 
+dependencies = [
+    "importlib-resources;python<3.9",
+    
+]
+
 keywords = ["emoji", "unicode"]
 
 license = {text = "AGPLv3+"}
