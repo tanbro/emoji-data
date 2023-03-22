@@ -13,8 +13,7 @@ authors = [
 requires-python = ">=3.7"
 
 dependencies = [
-    "importlib-resources;python<3.9",
-    
+    "importlib-resources; python_version<'3.9'",
 ]
 
 keywords = ["emoji", "unicode"]
