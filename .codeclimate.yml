@@ -3,4 +3,3 @@ plugins:
     enabled: true
   bandit:
     enabled: true
-
