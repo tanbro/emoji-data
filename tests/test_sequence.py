@@ -1,4 +1,3 @@
-import importlib.resources
 import os
 import unittest
 
@@ -6,7 +5,7 @@ from emoji_data import (EmojiCharacter, EmojiSequence, QualifiedType,
                         code_points_to_string, detect_qualified,
                         is_emoji_character, is_emoji_flag_sequence,
                         is_emoji_keycap_sequence, is_emoji_modifier_sequence)
-from emoji_data.utils import read_data_file_iterable
+from emoji_data.utils import read_data_file_iterable, resources_files
 
 
 class SequenceTestCase(unittest.TestCase):
@@ -14,7 +13,7 @@ class SequenceTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        with importlib.resources.open_text('emoji_data.data', 'emoji-test.txt') as fp:
+        with resources_files('emoji_data').joinpath('data', 'emoji-test.txt').open(encoding='utf8') as fp:
             for content, _ in read_data_file_iterable(fp):
                 cls.test_data.append(tuple(s.strip() for s in content.split(';', 1)))  # type: ignore
 
