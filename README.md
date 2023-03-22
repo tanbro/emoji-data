@@ -1,6 +1,6 @@
 # emoji-data
 
-[![CircleCI](https://circleci.com/gh/tanbro/emoji-data.svg?style=svg)](https://circleci.com/gh/tanbro/emoji-data)
+[![CircleCI](https://github.com/tanbro/emoji-data/actions/workflows/python-package.yml/badge.svg)](https://github.com/tanbro/emoji-data/actions/workflows/python-package.yml)
 [![Documentation Status](https://readthedocs.org/projects/emoji-data/badge/?version=latest)](https://emoji-data.readthedocs.io/en/latest/?badge=latest)
 [![PyPI](https://img.shields.io/pypi/v/emoji-data.svg)](https://pypi.org/project/emoji-data/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/emoji-data.svg)](https://pypi.org/project/emoji-data/)
