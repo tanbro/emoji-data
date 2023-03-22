@@ -1,15 +1,10 @@
 import re
 from typing import Iterable, List, Tuple, Union
 
-try:
-    import importlib.resources as importlib_resources
-except ImportError:
-    import importlib_resources  # type: ignore
-
 from . import version
 from .character import EmojiCharacter
 from .types import BaseDictContainer
-from .utils import read_data_file_iterable
+from .utils import read_data_file_iterable, resources_files
 
 __all__ = ['EmojiSequence']
 
@@ -88,7 +83,7 @@ class EmojiSequence(metaclass=_MetaClass):
             return
         EmojiCharacter.initial()
         for data_name, data_file in DATA_FILES.items():
-            with importlib_resources.files(PACKAGE).joinpath('data', data_file).open(encoding='utf8') as fp:
+            with resources_files(PACKAGE).joinpath('data', data_file).open(encoding='utf8') as fp:
                 for content, comment in read_data_file_iterable(fp):
                     if data_name == 'test':
                         cps, status = (part.strip() for part in content.split(';', 1))

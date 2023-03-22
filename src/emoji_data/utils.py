@@ -1,6 +1,14 @@
 from typing import Iterable, TextIO, Tuple, Union
 
-__all__ = ['code_points_to_string', 'code_point_to_regex']
+try:
+    from importlib.resources import files  # type: ignore
+except ImportError:
+    from importlib_resources import files  # type: ignore
+
+
+__all__ = ['code_points_to_string', 'code_point_to_regex', 'resources_files']
+
+resources_files = files
 
 
 def read_data_file_iterable(handle: TextIO) -> Iterable[Tuple[str, str]]:
