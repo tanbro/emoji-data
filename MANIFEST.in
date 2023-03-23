@@ -1,4 +1,3 @@
-exclude Makefile
 exclude .git*
 exclude .*
 exclude readthedocs.yml
@@ -6,6 +5,7 @@ exclude sonar-project.properties
 
 prune .*
 prune *.git*
+prune build
 prune dist
 prune docs
 prune notebooks
