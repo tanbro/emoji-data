@@ -1,9 +1,8 @@
 from enum import Enum
 from typing import Iterable, List, Tuple, Union
 
-from . import version
 from .types import BaseDictContainer
-from .utils import code_point_to_regex, read_data_file_iterable, resources_files
+from .utils import code_point_to_regex, data_file, read_data_file_iterable
 
 __all__ = ['EmojiCharProperty', 'EmojiCharacter', 'TEXT_PRESENTATION_SELECTOR', 'EMOJI_PRESENTATION_SELECTOR',
            'EMOJI_KEYCAP', 'REGIONAL_INDICATORS', 'TAGS', 'ZWJ']
@@ -91,7 +90,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         """
         if cls._initialed:
             return
-        with resources_files(version.__package__).joinpath('data', 'emoji-data.txt').open(encoding='utf8') as fp:
+        with data_file('emoji-data.txt').open(encoding='utf8') as fp:
             for content, comment in read_data_file_iterable(fp):
                 cps, property_text = (part.strip() for part in content.split(';', 1))
                 cps_parts = cps.split('..', 1)
