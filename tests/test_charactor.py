@@ -9,9 +9,9 @@ class CharacterTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        with data_file('emoji-test.txt').open(encoding='utf8') as fp:
+        with data_file("emoji-test.txt").open(encoding="utf8") as fp:
             for content, _ in read_data_file_iterable(fp):
-                cls.test_data.append([s.strip() for s in content.split(';', 1)])
+                cls.test_data.append([s.strip() for s in content.split(";", 1)])
 
     def test_code_points(self):
         for code_points, _ in self.test_data:
@@ -19,5 +19,5 @@ class CharacterTestCase(unittest.TestCase):
             self.assertTrue(all(is_emoji_character(c) for c in s))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

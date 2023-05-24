@@ -1,3 +1,6 @@
+__all__ = ["BaseDictContainer"]
+
+
 class BaseDictContainer(type):
     def __new__(cls, name, bases, attrs):
         cls.__data__ = dict()

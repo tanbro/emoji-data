@@ -4,8 +4,17 @@ from typing import Iterable, List, Tuple, Union
 from .types import BaseDictContainer
 from .utils import code_point_to_regex, data_file, read_data_file_iterable
 
-__all__ = ['EmojiCharProperty', 'EmojiCharacter', 'TEXT_PRESENTATION_SELECTOR', 'EMOJI_PRESENTATION_SELECTOR',
-           'EMOJI_KEYCAP', 'REGIONAL_INDICATORS', 'TAGS', 'ZWJ']
+
+__all__ = [
+    "EmojiCharProperty",
+    "EmojiCharacter",
+    "TEXT_PRESENTATION_SELECTOR",
+    "EMOJI_PRESENTATION_SELECTOR",
+    "EMOJI_KEYCAP",
+    "REGIONAL_INDICATORS",
+    "TAGS",
+    "ZWJ",
+]
 
 
 TEXT_PRESENTATION_SELECTOR = 0xFE0E
@@ -21,12 +30,13 @@ class EmojiCharProperty(Enum):
 
     see: http://www.unicode.org/reports/tr51/#Emoji_Properties
     """
-    EMOJI = 'Emoji'
-    EPRES = 'Emoji_Presentation'
-    EMOD = 'Emoji_Modifier'
-    EBASE = 'Emoji_Modifier_Base'
-    ECOMP = 'Emoji_Component'
-    EXTPICT = 'Extended_Pictographic'
+
+    EMOJI = "Emoji"
+    EPRES = "Emoji_Presentation"
+    EMOD = "Emoji_Modifier"
+    EBASE = "Emoji_Modifier_Base"
+    ECOMP = "Emoji_Component"
+    EXTPICT = "Extended_Pictographic"
 
 
 class _MetaClass(BaseDictContainer):
@@ -39,11 +49,12 @@ class EmojiCharacter(metaclass=_MetaClass):
     see: http://www.unicode.org/reports/tr51/#Emoji_Characters
     """
 
-    def __init__(self,
-                 code_point: int,
-                 properties: Union[Iterable[EmojiCharProperty], EmojiCharProperty, None] = None,
-                 comments: Union[Iterable[str], str, None] = None,
-                 ):
+    def __init__(
+        self,
+        code_point: int,
+        properties: Union[Iterable[EmojiCharProperty], EmojiCharProperty, None] = None,
+        comments: Union[Iterable[str], str, None] = None,
+    ):
         self._code_point = code_point
         self._string = chr(self._code_point)
         self._regex = code_point_to_regex(code_point)
@@ -56,7 +67,7 @@ class EmojiCharacter(metaclass=_MetaClass):
             self._properties = list(properties)
         else:
             raise TypeError(
-                f'Argument `properties` expects `EmojiCharProperty`, `Iterable[EmojiCharProperty]`, or `None`, but actual {type(properties)}'
+                f"Argument `properties` expects `EmojiCharProperty`, `Iterable[EmojiCharProperty]`, or `None`, but actual {type(properties)}"
             )
         #
         if comments is None:
@@ -66,15 +77,13 @@ class EmojiCharacter(metaclass=_MetaClass):
         elif isinstance(comments, Iterable):
             self._comments = [s for s in comments if isinstance(s, str)]
         else:
-            raise TypeError(
-                f'Argument `comments` expects `str`, `Iterable[str]`, or `None`, but actual {type(comments)}'
-            )
+            raise TypeError(f"Argument `comments` expects `str`, `Iterable[str]`, or `None`, but actual {type(comments)}")
 
     def __str__(self):
         return self._string
 
     def __repr__(self):
-        return '<{} hex={} char={!r}>'.format(
+        return "<{} hex={} char={!r}>".format(
             type(self).__name__,
             self.hex,
             self.string,
@@ -90,10 +99,10 @@ class EmojiCharacter(metaclass=_MetaClass):
         """
         if cls._initialed:
             return
-        with data_file('emoji-data.txt').open(encoding='utf8') as fp:
+        with data_file("emoji-data.txt").open(encoding="utf8") as fp:
             for content, comment in read_data_file_iterable(fp):
-                cps, property_text = (part.strip() for part in content.split(';', 1))
-                cps_parts = cps.split('..', 1)
+                cps, property_text = (part.strip() for part in content.split(";", 1))
+                cps_parts = cps.split("..", 1)
                 property_ = EmojiCharProperty(property_text)
                 for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):
                     try:
@@ -119,15 +128,13 @@ class EmojiCharacter(metaclass=_MetaClass):
         cls._initialed = False
 
     @classmethod
-    def items(cls) -> Iterable[Tuple[int, 'EmojiCharacter']]:
-        """Return an iterator of all code-point -> emoji-character pairs of the class
-        """
+    def items(cls) -> Iterable[Tuple[int, "EmojiCharacter"]]:
+        """Return an iterator of all code-point -> emoji-character pairs of the class"""
         return ((k, cls[k]) for k in cls)
 
     @classmethod
-    def values(cls) -> Iterable['EmojiCharacter']:
-        """Return an iterator of all emoji-characters of the class
-        """
+    def values(cls) -> Iterable["EmojiCharacter"]:
+        """Return an iterator of all emoji-characters of the class"""
         return (cls[k] for k in cls)
 
     def add_property(self, val: EmojiCharProperty):
@@ -187,7 +194,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         return self._string
 
     @classmethod
-    def from_string(cls, value: str) -> 'EmojiCharacter':
+    def from_string(cls, value: str) -> "EmojiCharacter":
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode character
 
         :param str value: Emoji character
@@ -198,7 +205,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         return cls[ord(value)]
 
     @classmethod
-    def from_hex(cls, value: Union[int, str]) -> 'EmojiCharacter':
+    def from_hex(cls, value: Union[int, str]) -> "EmojiCharacter":
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode integer value or it's hex string
 
         :param Union[int, str] value: Emoji Unicode, either integer value or hex string

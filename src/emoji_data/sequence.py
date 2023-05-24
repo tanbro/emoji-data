@@ -5,14 +5,15 @@ from .character import EmojiCharacter
 from .types import BaseDictContainer
 from .utils import data_file, read_data_file_iterable
 
-__all__ = ['EmojiSequence']
+
+__all__ = ["EmojiSequence"]
 
 
 DATA_FILES = {
-    'zwj-sequences': 'emoji-zwj-sequences.txt',
-    'sequences': 'emoji-sequences.txt',
-    'variation-sequences': 'emoji-variation-sequences.txt',
-    'test': 'emoji-test.txt',
+    "zwj-sequences": "emoji-zwj-sequences.txt",
+    "sequences": "emoji-sequences.txt",
+    "variation-sequences": "emoji-variation-sequences.txt",
+    "test": "emoji-test.txt",
 }
 
 
@@ -26,26 +27,28 @@ class EmojiSequence(metaclass=_MetaClass):
     see: http://www.unicode.org/reports/tr51/#Emoji_Variation_Sequences
     """
 
-    def __init__(self,
-                 code_points: Union[Iterable[int], int],
-                 status: str = '',
-                 type_field: str = '',
-                 description: str = '',
-                 comment: str = ''):
+    def __init__(
+        self,
+        code_points: Union[Iterable[int], int],
+        status: str = "",
+        type_field: str = "",
+        description: str = "",
+        comment: str = "",
+    ):
         if isinstance(code_points, Iterable):
             self._code_points = list(code_points)
         else:
             self._code_points = [code_points]
         self._status = status.strip()
-        self._string = ''.join(chr(n) for n in self._code_points)
+        self._string = "".join(chr(n) for n in self._code_points)
         self._characters = [EmojiCharacter.from_hex(n) for n in self._code_points]
         self._type_field = type_field.strip()
         self._comment = comment.strip()
         self._description = description
         # regex
-        self._regex = r''
+        self._regex = r""
         if not self._regex:
-            self._regex = ''.join(m.regex for m in self._characters)
+            self._regex = "".join(m.regex for m in self._characters)
         self._regex_compiled = re.compile(self._regex)
 
     def __len__(self):
@@ -55,17 +58,17 @@ class EmojiSequence(metaclass=_MetaClass):
         return self._string
 
     def __repr__(self):
-        return '<{} code_points={!r} status={!r}, string={!r}, description={!r}>'.format(
+        return "<{} code_points={!r} status={!r}, string={!r}, description={!r}>".format(
             type(self).__name__,
-            ' '.join('{:04X}'.format(n) for n in self._code_points),
+            " ".join("{:04X}".format(n) for n in self._code_points),
             self._status,
             self._string,
-            self._description
+            self._description,
         )
 
     _initialed = False
 
-    pattern = re.compile(r'')
+    pattern = re.compile(r"")
     """Compiled regular express pattern object for all-together Emoji sequences.
     """
 
@@ -79,10 +82,10 @@ class EmojiSequence(metaclass=_MetaClass):
             return
         EmojiCharacter.initial()
         for name, file in DATA_FILES.items():
-            with data_file(file).open(encoding='utf8') as fp:
+            with data_file(file).open(encoding="utf8") as fp:
                 for content, comment in read_data_file_iterable(fp):
-                    if name == 'test':
-                        cps, status = (part.strip() for part in content.split(';', 1))
+                    if name == "test":
+                        cps, status = (part.strip() for part in content.split(";", 1))
                         code_points = [int(cp, 16) for cp in cps.split()]
                         inst = cls(code_points, status=status, comment=comment)
                         s = inst.string
@@ -93,25 +96,25 @@ class EmojiSequence(metaclass=_MetaClass):
                         else:
                             existed_inst.status = status
                     else:
-                        cps, type_field, description = (part.strip() for part in content.split(';', 2))
+                        cps, type_field, description = (part.strip() for part in content.split(";", 2))
                         # codes ...
                         try:
-                            cp_head, cp_tail = cps.split('..', 1)  # begin..end form
+                            cp_head, cp_tail = cps.split("..", 1)  # begin..end form
                         except ValueError:
                             code_points = [int(cp, 16) for cp in cps.split()]
-                            inst = cls(code_points, type_field, '', description, comment)
+                            inst = cls(code_points, type_field, "", description, comment)
                             text = inst.string
                             if text not in cls:
                                 cls[text] = inst
                         else:
                             # A range of single char emoji-seq
                             for cp in range(int(cp_head, 16), 1 + int(cp_tail, 16)):
-                                inst = cls(cp, type_field, '', description, comment)
+                                inst = cls(cp, type_field, "", description, comment)
                                 if inst.string not in cls:
                                     cls[inst.string] = inst
         # build regex
         ordered_list = sorted((m for m in cls.values()), key=lambda x: len(x.code_points), reverse=True)
-        exp = r'|'.join(m.regex for m in ordered_list)
+        exp = r"|".join(m.regex for m in ordered_list)
         cls.pattern = re.compile(exp)
         # initialed OK
         cls._initialed = True
@@ -126,19 +129,17 @@ class EmojiSequence(metaclass=_MetaClass):
         cls._initialed = False
 
     @classmethod
-    def items(cls) -> Iterable[Tuple[str, 'EmojiSequence']]:
-        """Return an iterator of all string -> emoji-sequence pairs of the class
-        """
+    def items(cls) -> Iterable[Tuple[str, "EmojiSequence"]]:
+        """Return an iterator of all string -> emoji-sequence pairs of the class"""
         return ((k, cls[k]) for k in cls)
 
     @classmethod
-    def values(cls) -> Iterable['EmojiSequence']:
-        """Return an iterator of all emoji-sequences of the class
-        """
+    def values(cls) -> Iterable["EmojiSequence"]:
+        """Return an iterator of all emoji-sequences of the class"""
         return (cls[k] for k in cls)
 
     @classmethod
-    def from_text(cls, value: str) -> 'EmojiSequence':
+    def from_text(cls, value: str) -> "EmojiSequence":
         """Get an :class:`EmojiSequence` instance by text
 
         :param str value: Emoji string
@@ -149,15 +150,15 @@ class EmojiSequence(metaclass=_MetaClass):
         """
         value = value.strip()
         if not all(ord(s) in EmojiCharacter for s in value):
-            raise RuntimeError('Not all characters in the text is Emoji character.')
+            raise RuntimeError("Not all characters in the text is Emoji character.")
         try:
             return cls[value]
         except KeyError:
-            code_points_text = ' '.join('{:04X}'.format(ord(c)) for c in value)
-            raise KeyError('[{}]({!r})'.format(code_points_text, value))
+            code_points_text = " ".join("{:04X}".format(ord(c)) for c in value)
+            raise KeyError("[{}]({!r})".format(code_points_text, value))
 
     @classmethod
-    def from_emoji_character(cls, value: Union[EmojiCharacter, Iterable[EmojiCharacter]]) -> 'EmojiSequence':
+    def from_emoji_character(cls, value: Union[EmojiCharacter, Iterable[EmojiCharacter]]) -> "EmojiSequence":
         """Get an :class:`EmojiSequence` instance by :class:`EmojiCharacter` object or list
 
         :param value: Single or iterable object of :class:`EmojiCharacter`, composing the sequence
@@ -168,13 +169,13 @@ class EmojiSequence(metaclass=_MetaClass):
         if isinstance(value, EmojiCharacter):
             s = value.string
         elif isinstance(value, Iterable):
-            s = ''.join(m.string for m in value)
+            s = "".join(m.string for m in value)
         else:
-            raise TypeError('Argument `value` must be one of `EmojiCharacter` or `Iterable[EmojiCharacter]`')
+            raise TypeError("Argument `value` must be one of `EmojiCharacter` or `Iterable[EmojiCharacter]`")
         return cls.from_text(s)
 
     @classmethod
-    def from_hex(cls, value: Union[str, int, Iterable[str], Iterable[int]]) -> 'EmojiSequence':
+    def from_hex(cls, value: Union[str, int, Iterable[str], Iterable[int]]) -> "EmojiSequence":
         """Get an :class:`EmojiSequence` instance by unicode code point(s)
 
         :type value: Union[str, int, Iterable[str], Iterable[int]]
@@ -199,9 +200,7 @@ class EmojiSequence(metaclass=_MetaClass):
         elif isinstance(value, Iterable):
             cps_array = value
         else:
-            raise TypeError(
-                'The `args` should be one of `str`, `int`, or a sequence of that'
-            )
+            raise TypeError("The `args` should be one of `str`, `int`, or a sequence of that")
         return cls.from_emoji_character(EmojiCharacter.from_hex(cp) for cp in cps_array)
 
     @property
@@ -262,8 +261,7 @@ class EmojiSequence(metaclass=_MetaClass):
 
     @property
     def regex_compiled(self):
-        """Compiled regular express pattern of the Emoji Sequence
-        """
+        """Compiled regular express pattern of the Emoji Sequence"""
         return self._regex_compiled
 
     @property
@@ -275,13 +273,12 @@ class EmojiSequence(metaclass=_MetaClass):
         return self._code_points
 
     @classmethod
-    def find(cls, s: str) -> List[Tuple['EmojiSequence', int, int]]:
-        """Finds out all emoji sequences in a string, and return them in a list
-        """
+    def find(cls, s: str) -> List[Tuple["EmojiSequence", int, int]]:
+        """Finds out all emoji sequences in a string, and return them in a list"""
         return list(cls.iter_find(s))
 
     @classmethod
-    def iter_find(cls, s: str) -> Iterable[Tuple['EmojiSequence', int, int]]:
+    def iter_find(cls, s: str) -> Iterable[Tuple["EmojiSequence", int, int]]:
         """Return an iterator which yields all emoji sequences in a string, without actually storing them all simultaneously.
 
         Item of the iterator is a 3-member tuple:
