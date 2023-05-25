@@ -197,6 +197,9 @@ class EmojiCharacter(metaclass=_MetaClass):
     def from_string(cls, value: str) -> "EmojiCharacter":
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode character
 
+        .. note::
+            The argument ``value`` should be a single unicode character.
+
         :param str value: Emoji character
         :return: Instance returned from the class's internal dictionary
         :rtype: EmojiCharacter

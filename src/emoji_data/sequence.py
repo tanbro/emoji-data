@@ -244,6 +244,11 @@ class EmojiSequence(metaclass=_MetaClass):
         return self._characters
 
     @property
+    def hex(self) -> str:
+        """Return code points in hex format string, separated by spaces"""
+        return " ".join(c.hex for c in self._characters)
+
+    @property
     def string(self) -> str:
         """string of the Emoji Sequence
 
@@ -274,7 +279,7 @@ class EmojiSequence(metaclass=_MetaClass):
 
     @classmethod
     def find(cls, s: str) -> List[Tuple["EmojiSequence", int, int]]:
-        """Finds out all emoji sequences in a string, and return them in a list"""
+        """Find out all emoji sequences in a string, and return them in a list"""
         return list(cls.iter_find(s))
 
     @classmethod

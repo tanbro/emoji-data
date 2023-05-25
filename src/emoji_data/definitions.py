@@ -157,65 +157,119 @@ EMOJI_PATTERNS = {k[3:]: re.compile(v) for k, v in _RE.items()}
 
 
 def is_emoji_character(c: str) -> bool:
-    """Tell if this is a character
+    """Is ``c`` an emoji character?
 
-    This can also be done by::
+    A character that has the Emoji property.
 
-        c in (str(x) for x in emoji_data.EmojiCharacter.values())
+    see: https://unicode.org/reports/tr51/#Emoji_Characters
     """
-    _l = len(c)
-    if _l > 1:
-        raise TypeError(f"is_emoji_character() expected a character, but string of length {_l} found ")
-    return EMOJI_PATTERNS["EMOJI_CHARACTER"].fullmatch(c) is not None
+    return ord(c) in EmojiCharacter
 
 
 def is_default_emoji_presentation_character(c: str) -> bool:
-    _l = len(c)
-    if _l > 1:
-        raise TypeError(f"is_default_emoji_presentation_character() expected a character, but string of length {_l} found ")
-    return EMOJI_PATTERNS["DEFAULT_EMOJI_PRESENTATION_CHARACTER"].fullmatch(c) is not None
+    """Is ``c`` a default emoji presentation character?
+
+    A character that, by default, should appear with an emoji presentation, rather than a text presentation.
+
+    see: https://unicode.org/reports/tr51/#def_emoji_presentation
+    """
+    _c = chr(ord(c))
+    return EMOJI_PATTERNS["DEFAULT_EMOJI_PRESENTATION_CHARACTER"].fullmatch(_c) is not None
 
 
 def is_default_text_presentation_character(c: str) -> bool:
-    _l = len(c)
-    if _l > 1:
-        raise TypeError(f"is_default_text_presentation_character() expected a character, but string of length {_l} found ")
-    return EMOJI_PATTERNS["DEFAULT_TEXT_PRESENTATION_CHARACTER"].fullmatch(c) is not None
+    """Is ``c`` a default text presentation character
+
+    A character that, by default, should appear with a text presentation, rather than an emoji presentation.
+
+    see: https://unicode.org/reports/tr51/#def_text_presentation_sequence
+    """
+    _c = chr(ord(c))
+    return EMOJI_PATTERNS["DEFAULT_TEXT_PRESENTATION_CHARACTER"].fullmatch(_c) is not None
 
 
 def is_text_presentation_selector(c: str) -> bool:
+    """Is ``c`` a text presentation selector
+
+    The character U+FE0E VARIATION SELECTOR-15 (VS15), used to request a text presentation for an emoji character. (Also known as text variation selector in prior versions of this specification.)
+
+    see: https://unicode.org/reports/tr51/#def_emoji_presentation_selector
+    """
     return EMOJI_PATTERNS["TEXT_PRESENTATION_SELECTOR"].fullmatch(c) is not None
 
 
 def is_text_presentation_sequence(s: str) -> bool:
+    """Is ``s`` a text presentation selector
+
+    The character U+FE0E VARIATION SELECTOR-15 (VS15), used to request a text presentation for an emoji character. (Also known as text variation selector in prior versions of this specification.)
+
+    see: https://unicode.org/reports/tr51/#def_text_presentation_sequence
+    """
     return EMOJI_PATTERNS["TEXT_PRESENTATION_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_emoji_presentation_selector(c: str) -> bool:
+    """detect emoji presentation selector
+
+    The character U+FE0F VARIATION SELECTOR-16 (VS16), used to request an emoji presentation for an emoji character. (Also known as emoji variation selector in prior versions of this specification.)
+
+    see: https://unicode.org/reports/tr51/#def_emoji_presentation_selector
+    """
     return EMOJI_PATTERNS["EMOJI_PRESENTATION_SELECTOR"].fullmatch(c) is not None
 
 
 def is_emoji_presentation_sequence(s: str) -> bool:
+    """detect emoji presentation sequence
+
+    A variation sequence consisting of an emoji character followed by a emoji presentation selector.
+
+    see: https://unicode.org/reports/tr51/#def_emoji_presentation_sequence
+    """
     return EMOJI_PATTERNS["EMOJI_PRESENTATION_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_emoji_modifier(c: str) -> bool:
-    return EMOJI_PATTERNS["EMOJI_MODIFIER"].fullmatch(c) is not None
+    """detect emoji modifier
+
+    A character that can be used to modify the appearance of a preceding emoji in an emoji modifier sequence.
+
+    see: https://unicode.org/reports/tr51/#def_emoji_modifier
+    """
+    _c = chr(ord(c))
+    return EMOJI_PATTERNS["EMOJI_MODIFIER"].fullmatch(_c) is not None
 
 
 def is_emoji_modifier_base(c: str) -> bool:
-    return EMOJI_PATTERNS["EMOJI_MODIFIER_BASE"].fullmatch(c) is not None
+    """Detect emoji modifier base
+
+    A character whose appearance can be modified by a subsequent emoji modifier in an emoji modifier sequence.
+
+    see: https://unicode.org/reports/tr51/#def_emoji_modifier_base
+    """
+    _c = chr(ord(c))
+    return EMOJI_PATTERNS["EMOJI_MODIFIER_BASE"].fullmatch(_c) is not None
 
 
 def is_emoji_modifier_sequence(s: str) -> bool:
+    """Detect emoji modifier sequence
+
+    A sequence of the following form::
+
+    emoji_modifier_sequence := emoji_modifier_base emoji_modifier
+    """
     return EMOJI_PATTERNS["EMOJI_MODIFIER_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_regional_indicator(s: str) -> bool:
+    """A singleton Regional Indicator character is not a well-formed emoji flag sequence."""
     return EMOJI_PATTERNS["REGIONAL_INDICATOR"].fullmatch(s) is not None
 
 
 def is_emoji_flag_sequence(s: str) -> bool:
+    """Detect emoji flag sequence
+
+    A sequence of two Regional Indicator characters, where the corresponding ASCII characters are valid region sequences as specified by Unicode region subtags in [CLDR], with idStatus = “regular”, “deprecated”, or “macroregion”.
+    """
     return EMOJI_PATTERNS["EMOJI_FLAG_SEQUENCE"].fullmatch(s) is not None
 
 
@@ -236,6 +290,12 @@ def is_emoji_tag_sequence(s: str) -> bool:
 
 
 def is_emoji_keycap_sequence(s: str) -> bool:
+    """Detect emoji keycap sequence
+    
+    A sequence of the following form::
+
+        emoji_keycap_sequence := [0-9#*] \\x{FE0F 20E3}
+    """
     return EMOJI_PATTERNS["EMOJI_KEYCAP_SEQUENCE"].fullmatch(s) is not None
 
 
@@ -287,7 +347,7 @@ def detect_qualified(s: str) -> QualifiedType:
     - unqualified emoji — An emoji that is neither fully-qualified nor minimally qualified.
 
     :param str s: string to detect
-    :retype: QualifiedType
+    :rtype: QualifiedType
     """
     s = s.strip()
     if not all(is_emoji_character(c) for c in s):
