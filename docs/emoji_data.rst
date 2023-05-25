@@ -1,10 +1,19 @@
 emoji\_data package
 ===================
 
+Module contents
+---------------
+
+.. automodule:: emoji_data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Submodules
 ----------
 
 .. toctree::
+   :maxdepth: 4
 
    emoji_data.character
    emoji_data.definitions
@@ -12,11 +21,3 @@ Submodules
    emoji_data.types
    emoji_data.utils
    emoji_data.version
-
-Module contents
----------------
-
-.. automodule:: emoji_data
-    :members:
-    :undoc-members:
-    :show-inheritance:

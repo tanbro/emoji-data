@@ -12,14 +12,15 @@ Contents
    :caption: Documentations
    :titlesonly:
 
-   README <README>
-   CHANGELOG
-   AUTHORS
+   README <README.md>
+   CHANGELOG <CHANGELOG.md>
+   AUTHORS <AUTHORS.md>
 
 .. toctree::
     :caption: API References
+    :titlesonly:
 
-    modules
+    emoji_data
 
 .. toctree::
    :caption: Notebooks
