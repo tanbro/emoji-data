@@ -8,7 +8,7 @@ A library represents emoji sequences and characters in [Unicode® Technical Stan
 
 ## How to use
 
-Examples below are also in a [notebook](notebooks/example)
+Examples below are also in a [notebook](notebooks/example.ipynb)
 
 Class `EmojiSequence` is most useful:
 

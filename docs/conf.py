@@ -58,6 +58,9 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
     "nbsphinx",
+    # "sphinxext.opengraph",
+    "sphinx_inline_tabs",
+    "sphinx_copybutton",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -70,7 +73,6 @@ templates_path = ["_templates"]
 source_suffix = {
     ".rst": "restructuredtext",
     ".md": "markdown",
-    ".txt": "markdown",
 }
 
 # The master toctree document.
@@ -104,10 +106,6 @@ html_theme = "furo"
 # documentation.
 #
 # html_theme_options = {}
-html_theme_options = {
-    'github_user': 'tanbro',
-    'github_repo': 'emoji-data',
-}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
