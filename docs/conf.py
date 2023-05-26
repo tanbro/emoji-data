@@ -32,7 +32,7 @@ author = "liu xue yan"
 # version = ''
 # # The full version, including alpha/beta/rc tags
 # release = '0.1'
-
+#
 # full version
 version = importlib_metadata.version(project)
 # major/minor version
@@ -97,13 +97,17 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'furo'
+html_theme = "furo"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
 # html_theme_options = {}
+html_theme_options = {
+    'github_user': 'tanbro',
+    'github_repo': 'emoji-data',
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -124,7 +128,7 @@ html_theme = 'furo'
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = "emoji-datadoc"
+htmlhelp_basename = "emoji-data"
 
 
 # -- Options for LaTeX output ------------------------------------------------

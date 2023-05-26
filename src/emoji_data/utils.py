@@ -6,7 +6,7 @@ except ImportError:
     from importlib_resources import files  # type: ignore
 
 
-__all__ = ["code_points_to_string", "code_point_to_regex", "data_file"]
+__all__ = ["code_points_to_string", "code_point_to_regex", "data_file", "read_data_file_iterable"]
 
 
 def data_file(file):

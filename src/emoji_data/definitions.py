@@ -1,6 +1,6 @@
 """Regular expressions for Emoji Definitions
 
-see: http://www.unicode.org/reports/tr51/#Definitions
+ref: http://www.unicode.org/reports/tr51/#Definitions
 """
 
 import re
@@ -53,157 +53,131 @@ class QualifiedType(Enum):
     UNQUALIFIED = "unqualified"
 
 
-_RE = dict()
+def _make_regex_dict():
+    d = dict()
+    d.update({"EMOJI_CHARACTER": r"[" + "".join(m.regex for m in EmojiCharacter.values()) + r"]"})
+    d.update(
+        {
+            "DEFAULT_EMOJI_PRESENTATION_CHARACTER": r"["
+            + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EPRES in m.properties)
+            + r"]"
+        }
+    )
+    d.update(
+        {
+            "DEFAULT_TEXT_PRESENTATION_CHARACTER": r"["
+            + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EPRES not in m.properties)
+            + r"]"
+        }
+    )
+    d.update({"TEXT_PRESENTATION_SELECTOR": code_point_to_regex(TEXT_PRESENTATION_SELECTOR)})
+    d.update({"TEXT_PRESENTATION_SEQUENCE": r"({EMOJI_CHARACTER}{TEXT_PRESENTATION_SELECTOR})".format(**d)})
+    d.update({"EMOJI_PRESENTATION_SELECTOR": code_point_to_regex(EMOJI_PRESENTATION_SELECTOR)})
+    d.update({"EMOJI_PRESENTATION_SEQUENCE": r"({EMOJI_CHARACTER}{EMOJI_PRESENTATION_SELECTOR})".format(**d)})
+    d.update(
+        {
+            "EMOJI_MODIFIER": r"["
+            + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EMOD in m.properties)
+            + r"]"
+        }
+    )
+    d.update(
+        {
+            "EMOJI_MODIFIER_BASE": r"["
+            + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EBASE in m.properties)
+            + r"]"
+        }
+    )
+    d.update({"EMOJI_MODIFIER_SEQUENCE": r"({EMOJI_MODIFIER_BASE}{EMOJI_MODIFIER})".format(**d)})
+    d.update(
+        {
+            "REGIONAL_INDICATOR": r"["
+            + code_point_to_regex(REGIONAL_INDICATORS[0])
+            + r"-"
+            + code_point_to_regex(REGIONAL_INDICATORS[-1])
+            + r"]"
+        }
+    )
+    d.update({"EMOJI_FLAG_SEQUENCE": r"({REGIONAL_INDICATOR}{REGIONAL_INDICATOR})".format(**d)})
+    d.update({"TAG_BASE": r"({EMOJI_CHARACTER}|{EMOJI_MODIFIER_SEQUENCE}|{EMOJI_PRESENTATION_SEQUENCE})".format(**d)})
+    d.update({"TAG_SPEC": r"[" + code_point_to_regex(TAGS[0]) + r"-" + code_point_to_regex(TAGS[-2]) + r"]"})
+    d.update({"TAG_TERM": code_point_to_regex(TAGS[-1])})
+    d.update({"EMOJI_TAG_SEQUENCE": r"({TAG_BASE}{TAG_SPEC}{TAG_TERM})".format(**d)})
+    d.update(
+        {
+            "EMOJI_KEYCAP_SEQUENCE": r"([0-9#*]{}{})".format(
+                *(code_point_to_regex(n) for n in (EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP))
+            )
+        }
+    )
+    d.update(
+        {
+            "EMOJI_COSEQUENCE": r"("
+            r"{EMOJI_CHARACTER}"
+            r"|{EMOJI_PRESENTATION_SEQUENCE}"
+            r"|{EMOJI_KEYCAP_SEQUENCE}"
+            r"|{EMOJI_MODIFIER_SEQUENCE}"
+            r"|{EMOJI_FLAG_SEQUENCE}"
+            r")".format(**d)
+        }
+    )
+    d.update({"EMOJI_ZWJ_ELEMENT": r"({EMOJI_CHARACTER}|{EMOJI_PRESENTATION_SEQUENCE}|{EMOJI_MODIFIER_SEQUENCE})".format(**d)})
+    d.update({"EMOJI_ZWJ_SEQUENCE": r"({EMOJI_ZWJ_ELEMENT}({0}{EMOJI_ZWJ_ELEMENT})+)".format(code_point_to_regex(ZWJ), **d)})
+    d.update({"EMOJI_SEQUENCE": r"({EMOJI_COSEQUENCE}|{EMOJI_ZWJ_SEQUENCE}|{EMOJI_TAG_SEQUENCE})".format(**d)})
+    return d
 
-_RE.update({"RE_EMOJI_CHARACTER": r"[" + "".join(m.regex for m in EmojiCharacter.values()) + r"]"})
 
-_RE.update(
-    {
-        "RE_DEFAULT_EMOJI_PRESENTATION_CHARACTER": r"["
-        + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EPRES in m.properties)
-        + r"]"
-    }
-)
-
-_RE.update(
-    {
-        "RE_DEFAULT_TEXT_PRESENTATION_CHARACTER": r"["
-        + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EPRES not in m.properties)
-        + r"]"
-    }
-)
-
-_RE.update({"RE_TEXT_PRESENTATION_SELECTOR": code_point_to_regex(TEXT_PRESENTATION_SELECTOR)})
-
-_RE.update({"RE_TEXT_PRESENTATION_SEQUENCE": r"({RE_EMOJI_CHARACTER}{RE_TEXT_PRESENTATION_SELECTOR})".format(**_RE)})
-
-_RE.update({"RE_EMOJI_PRESENTATION_SELECTOR": code_point_to_regex(EMOJI_PRESENTATION_SELECTOR)})
-
-_RE.update({"RE_EMOJI_PRESENTATION_SEQUENCE": r"({RE_EMOJI_CHARACTER}{RE_EMOJI_PRESENTATION_SELECTOR})".format(**_RE)})
-
-_RE.update(
-    {
-        "RE_EMOJI_MODIFIER": r"["
-        + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EMOD in m.properties)
-        + r"]"
-    }
-)
-
-_RE.update(
-    {
-        "RE_EMOJI_MODIFIER_BASE": r"["
-        + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EBASE in m.properties)
-        + r"]"
-    }
-)
-
-_RE.update({"RE_EMOJI_MODIFIER_SEQUENCE": r"({RE_EMOJI_MODIFIER_BASE}{RE_EMOJI_MODIFIER})".format(**_RE)})
-
-_RE.update(
-    {
-        "RE_REGIONAL_INDICATOR": r"["
-        + code_point_to_regex(REGIONAL_INDICATORS[0])
-        + r"-"
-        + code_point_to_regex(REGIONAL_INDICATORS[-1])
-        + r"]"
-    }
-)
-
-_RE.update({"RE_EMOJI_FLAG_SEQUENCE": r"({RE_REGIONAL_INDICATOR}{RE_REGIONAL_INDICATOR})".format(**_RE)})
-
-_RE.update({"RE_TAG_BASE": r"({RE_EMOJI_CHARACTER}|{RE_EMOJI_MODIFIER_SEQUENCE}|{RE_EMOJI_PRESENTATION_SEQUENCE})".format(**_RE)})
-
-_RE.update({"RE_TAG_SPEC": r"[" + code_point_to_regex(TAGS[0]) + r"-" + code_point_to_regex(TAGS[-2]) + r"]"})
-
-_RE.update({"RE_TAG_TERM": code_point_to_regex(TAGS[-1])})
-
-_RE.update({"RE_EMOJI_TAG_SEQUENCE": r"({RE_TAG_BASE}{RE_TAG_SPEC}{RE_TAG_TERM})".format(**_RE)})
-
-_RE.update(
-    {
-        "RE_EMOJI_KEYCAP_SEQUENCE": r"([0-9#*]{}{})".format(
-            *(code_point_to_regex(n) for n in (EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP))
-        )
-    }
-)
-
-_RE.update(
-    {
-        "RE_EMOJI_CORE_SEQUENCE": r"("
-        r"{RE_EMOJI_CHARACTER}"
-        r"|{RE_EMOJI_PRESENTATION_SEQUENCE}"
-        r"|{RE_EMOJI_KEYCAP_SEQUENCE}"
-        r"|{RE_EMOJI_MODIFIER_SEQUENCE}"
-        r"|{RE_EMOJI_FLAG_SEQUENCE}"
-        r")".format(**_RE)
-    }
-)
-
-_RE.update(
-    {
-        "RE_EMOJI_ZWJ_ELEMENT": r"({RE_EMOJI_CHARACTER}|{RE_EMOJI_PRESENTATION_SEQUENCE}|{RE_EMOJI_MODIFIER_SEQUENCE})".format(
-            **_RE
-        )
-    }
-)
-
-_RE.update(
-    {"RE_EMOJI_ZWJ_SEQUENCE": r"({RE_EMOJI_ZWJ_ELEMENT}({0}{RE_EMOJI_ZWJ_ELEMENT})+)".format(code_point_to_regex(ZWJ), **_RE)}
-)
-
-_RE.update({"RE_EMOJI_SEQUENCE": r"({RE_EMOJI_CORE_SEQUENCE}|{RE_EMOJI_ZWJ_SEQUENCE}|{RE_EMOJI_TAG_SEQUENCE})".format(**_RE)})
-
-EMOJI_PATTERNS = {k[3:]: re.compile(v) for k, v in _RE.items()}
+EMOJI_PATTERNS = {k: re.compile(v) for k, v in _make_regex_dict().items()}
 
 
 def is_emoji_character(c: str) -> bool:
-    """Is ``c`` an emoji character?
+    """detect emoji character
 
     A character that has the Emoji property.
 
-    see: https://unicode.org/reports/tr51/#Emoji_Characters
+    ref: https://unicode.org/reports/tr51/#Emoji_Characters
     """
     return ord(c) in EmojiCharacter
 
 
 def is_default_emoji_presentation_character(c: str) -> bool:
-    """Is ``c`` a default emoji presentation character?
+    """detect default emoji presentation character
 
     A character that, by default, should appear with an emoji presentation, rather than a text presentation.
 
-    see: https://unicode.org/reports/tr51/#def_emoji_presentation
+    ref: https://unicode.org/reports/tr51/#def_emoji_presentation
     """
     _c = chr(ord(c))
     return EMOJI_PATTERNS["DEFAULT_EMOJI_PRESENTATION_CHARACTER"].fullmatch(_c) is not None
 
 
 def is_default_text_presentation_character(c: str) -> bool:
-    """Is ``c`` a default text presentation character
+    """detect default text presentation character
 
     A character that, by default, should appear with a text presentation, rather than an emoji presentation.
 
-    see: https://unicode.org/reports/tr51/#def_text_presentation_sequence
+    ref: https://unicode.org/reports/tr51/#def_text_presentation_sequence
     """
     _c = chr(ord(c))
     return EMOJI_PATTERNS["DEFAULT_TEXT_PRESENTATION_CHARACTER"].fullmatch(_c) is not None
 
 
 def is_text_presentation_selector(c: str) -> bool:
-    """Is ``c`` a text presentation selector
+    """detect text presentation selector
 
     The character U+FE0E VARIATION SELECTOR-15 (VS15), used to request a text presentation for an emoji character. (Also known as text variation selector in prior versions of this specification.)
 
-    see: https://unicode.org/reports/tr51/#def_emoji_presentation_selector
+    ref: https://unicode.org/reports/tr51/#def_emoji_presentation_selector
     """
     return EMOJI_PATTERNS["TEXT_PRESENTATION_SELECTOR"].fullmatch(c) is not None
 
 
 def is_text_presentation_sequence(s: str) -> bool:
-    """Is ``s`` a text presentation selector
+    """detect text presentation selector
 
     The character U+FE0E VARIATION SELECTOR-15 (VS15), used to request a text presentation for an emoji character. (Also known as text variation selector in prior versions of this specification.)
 
-    see: https://unicode.org/reports/tr51/#def_text_presentation_sequence
+    ref: https://unicode.org/reports/tr51/#def_text_presentation_sequence
     """
     return EMOJI_PATTERNS["TEXT_PRESENTATION_SEQUENCE"].fullmatch(s) is not None
 
@@ -213,7 +187,7 @@ def is_emoji_presentation_selector(c: str) -> bool:
 
     The character U+FE0F VARIATION SELECTOR-16 (VS16), used to request an emoji presentation for an emoji character. (Also known as emoji variation selector in prior versions of this specification.)
 
-    see: https://unicode.org/reports/tr51/#def_emoji_presentation_selector
+    ref: https://unicode.org/reports/tr51/#def_emoji_presentation_selector
     """
     return EMOJI_PATTERNS["EMOJI_PRESENTATION_SELECTOR"].fullmatch(c) is not None
 
@@ -223,7 +197,7 @@ def is_emoji_presentation_sequence(s: str) -> bool:
 
     A variation sequence consisting of an emoji character followed by a emoji presentation selector.
 
-    see: https://unicode.org/reports/tr51/#def_emoji_presentation_sequence
+    ref: https://unicode.org/reports/tr51/#def_emoji_presentation_sequence
     """
     return EMOJI_PATTERNS["EMOJI_PRESENTATION_SEQUENCE"].fullmatch(s) is not None
 
@@ -233,7 +207,7 @@ def is_emoji_modifier(c: str) -> bool:
 
     A character that can be used to modify the appearance of a preceding emoji in an emoji modifier sequence.
 
-    see: https://unicode.org/reports/tr51/#def_emoji_modifier
+    ref: https://unicode.org/reports/tr51/#def_emoji_modifier
     """
     _c = chr(ord(c))
     return EMOJI_PATTERNS["EMOJI_MODIFIER"].fullmatch(_c) is not None
@@ -244,7 +218,7 @@ def is_emoji_modifier_base(c: str) -> bool:
 
     A character whose appearance can be modified by a subsequent emoji modifier in an emoji modifier sequence.
 
-    see: https://unicode.org/reports/tr51/#def_emoji_modifier_base
+    ref: https://unicode.org/reports/tr51/#def_emoji_modifier_base
     """
     _c = chr(ord(c))
     return EMOJI_PATTERNS["EMOJI_MODIFIER_BASE"].fullmatch(_c) is not None
@@ -291,7 +265,7 @@ def is_emoji_tag_sequence(s: str) -> bool:
 
 def is_emoji_keycap_sequence(s: str) -> bool:
     """Detect emoji keycap sequence
-    
+
     A sequence of the following form::
 
         emoji_keycap_sequence := [0-9#*] \\x{FE0F 20E3}
