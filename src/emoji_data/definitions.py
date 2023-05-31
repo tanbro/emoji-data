@@ -158,6 +158,12 @@ def is_default_emoji_presentation_character(c: str) -> bool:
 
     A character that, by default, should appear with an emoji presentation, rather than a text presentation.
 
+    ::
+
+        default_emoji_presentation_character := \\p{Emoji_Presentation}
+
+    - These characters have the Emoji_Presentation property.
+
     ref: https://unicode.org/reports/tr51/#def_emoji_presentation
     """
     _c = chr(ord(c))
@@ -323,11 +329,13 @@ def is_qualified_emoji_character(s: str, i: int) -> bool:
     ref: http://www.unicode.org/reports/tr51/#def_qualified_emoji_character
     """
     c = s[i]
-    if is_default_emoji_presentation_character(c):
+    if is_default_emoji_presentation_character(c):  # default emoji presentation
         return True
-    if EMOJI_PATTERNS["EMOJI_MODIFIER_SEQUENCE"].match(s[i:]):
+    if EMOJI_PATTERNS["EMOJI_MODIFIER_SEQUENCE"].match(s[i:]) is not None:  # first character in an emoji modifier sequence
         return True
-    if EMOJI_PATTERNS["EMOJI_PRESENTATION_SEQUENCE"].match(s[i:]):
+    if (
+        EMOJI_PATTERNS["EMOJI_PRESENTATION_SEQUENCE"].match(s[i:]) is not None
+    ):  # first character in an emoji presentation sequence
         return True
     return False
 
@@ -348,17 +356,13 @@ def detect_qualified(s: str) -> QualifiedType:
     :param str s: string to detect
     :rtype: QualifiedType
     """
-    if not is_emoji_sequence(s) and not is_emoji_character(s):
-        raise ValueError(f"{s!r} is not an emoji character or sequence string")
-    # if is_emoji_character(s):
-    #     if EmojiCharProperty.EPRES in EmojiCharacter.from_character(s).properties:
-    #         return QualifiedType.FULLY_QUALIFIED
-    # elif is_emoji_modifier_sequence(s):
-    #   return QualifiedType.FULLY_QUALIFIED
-    # elif is_emoji_presentation_sequence(s):
-    #     return QualifiedType.FULLY_QUALIFIED
-    if all(is_qualified_emoji_character(s, i) for i in range(len(s))):
-        return QualifiedType.FULLY_QUALIFIED
+    if not s:
+        raise ValueError(f"Argument `s` should not be empty or null")
     if is_qualified_emoji_character(s, 0):
+        n = len(s)
+        if n == 1:
+            return QualifiedType.FULLY_QUALIFIED
+        if all(is_qualified_emoji_character(s, i) for i in range(1, n)):
+            return QualifiedType.FULLY_QUALIFIED
         return QualifiedType.MINIMALLY_QUALIFIED
     return QualifiedType.UNQUALIFIED
