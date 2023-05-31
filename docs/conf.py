@@ -107,6 +107,16 @@ html_theme = "furo"
 #
 # html_theme_options = {}
 
+# -- Options for furo theme
+# -- See: https://pradyunsg.me/furo/customisation/
+html_title = "emoji-data"
+html_theme_options = {
+    "navigation_with_keys": True,
+    "source_repository": "https://github.com/tanbro/emoji-data/",
+    "source_branch": "master",
+    "source_directory": "docs/",
+}
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
@@ -207,6 +217,6 @@ intersphinx_mapping = {
 }
 
 
-# nbsphinx Configuration Value
+# -- Options for nbsphinx Configuration Value
 nbsphinx_allow_errors = True
 nbsphinx_execute = "never"

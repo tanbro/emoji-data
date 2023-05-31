@@ -13,7 +13,7 @@ Submodules
 ----------
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 1
 
    emoji_data.character
    emoji_data.definitions

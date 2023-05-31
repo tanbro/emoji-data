@@ -1,12 +1,14 @@
 emoji-data
 ==========
 
-:Release: |release|
-:Version: |version|
-:Date:    |today|
+:release:  |release|
+:version:  |version|
+:built at: |today|
 
 Contents
 --------
+
+----
 
 .. toctree::
    :caption: Documentations
@@ -16,18 +18,24 @@ Contents
    CHANGELOG <CHANGELOG.md>
    AUTHORS <AUTHORS.md>
 
+----
+
 .. toctree::
     :caption: API References
     :titlesonly:
 
     emoji_data
 
+----
+
 .. toctree::
    :caption: Notebooks
    :glob:
    :titlesonly:
 
-   notebooks/*
+   notebooks/*.ipynb
+
+----
 
 Indices and tables
 ------------------
