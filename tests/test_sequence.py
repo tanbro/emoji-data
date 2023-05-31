@@ -1,10 +1,16 @@
 import os
 import unittest
 
-from emoji_data import (EmojiSequence, QualifiedType, code_points_to_string,
-                        detect_qualified, is_emoji_character,
-                        is_emoji_flag_sequence, is_emoji_keycap_sequence,
-                        is_emoji_modifier_sequence)
+from emoji_data import (
+    EmojiSequence,
+    QualifiedType,
+    code_points_to_string,
+    detect_qualified,
+    is_emoji_character,
+    is_emoji_flag_sequence,
+    is_emoji_keycap_sequence,
+    is_emoji_modifier_sequence,
+)
 from emoji_data.utils import data_file, read_data_file_iterable
 
 
@@ -26,7 +32,7 @@ class SequenceTestCase(unittest.TestCase):
         for code_points, status in self.test_data:
             obj = EmojiSequence.from_hex(code_points)
             s = obj.string
-            self.assertEqual(obj.status, status)
+            self.assertEqual(obj.status, status, f"wrong status detected: {obj!r}")
             if obj.type_field:
                 self.assertEqual(detect_qualified(s), QualifiedType(status), f"wrong qualified detected: {obj!r}")
 
@@ -35,13 +41,13 @@ class SequenceTestCase(unittest.TestCase):
             obj = EmojiSequence.from_hex(code_points)
             s = obj.string
             if obj.type_field == "Basic_Emoji":
-                self.assertTrue(is_emoji_character(s))
+                self.assertTrue(is_emoji_character(s), f"wrong Basic_Emoji type_field detected: {obj!r}")
             elif obj.type_field == "Emoji_Keycap_Sequence":
-                self.assertTrue(is_emoji_keycap_sequence(s))
+                self.assertTrue(is_emoji_keycap_sequence(s), f"wrong Emoji_Keycap_Sequence type_field detected: {obj!r}")
             elif obj.type_field == "Emoji_Flag_Sequence":
-                self.assertTrue(is_emoji_flag_sequence(s))
+                self.assertTrue(is_emoji_flag_sequence(s), f"wrong Emoji_Flag_Sequence type_field detected: {obj!r}")
             elif obj.type_field == "Emoji_Modifier_Sequence":
-                self.assertTrue(is_emoji_modifier_sequence(s))
+                self.assertTrue(is_emoji_modifier_sequence(s), f"wrong Emoji_Modifier_Sequence type_field detected: {obj!r}")
 
 
 class SequencePatternTestCase(unittest.TestCase):
