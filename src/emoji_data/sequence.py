@@ -9,12 +9,12 @@ from .utils import data_file, read_data_file_iterable
 __all__ = ["EmojiSequence"]
 
 
-DATA_FILES = {
-    "zwj-sequences": "emoji-zwj-sequences.txt",
-    "sequences": "emoji-sequences.txt",
-    "variation-sequences": "emoji-variation-sequences.txt",
-    "test": "emoji-test.txt",
-}
+_DATA_FILES = [
+    "emoji-sequences.txt",
+    "emoji-zwj-sequences.txt",
+    "emoji-variation-sequences.txt",
+    "emoji-test.txt",
+]
 
 
 class _MetaClass(BaseDictContainer):
@@ -81,37 +81,48 @@ class EmojiSequence(metaclass=_MetaClass):
         if cls._initialed:
             return
         EmojiCharacter.initial()
-        for name, file in DATA_FILES.items():
-            with data_file(file).open(encoding="utf8") as fp:
+
+        def _decode_code_points(_cps, **_kwargs):
+            try:
+                _cp_head, _cp_tail = _cps.split("..", 1)  # begin..end form
+            except ValueError:
+                _arr_cp = [int(x, 16) for x in _cps.split()]
+                if _arr_cp == [0x263A, 0xFE0F]:
+                    print(_cps, _kwargs)
+                _seq = cls(_arr_cp, **_kwargs)
+                if _seq.string not in cls:
+                    cls[_seq.string] = _seq
+            else:
+                # begin..end form: A range of single char emoji-seq
+                for _cp in range(int(_cp_head, 16), 1 + int(_cp_tail, 16)):
+                    _seq = cls(_cp, **_kwargs)
+                    if _seq.string not in cls:
+                        cls[_seq.string] = _seq
+
+        for fname in _DATA_FILES:
+            with data_file(fname).open(encoding="utf8") as fp:
                 for content, comment in read_data_file_iterable(fp):
-                    if name == "test":
+                    if fname in ("emoji-sequences.txt", "emoji-zwj-sequences.txt"):
+                        cps, type_field, description = (part.strip() for part in content.split(";", 2))
+                        _decode_code_points(cps, type_field=type_field, description=description, comment=comment)
+                    elif fname == "emoji-variation-sequences.txt":
+                        cps, description = (part.strip() for part in content.split(";", 1))
+                        _decode_code_points(cps, description=description, comment=comment)
+                    elif fname == "emoji-test.txt":
                         cps, status = (part.strip() for part in content.split(";", 1))
-                        code_points = [int(cp, 16) for cp in cps.split()]
-                        inst = cls(code_points, status=status, comment=comment)
+                        cp_arr = [int(cp, 16) for cp in cps.split()]
+                        if cp_arr == [0x263A, 0xFE0F]:
+                            print("::TEST:::", cp_arr, status, comment)
+                        inst = cls(cp_arr, status=status, comment=comment)
                         s = inst.string
                         try:
-                            existed_inst = cls[s]
+                            inst_0 = cls[s]
                         except KeyError:
                             cls[s] = inst
                         else:
-                            existed_inst.status = status
+                            inst_0.status = status
                     else:
-                        cps, type_field, description = (part.strip() for part in content.split(";", 2))
-                        # codes ...
-                        try:
-                            cp_head, cp_tail = cps.split("..", 1)  # begin..end form
-                        except ValueError:
-                            code_points = [int(cp, 16) for cp in cps.split()]
-                            inst = cls(code_points, type_field, "", description, comment)
-                            text = inst.string
-                            if text not in cls:
-                                cls[text] = inst
-                        else:
-                            # A range of single char emoji-seq
-                            for cp in range(int(cp_head, 16), 1 + int(cp_tail, 16)):
-                                inst = cls(cp, type_field, "", description, comment)
-                                if inst.string not in cls:
-                                    cls[inst.string] = inst
+                        raise RuntimeError(f"Invalid data file name {fname}")
         # build regex
         ordered_list = sorted((m for m in cls.values()), key=lambda x: len(x.code_points), reverse=True)
         exp = r"|".join(m.regex for m in ordered_list)
@@ -207,13 +218,16 @@ class EmojiSequence(metaclass=_MetaClass):
     def type_field(self) -> str:
         """A convenience for parsing the emoji sequence files, and is not intended to be maintained as a property.
 
-        one of the following:
+        may be one of:
 
         - `"Basic_Emoji"`
         - `"Emoji_Keycap_Sequence"`
         - `"Emoji_Flag_Sequence"`
         - `"Emoji_Tag_Sequence"`
         - `"Emoji_Modifier_Sequence"`
+        - `"RGI_Emoji_ZWJ_Sequence"`
+
+        or other string
 
         :type: str
         """

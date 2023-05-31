@@ -28,7 +28,7 @@ class SequenceTestCase(unittest.TestCase):
             s = obj.string
             self.assertEqual(obj.status, status)
             if obj.type_field:
-                self.assertEqual(detect_qualified(s), QualifiedType(status))
+                self.assertEqual(detect_qualified(s), QualifiedType(status), f"{obj!r}")
 
     def test_type_field(self):
         for code_points, *_ in self.test_data:
