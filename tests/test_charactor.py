@@ -1,6 +1,6 @@
 import unittest
 
-from emoji_data import code_points_to_string, is_emoji_character
+from emoji_data import code_points_to_string, EmojiCharacter
 from emoji_data.utils import data_file, read_data_file_iterable
 
 
@@ -16,7 +16,7 @@ class CharacterTestCase(unittest.TestCase):
     def test_code_points(self):
         for code_points, _ in self.test_data:
             s = code_points_to_string(code_points)
-            self.assertTrue(all(is_emoji_character(c) for c in s))
+            self.assertTrue(all(ord(c) in EmojiCharacter for c in s))
 
 
 if __name__ == "__main__":

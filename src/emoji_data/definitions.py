@@ -55,7 +55,13 @@ class QualifiedType(Enum):
 
 def _make_regex_dict():
     d = dict()
-    d.update({"EMOJI_CHARACTER": r"[" + "".join(m.regex for m in EmojiCharacter.values()) + r"]"})
+    d.update(
+        {
+            "EMOJI_CHARACTER": r"["
+            + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EMOJI in m.properties)
+            + r"]"
+        }
+    )
     d.update(
         {
             "DEFAULT_EMOJI_PRESENTATION_CHARACTER": r"["
@@ -135,11 +141,16 @@ def is_emoji_character(c: str) -> bool:
 
     A character that has the Emoji property.
 
+    ::
+
+        emoji_character := \\p{Emoji}
+
+    - These characters are recommended for use as emoji.
+
     ref: https://unicode.org/reports/tr51/#Emoji_Characters
     """
-    return ord(c) in EmojiCharacter
-    # _c = chr(ord(c))
-    # return EMOJI_PATTERNS["EMOJI_CHARACTER"].fullmatch(_c) is not None
+    _c = chr(ord(c))
+    return EMOJI_PATTERNS["EMOJI_CHARACTER"].fullmatch(_c) is not None
 
 
 def is_default_emoji_presentation_character(c: str) -> bool:
@@ -198,6 +209,12 @@ def is_emoji_presentation_sequence(s: str) -> bool:
     """detect emoji presentation sequence
 
     A variation sequence consisting of an emoji character followed by a emoji presentation selector.
+
+    ::
+
+        emoji_presentation_sequence := emoji_character emoji_presentation_selector
+
+    - The only valid emoji presentation sequences are those listed in emoji-variation-sequences.txt
 
     ref: https://unicode.org/reports/tr51/#def_emoji_presentation_sequence
     """
@@ -318,6 +335,12 @@ def is_qualified_emoji_character(s: str, i: int) -> bool:
 def detect_qualified(s: str) -> QualifiedType:
     """Detect qualified type of emoji string
 
+    - qualified emoji character — An emoji character in a string that
+
+        - (a) has default emoji presentation or
+        - (b) is the first character in an emoji modifier sequence or
+        - (c) is not a default emoji presentation character, but is the first character in an emoji presentation sequence.
+
     - fully-qualified emoji — A qualified emoji character, or an emoji sequence in which each emoji character is qualified.
     - minimally-qualified emoji — An emoji sequence in which the first character is qualified but the sequence is not fully qualified.
     - unqualified emoji — An emoji that is neither fully-qualified nor minimally qualified.
@@ -325,12 +348,17 @@ def detect_qualified(s: str) -> QualifiedType:
     :param str s: string to detect
     :rtype: QualifiedType
     """
-    s = s.strip()
-    if not all(is_emoji_character(c) for c in s):
-        raise ValueError("Not every character of `s` is Emoji character")
-    if is_emoji_sequence(s):
-        if all(is_qualified_emoji_character(s, i) for i in range(len(s))):
-            return QualifiedType.FULLY_QUALIFIED
-        if is_qualified_emoji_character(s, 0):
-            return QualifiedType.MINIMALLY_QUALIFIED
+    if not is_emoji_sequence(s) and not is_emoji_character(s):
+        raise ValueError(f"{s!r} is not an emoji character or sequence string")
+    # if is_emoji_character(s):
+    #     if EmojiCharProperty.EPRES in EmojiCharacter.from_character(s).properties:
+    #         return QualifiedType.FULLY_QUALIFIED
+    # elif is_emoji_modifier_sequence(s):
+    #   return QualifiedType.FULLY_QUALIFIED
+    # elif is_emoji_presentation_sequence(s):
+    #     return QualifiedType.FULLY_QUALIFIED
+    if all(is_qualified_emoji_character(s, i) for i in range(len(s))):
+        return QualifiedType.FULLY_QUALIFIED
+    if is_qualified_emoji_character(s, 0):
+        return QualifiedType.MINIMALLY_QUALIFIED
     return QualifiedType.UNQUALIFIED

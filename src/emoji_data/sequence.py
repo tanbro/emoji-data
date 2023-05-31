@@ -152,8 +152,8 @@ class EmojiSequence(metaclass=_MetaClass):
         :param str value: Emoji string
         :return: Instance from internal dictionary
         :rtype: EmojiSequence
-        :raises RuntimeError: When non-emoji character in text
-        :raises KeyError: When passed-in value not found in internal dictionary
+        :raise RuntimeError: When non-emoji character in text
+        :raise KeyError: When passed-in value not found in internal dictionary
         """
         value = value.strip()
         if not all(ord(s) in EmojiCharacter for s in value):
@@ -171,7 +171,7 @@ class EmojiSequence(metaclass=_MetaClass):
         :param value: Single or iterable object of :class:`EmojiCharacter`, composing the sequence
         :return: Instance from internal dictionary
         :rtype: EmojiSequence
-        :raises KeyError: When passed-in value not found in internal dictionary
+        :raise KeyError: When passed-in value not found in internal dictionary
         """
         if isinstance(value, EmojiCharacter):
             s = value.string
@@ -198,7 +198,7 @@ class EmojiSequence(metaclass=_MetaClass):
         :return: Instance returned from the class's internal dictionary
         :rtype: EmojiSequence
 
-        :raises KeyError: When passed-in value not found in the class' internal dictionary
+        :raise KeyError: When passed-in value not found in the class' internal dictionary
         """
         if isinstance(value, str):
             cps_array = value.split()
