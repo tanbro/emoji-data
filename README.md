@@ -6,6 +6,12 @@
 
 A library represents emoji sequences and characters in [Unicode® Technical Standard #51 Data Files](http://www.unicode.org/reports/tr51/#Data_Files_Table)
 
+## Install
+
+```bash
+pip install emoji-data
+```
+
 ## How to use
 
 Examples below are also in a [notebook](notebooks/example.ipynb)

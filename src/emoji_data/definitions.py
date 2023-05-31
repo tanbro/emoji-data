@@ -298,7 +298,7 @@ def is_qualified_emoji_character(s: str, i: int) -> bool:
 
     :param str s: the string where the character in it
     :param int i: index of the character in the string to check if qualified
-    :return: True of False
+    :return: ``True`` or ``False``
     :rtype: bool
 
     ref: http://www.unicode.org/reports/tr51/#def_qualified_emoji_character
