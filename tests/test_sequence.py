@@ -20,7 +20,7 @@ class SequenceTestCase(unittest.TestCase):
     def test_len(self):
         for code_points, *_ in self.test_data:
             obj = EmojiSequence.from_hex(code_points)
-            self.assertEqual(len(code_points.split()), len(obj))
+            self.assertEqual(len(code_points.split()), len(obj), f"code_points: {code_points}")
 
     def test_status(self):
         for code_points, status in self.test_data:
