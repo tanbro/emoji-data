@@ -362,7 +362,7 @@ def detect_qualified(s: str) -> QualifiedType:
         n = len(s)
         if n == 1:
             return QualifiedType.FULLY_QUALIFIED
-        if all(is_qualified_emoji_character(s, i) for i in range(1, n)):
+        if all(is_qualified_emoji_character(s, i) for i in range(1, n) if is_emoji_character(s[i])):
             return QualifiedType.FULLY_QUALIFIED
         return QualifiedType.MINIMALLY_QUALIFIED
     return QualifiedType.UNQUALIFIED

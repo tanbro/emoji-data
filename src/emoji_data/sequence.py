@@ -13,7 +13,7 @@ _DATA_FILES = [
     "emoji-variation-sequences.txt",
     "emoji-zwj-sequences.txt",
     "emoji-sequences.txt",
-    # "emoji-test.txt",
+    "emoji-test.txt",
 ]
 
 
