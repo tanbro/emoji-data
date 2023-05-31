@@ -194,8 +194,8 @@ class EmojiCharacter(metaclass=_MetaClass):
         return self._string
 
     @classmethod
-    def from_string(cls, value: str) -> "EmojiCharacter":
-        """Get an :class:`EmojiCharacter` instance by Emoji Unicode character
+    def from_character(cls, c: str) -> "EmojiCharacter":
+        """Get :class:`EmojiCharacter` instance from a single Emoji Unicode character
 
         .. note::
             The argument ``value`` should be a single unicode character.
@@ -205,7 +205,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         :rtype: EmojiCharacter
         :raises KeyError: When character not found in the class' internal dictionary
         """
-        return cls[ord(value)]
+        return cls[ord(c)]
 
     @classmethod
     def from_hex(cls, value: Union[int, str]) -> "EmojiCharacter":

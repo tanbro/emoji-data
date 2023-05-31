@@ -138,6 +138,8 @@ def is_emoji_character(c: str) -> bool:
     ref: https://unicode.org/reports/tr51/#Emoji_Characters
     """
     return ord(c) in EmojiCharacter
+    # _c = chr(ord(c))
+    # return EMOJI_PATTERNS["EMOJI_CHARACTER"].fullmatch(_c) is not None
 
 
 def is_default_emoji_presentation_character(c: str) -> bool:

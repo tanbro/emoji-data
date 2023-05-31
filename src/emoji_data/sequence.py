@@ -8,11 +8,11 @@ from .utils import data_file, read_data_file_iterable
 
 __all__ = ["EmojiSequence"]
 
-
+# http://www.unicode.org/reports/tr51/#Data_Files_Table
 _DATA_FILES = [
-    "emoji-sequences.txt",
-    "emoji-zwj-sequences.txt",
     "emoji-variation-sequences.txt",
+    "emoji-zwj-sequences.txt",
+    "emoji-sequences.txt",
     "emoji-test.txt",
 ]
 
@@ -87,8 +87,6 @@ class EmojiSequence(metaclass=_MetaClass):
                 _cp_head, _cp_tail = _cps.split("..", 1)  # begin..end form
             except ValueError:
                 _arr_cp = [int(x, 16) for x in _cps.split()]
-                if _arr_cp == [0x263A, 0xFE0F]:
-                    print(_cps, _kwargs)
                 _seq = cls(_arr_cp, **_kwargs)
                 if _seq.string not in cls:
                     cls[_seq.string] = _seq
@@ -111,8 +109,6 @@ class EmojiSequence(metaclass=_MetaClass):
                     elif fname == "emoji-test.txt":
                         cps, status = (part.strip() for part in content.split(";", 1))
                         cp_arr = [int(cp, 16) for cp in cps.split()]
-                        if cp_arr == [0x263A, 0xFE0F]:
-                            print("::TEST:::", cp_arr, status, comment)
                         inst = cls(cp_arr, status=status, comment=comment)
                         s = inst.string
                         try:
@@ -150,7 +146,7 @@ class EmojiSequence(metaclass=_MetaClass):
         return (cls[k] for k in cls)
 
     @classmethod
-    def from_text(cls, value: str) -> "EmojiSequence":
+    def from_string(cls, value: str) -> "EmojiSequence":
         """Get an :class:`EmojiSequence` instance by text
 
         :param str value: Emoji string
@@ -183,7 +179,7 @@ class EmojiSequence(metaclass=_MetaClass):
             s = "".join(m.string for m in value)
         else:
             raise TypeError("Argument `value` must be one of `EmojiCharacter` or `Iterable[EmojiCharacter]`")
-        return cls.from_text(s)
+        return cls.from_string(s)
 
     @classmethod
     def from_hex(cls, value: Union[str, int, Iterable[str], Iterable[int]]) -> "EmojiSequence":
@@ -308,7 +304,7 @@ class EmojiSequence(metaclass=_MetaClass):
         """
         m = cls.pattern.search(s)
         while m:
-            yield cls.from_text(m.group()), m.start(), m.end()
+            yield cls.from_string(m.group()), m.start(), m.end()
             m = cls.pattern.search(s, m.end())
 
 
