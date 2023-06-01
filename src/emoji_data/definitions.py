@@ -329,13 +329,13 @@ def is_qualified_emoji_character(s: str, i: int) -> bool:
     ref: http://www.unicode.org/reports/tr51/#def_qualified_emoji_character
     """
     c = s[i]
+    if not is_emoji_character(c):
+        return False
     if is_default_emoji_presentation_character(c):  # default emoji presentation
         return True
-    if EMOJI_PATTERNS["EMOJI_MODIFIER_SEQUENCE"].match(s[i:]) is not None:  # first character in an emoji modifier sequence
+    if EMOJI_PATTERNS["EMOJI_MODIFIER_SEQUENCE"].match(s[i:]):  # first character in an emoji modifier sequence
         return True
-    if (
-        EMOJI_PATTERNS["EMOJI_PRESENTATION_SEQUENCE"].match(s[i:]) is not None
-    ):  # first character in an emoji presentation sequence
+    if EMOJI_PATTERNS["EMOJI_PRESENTATION_SEQUENCE"].match(s[i:]):  # first character in an emoji presentation sequence
         return True
     return False
 

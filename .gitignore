@@ -1,4 +1,4 @@
-version.py
+src/**/version.py
 *.lock
 cc-test-reporter
 tmp/
