@@ -41,7 +41,21 @@ release = ".".join(version.split(".")[:2])
 
 # -- General configuration ---------------------------------------------------
 
+
+# -- Options for autodoc ----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html#configuration
+
+# Automatically extract typehints when specified and place them in
+# descriptions of the relevant function/method.
+autodoc_typehints = "description"
+
+# Don't show class signature with the class' name.
+autodoc_class_signature = "separated"
+
+
 autoclass_content = "both"
+autodoc_default_options = {"member-order": "bysource"}
+
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
@@ -93,10 +107,6 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 # The name of the Pygments (syntax highlighting) style to use.
 # pygments_style = None
 
-# -- Options for autodoc -------------------------------------------------
-autodoc_default_options = {
-    'member-order': 'bysource'
-}
 
 # -- Options for HTML output -------------------------------------------------
 

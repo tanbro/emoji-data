@@ -133,23 +133,15 @@ class EmojiSequence(metaclass=_MetaClass):
         return (cls[k] for k in cls)
 
     @classmethod
-    def from_string(cls, value: str) -> "EmojiSequence":
+    def from_string(cls, s: str) -> "EmojiSequence":
         """Get an :class:`EmojiSequence` instance from string
 
         :param str value: Emoji string
         :return: Instance from internal dictionary
         :rtype: EmojiSequence
-        :raise ValueError: When non-emoji character in string
         :raise KeyError: When passed-in value not found in internal dictionary
         """
-        value = value.strip()
-        if not all(ord(s) in EmojiCharacter for s in value):
-            raise ValueError("Not all characters in the text is Emoji character.")
-        try:
-            return cls[value]
-        except KeyError:
-            code_points_text = " ".join("{:04X}".format(ord(c)) for c in value)
-            raise KeyError("[{}]({!r})".format(code_points_text, value))
+        return cls[s]
 
     @classmethod
     def from_emoji_character(cls, value: Union[EmojiCharacter, Iterable[EmojiCharacter]]) -> "EmojiSequence":

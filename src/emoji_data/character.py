@@ -223,7 +223,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         :param str value: Emoji character
         :return: Instance returned from the class's internal dictionary
         :rtype: EmojiCharacter
-        :raises KeyError: When character not found in the class' internal dictionary
+        :raise KeyError: When character not found in the class' internal dictionary
         """
         return cls[ord(c)]
 
