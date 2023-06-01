@@ -153,6 +153,11 @@ class EmojiCharacter(metaclass=_MetaClass):
         return ((k, cls[k]) for k in cls)
 
     @classmethod
+    def keys(cls) -> Iterable[int]:
+        """Return an iterator of each emoji-character's key code-point of the class"""
+        return (k for k in cls)
+
+    @classmethod
     def values(cls) -> Iterable["EmojiCharacter"]:
         """Return an iterator of all emoji-characters of the class"""
         return (cls[k] for k in cls)

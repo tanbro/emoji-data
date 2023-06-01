@@ -128,6 +128,11 @@ class EmojiSequence(metaclass=_MetaClass):
         return ((k, cls[k]) for k in cls)
 
     @classmethod
+    def keys(cls) -> Iterable[str]:
+        """Return an iterator of each emoji-sequence's key string of the class"""
+        return (k for k in cls)
+
+    @classmethod
     def values(cls) -> Iterable["EmojiSequence"]:
         """Return an iterator of all emoji-sequences of the class"""
         return (cls[k] for k in cls)
@@ -230,8 +235,7 @@ class EmojiSequence(metaclass=_MetaClass):
 
     @property
     def string(self) -> str:
-        """string of the Emoji Sequence
-        """
+        """string of the Emoji Sequence"""
         return self._string
 
     @property
