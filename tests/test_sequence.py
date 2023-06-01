@@ -18,7 +18,7 @@ from emoji_data.utils import data_file, read_data_file_iterable
 
 
 class SequenceTestCase(unittest.TestCase):
-    test_data: list[tuple[str, str]] = []
+    test_data = []
 
     @classmethod
     def setUpClass(cls):
