@@ -17,11 +17,32 @@ __all__ = [
 
 
 TEXT_PRESENTATION_SELECTOR = 0xFE0E
+"""The character U+FE0E VARIATION SELECTOR-15 (VS15), used to request a text presentation for an emoji character.
+(Also known as text variation selector in prior versions of this specification.)
+"""
+
 EMOJI_PRESENTATION_SELECTOR = 0xFE0F
+"""The character U+FE0F VARIATION SELECTOR-16 (VS16), used to request an emoji presentation for an emoji character.
+(Also known as emoji variation selector in prior versions of this specification.)
+"""
+
 EMOJI_KEYCAP = 0x20E3
+"""A sequence of the following form::
+
+    emoji_keycap_sequence := [0-9#*] \\x{FE0F 20E3}
+
+- These sequences are in the `emoji-sequences.txt` file listed under the type_field ``Emoji_Keycap_Sequence``
+"""
+
 ZWJ = 0x200D
+"""An emoji sequence with at least one joiner character.
+"""
+
 REGIONAL_INDICATORS = list(range(0x1F1E6, 0x1F1FF + 1))
+"""regional indicators"""
+
 TAGS = list(range(0xE0020, 0xE007F + 1))
+"""tags"""
 
 
 class EmojiCharProperty(Enum):
