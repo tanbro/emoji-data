@@ -135,12 +135,12 @@ class EmojiSequence(metaclass=_MetaClass):
 
     @classmethod
     def from_string(cls, value: str) -> "EmojiSequence":
-        """Get an :class:`EmojiSequence` instance by text
+        """Get an :class:`EmojiSequence` instance from string
 
         :param str value: Emoji string
         :return: Instance from internal dictionary
         :rtype: EmojiSequence
-        :raise RuntimeError: When non-emoji character in text
+        :raise ValueError: When non-emoji character in string
         :raise KeyError: When passed-in value not found in internal dictionary
         """
         value = value.strip()
