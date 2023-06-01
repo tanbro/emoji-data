@@ -355,7 +355,7 @@ def detect_qualified(s: str) -> QualifiedType:
     :param s: string to detect
     """
     if not s:
-        raise ValueError(f"Argument `s` should not be empty or null")
+        raise ValueError("Argument `s` should not be empty or null")
     if is_qualified_emoji_character(s, 0):
         n = len(s)
         if n == 1:

@@ -8,7 +8,6 @@ from emoji_data import (
     QualifiedType,
     code_points_to_string,
     detect_qualified,
-    is_emoji_sequence,
     is_emoji_character,
     is_emoji_flag_sequence,
     is_emoji_keycap_sequence,
