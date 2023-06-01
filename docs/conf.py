@@ -52,9 +52,8 @@ autodoc_typehints = "description"
 # Don't show class signature with the class' name.
 autodoc_class_signature = "separated"
 
-
 autoclass_content = "both"
-autodoc_default_options = {"member-order": "bysource"}
+autodoc_member_order = "bysource"
 
 
 # If your documentation needs a minimal Sphinx version, state it here.

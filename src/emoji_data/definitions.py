@@ -321,10 +321,9 @@ def is_qualified_emoji_character(s: str, i: int) -> bool:
     - (b) is the first character in an emoji modifier sequence or
     - (c) is not a default emoji presentation character, but is the first character in an emoji presentation sequence.
 
-    :param str s: the string where the character in it
-    :param int i: index of the character in the string to check if qualified
+    :param s: the string where the character in it
+    :param i: index of the character in the string to check if qualified
     :return: ``True`` or ``False``
-    :rtype: bool
 
     ref: http://www.unicode.org/reports/tr51/#def_qualified_emoji_character
     """
@@ -353,8 +352,7 @@ def detect_qualified(s: str) -> QualifiedType:
     - minimally-qualified emoji — An emoji sequence in which the first character is qualified but the sequence is not fully qualified.
     - unqualified emoji — An emoji that is neither fully-qualified nor minimally qualified.
 
-    :param str s: string to detect
-    :rtype: QualifiedType
+    :param s: string to detect
     """
     if not s:
         raise ValueError(f"Argument `s` should not be empty or null")

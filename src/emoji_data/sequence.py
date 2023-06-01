@@ -136,9 +136,8 @@ class EmojiSequence(metaclass=_MetaClass):
     def from_string(cls, s: str) -> "EmojiSequence":
         """Get an :class:`EmojiSequence` instance from string
 
-        :param str s: Emoji string
+        :param s: Emoji string
         :return: Instance from internal dictionary
-        :rtype: EmojiSequence
         :raise KeyError: When passed-in ``s`` not found in internal dictionary
         """
         return cls[s]
@@ -149,9 +148,8 @@ class EmojiSequence(metaclass=_MetaClass):
 
         :param value: Single or iterable object of :class:`EmojiCharacter`, composing the sequence
         :return: Instance from internal dictionary
-        :rtype: EmojiSequence
         :raise KeyError: When passed-in value not found in internal dictionary
-        :raise TypeError: When passed-in value is not :class:`EmojiCharacter` object or list
+        :raise TypeError: When passed-in value is not :class:`.EmojiCharacter` object or list
         """
         if isinstance(value, EmojiCharacter):
             s = value.string
@@ -170,13 +168,12 @@ class EmojiSequence(metaclass=_MetaClass):
 
             - it could be:
 
-              - one or more code points in hex format string, separated by spaces
-              - one code point integer
-              - An iterable object whose members are code point in hex format string
-              - An iterable object whose members are code point integer
+              - one or more code-point(s) in HEX format string, separated by spaces
+              - a single code-point integer
+              - An iterable object whose members are code-point string in HEX format
+              - An iterable object whose members are code-point integer
 
         :return: Instance returned from the class's internal dictionary
-        :rtype: EmojiSequence
 
         :raise KeyError: When passed-in value not found in the class' internal dictionary
         """
@@ -202,10 +199,6 @@ class EmojiSequence(metaclass=_MetaClass):
         - `"Emoji_Tag_Sequence"`
         - `"Emoji_Modifier_Sequence"`
         - `"RGI_Emoji_ZWJ_Sequence"`
-
-        or other string
-
-        :type: str
         """
         return self._type_field
 
@@ -227,10 +220,7 @@ class EmojiSequence(metaclass=_MetaClass):
 
     @property
     def characters(self) -> List[EmojiCharacter]:
-        """Emoji character objects list which makes up the Emoji Sequence
-
-        :type: List[EmojiCharacter]
-        """
+        """Emoji character objects list which makes up the Emoji Sequence"""
         return self._characters
 
     @property
@@ -241,17 +231,12 @@ class EmojiSequence(metaclass=_MetaClass):
     @property
     def string(self) -> str:
         """string of the Emoji Sequence
-
-        :type: str
         """
         return self._string
 
     @property
     def regex(self) -> str:
-        """Regular expression string of the Emoji Sequence
-
-        :type: str
-        """
+        """Regular expression string of the Emoji Sequence"""
         return self._regex
 
     @property
@@ -261,17 +246,22 @@ class EmojiSequence(metaclass=_MetaClass):
 
     @property
     def code_points(self) -> List[int]:
-        """List of unicode integer value of the characters who make up Emoji Sequence
-
-        :type: List[int]
-        """
+        """List of unicode integer value of the characters who make up Emoji Sequence"""
         return self._code_points
 
     @classmethod
     def find_all(cls, s: str) -> List[Tuple["EmojiSequence", int, int]]:
         """Find out all emoji sequences in a string, and return them in a list
 
-        Item of the list is same as :meth:`find`
+        Item of the returned list is as same as that in the iterator of :meth:`find`
+
+        The function equals::
+
+            list(EmojiSequence.find(s))
+
+        or ::
+
+            [x for x in EmojiSequence.find(s)]
         """
         return list(cls.find(s))
 
@@ -279,11 +269,13 @@ class EmojiSequence(metaclass=_MetaClass):
     def find(cls, s: str) -> Iterable[Tuple["EmojiSequence", int, int]]:
         """Return an iterator which yields all emoji sequences in a string, without actually storing them all simultaneously.
 
-        Item of the iterator is a 3-member tuple:
+        :param s: The string to find emoji sequences in it
 
-        #. ``0``: The found :class:`.EmojiSequence` object
-        #. ``1``: Begin position of the emoji sequence string
-        #. ``2``: End position of the emoji sequence string
+        :return: Item of the iterator is a 3-member tuple:
+
+            0. The found :class:`.EmojiSequence` object
+            1. Begin position of the emoji sequence in the string
+            2. End position of the emoji sequence in the string
         """
         m = cls.pattern.search(s)
         while m:

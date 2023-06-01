@@ -167,50 +167,32 @@ class EmojiCharacter(metaclass=_MetaClass):
 
     @property
     def code_point(self) -> int:
-        """Unicode integer value of the Emoji
-
-        :type: int
-        """
+        """Unicode integer value of the Emoji"""
         return self._code_point
 
     @property
     def properties(self) -> List[EmojiCharProperty]:
-        """Property description text of the Emoji
-
-        :type: List[EmojiCharProperty]
-        """
+        """Property description text of the Emoji"""
         return self._properties
 
     @property
     def comments(self) -> List[str]:
-        """Comments of the Emoji
-
-        :type: List[str]
-        """
+        """Comments of the Emoji"""
         return self._comments
 
     @property
     def regex(self) -> str:
-        """Regular express for the Emoji
-
-        :type: str
-        """
+        """Regular express for the Emoji"""
         return self._regex
 
     @property
     def hex(self) -> str:
-        """Hex style text of the Emoji's Unicode
-
-        :type: str
-        """
+        """Hex style text of the Emoji's Unicode"""
         return hex(self._code_point)
 
     @property
     def string(self) -> str:
-        """Emoji character string
-
-        :type: str
-        """
+        """Emoji character string"""
         return self._string
 
     @classmethod
@@ -220,9 +202,8 @@ class EmojiCharacter(metaclass=_MetaClass):
         .. note::
             ``c`` should be a single unicode character.
 
-        :param str c: Emoji character
+        :param c: Emoji character
         :return: Instance returned from the class's internal dictionary
-        :rtype: EmojiCharacter
         :raise KeyError: When character not found in the class' internal dictionary
         """
         return cls[ord(c)]
@@ -231,9 +212,8 @@ class EmojiCharacter(metaclass=_MetaClass):
     def from_hex(cls, value: Union[int, str]) -> "EmojiCharacter":
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode integer value or it's hex string
 
-        :param Union[int, str] value: Emoji Unicode, either integer value or hex string
+        :param value: Emoji Unicode, either integer value or hex string
         :return: Instance returned from the class's internal dictionary
-        :rtype: EmojiCharacter
         :raises KeyError: When code not found in the class' internal dictionary
         """
         if isinstance(value, str):
