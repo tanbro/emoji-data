@@ -72,7 +72,6 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.intersphinx",
     "nbsphinx",
-    # "sphinxext.opengraph",
     "sphinx_inline_tabs",
     "sphinx_copybutton",
 ]
@@ -113,7 +112,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "furo"
+# html_theme = ""
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -121,15 +120,7 @@ html_theme = "furo"
 #
 # html_theme_options = {}
 
-# -- Options for furo theme
-# -- See: https://pradyunsg.me/furo/customisation/
 html_title = "emoji-data"
-html_theme_options = {
-    "navigation_with_keys": True,
-    "source_repository": "https://github.com/tanbro/emoji-data/",
-    "source_branch": "master",
-    "source_directory": "docs/",
-}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

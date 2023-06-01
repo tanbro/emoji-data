@@ -218,9 +218,9 @@ class EmojiCharacter(metaclass=_MetaClass):
         """Get :class:`EmojiCharacter` instance from a single Emoji Unicode character
 
         .. note::
-            The argument ``value`` should be a single unicode character.
+            ``c`` should be a single unicode character.
 
-        :param str value: Emoji character
+        :param str c: Emoji character
         :return: Instance returned from the class's internal dictionary
         :rtype: EmojiCharacter
         :raise KeyError: When character not found in the class' internal dictionary

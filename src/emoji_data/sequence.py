@@ -1,5 +1,5 @@
 import re
-from typing import Iterable, List, Tuple, Union
+from typing import Iterable, List, Pattern, Tuple, Union
 
 from .character import EmojiCharacter
 from .types import BaseDictContainer
@@ -22,7 +22,7 @@ class _MetaClass(BaseDictContainer):
 class EmojiSequence(metaclass=_MetaClass):
     """Emoji and Text Presentation Sequences used to represent emoji
 
-    see: http://www.unicode.org/reports/tr51/#Emoji_Variation_Sequences
+    see: http://www.unicode.org/reports/tr51/#Emoji_Sequences
     """
 
     def __init__(
@@ -47,7 +47,7 @@ class EmojiSequence(metaclass=_MetaClass):
         self._regex = r""
         if not self._regex:
             self._regex = "".join(m.regex for m in self._characters)
-        self._regex_compiled = re.compile(self._regex)
+        self._regex_pat = re.compile(self._regex)
 
     def __len__(self):
         return len(self._code_points)
@@ -66,8 +66,8 @@ class EmojiSequence(metaclass=_MetaClass):
 
     _initialed = False
 
-    pattern = re.compile(r"")
-    """Compiled regular express pattern object for all-together Emoji sequences.
+    pattern: Pattern
+    """Compiled regular expression pattern object for all-together Emoji sequences.
     """
 
     @classmethod
@@ -107,9 +107,9 @@ class EmojiSequence(metaclass=_MetaClass):
                     else:
                         raise RuntimeError(f"Invalid data file name {fname}")
         # build regex
-        ordered_list = sorted((m for m in cls.values()), key=lambda x: len(x.code_points), reverse=True)
-        exp = r"|".join(m.regex for m in ordered_list)
-        cls.pattern = re.compile(exp)
+        cls.pattern = re.compile(
+            r"|".join(m.regex for m in sorted((m for m in cls.values()), key=lambda x: len(x.code_points), reverse=True))
+        )
         # initialed OK
         cls._initialed = True
 
@@ -136,10 +136,10 @@ class EmojiSequence(metaclass=_MetaClass):
     def from_string(cls, s: str) -> "EmojiSequence":
         """Get an :class:`EmojiSequence` instance from string
 
-        :param str value: Emoji string
+        :param str s: Emoji string
         :return: Instance from internal dictionary
         :rtype: EmojiSequence
-        :raise KeyError: When passed-in value not found in internal dictionary
+        :raise KeyError: When passed-in ``s`` not found in internal dictionary
         """
         return cls[s]
 
@@ -151,6 +151,7 @@ class EmojiSequence(metaclass=_MetaClass):
         :return: Instance from internal dictionary
         :rtype: EmojiSequence
         :raise KeyError: When passed-in value not found in internal dictionary
+        :raise TypeError: When passed-in value is not :class:`EmojiCharacter` object or list
         """
         if isinstance(value, EmojiCharacter):
             s = value.string
@@ -247,16 +248,16 @@ class EmojiSequence(metaclass=_MetaClass):
 
     @property
     def regex(self) -> str:
-        """Regular express of the Emoji Sequence
+        """Regular expression string of the Emoji Sequence
 
         :type: str
         """
         return self._regex
 
     @property
-    def regex_compiled(self):
-        """Compiled regular express pattern of the Emoji Sequence"""
-        return self._regex_compiled
+    def regex_pattern(self):
+        """Compiled regular expression pattern of the Emoji Sequence"""
+        return self._regex_pat
 
     @property
     def code_points(self) -> List[int]:

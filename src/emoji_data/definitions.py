@@ -254,7 +254,7 @@ def is_emoji_modifier_sequence(s: str) -> bool:
 
     A sequence of the following form::
 
-    emoji_modifier_sequence := emoji_modifier_base emoji_modifier
+        emoji_modifier_sequence := emoji_modifier_base emoji_modifier
     """
     return EMOJI_PATTERNS["EMOJI_MODIFIER_SEQUENCE"].fullmatch(s) is not None
 

@@ -2,7 +2,5 @@ Sphinx
 myst-parser
 nbsphinx
 importlib_metadata;python_version<"3.8"
-furo
-# sphinxext-opengraph
 sphinx-inline-tabs
 sphinx-copybutton

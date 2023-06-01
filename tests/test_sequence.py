@@ -79,7 +79,7 @@ class SequencePatternTestCase(unittest.TestCase):
     def test_1char_emoji_in_text(self):
         s = "这是😀笑脸"
         self.assertIsNone(EmojiSequence.pattern.match(s))
-        e, p0, p1 = EmojiSequence.find_all(s)[0]
+        _, p0, p1 = EmojiSequence.find_all(s)[0]
         self.assertEqual((p0, p1), (2, 3))
 
     def test_many_one_char_emoji_in_text(self):
@@ -100,7 +100,7 @@ class SequencePatternTestCase(unittest.TestCase):
     def test_single_multi_chars_emoji_in_text(self):
         s = "这个☺️也是笑脸"
         self.assertIsNone(EmojiSequence.pattern.match(s))
-        e, p0, p1 = EmojiSequence.find_all(s)[0]
+        _, p0, p1 = EmojiSequence.find_all(s)[0]
         self.assertEqual((p0, p1), (2, 4))
 
     def test_many_multi_chars_emoji_in_text(self):
