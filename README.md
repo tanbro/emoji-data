@@ -44,7 +44,7 @@ Print 10 emojis
     <EmojiSequence code_points='0032 FE0F' status='', string='2️', description='emoji style;'>
 ```
 
-### ### Check if hex list represents an EmojiSequence
+### Check if hex list represents an EmojiSequence
 
 ```python
 >>> emojis_data = [
