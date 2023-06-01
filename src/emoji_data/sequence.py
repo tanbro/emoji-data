@@ -276,12 +276,15 @@ class EmojiSequence(metaclass=_MetaClass):
         return self._code_points
 
     @classmethod
-    def find(cls, s: str) -> List[Tuple["EmojiSequence", int, int]]:
-        """Find out all emoji sequences in a string, and return them in a list"""
-        return list(cls.iter_find(s))
+    def find_all(cls, s: str) -> List[Tuple["EmojiSequence", int, int]]:
+        """Find out all emoji sequences in a string, and return them in a list
+
+        Item of the list is same as :meth:`find`
+        """
+        return list(cls.find(s))
 
     @classmethod
-    def iter_find(cls, s: str) -> Iterable[Tuple["EmojiSequence", int, int]]:
+    def find(cls, s: str) -> Iterable[Tuple["EmojiSequence", int, int]]:
         """Return an iterator which yields all emoji sequences in a string, without actually storing them all simultaneously.
 
         Item of the iterator is a 3-member tuple:
