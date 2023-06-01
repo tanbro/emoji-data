@@ -111,7 +111,7 @@ Print 10 emojis
     [63:64] - 😀 <EmojiSequence code_points='1F600' status='', string='😀', description='grinning face'>
     ---
     [59:61] - ©️ <EmojiSequence code_points='00A9 FE0F' status='', string='©️', description='emoji style;'>
----
----
----
+    ---
+    ---
+    ---
 ```
