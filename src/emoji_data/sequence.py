@@ -144,8 +144,8 @@ class EmojiSequence(metaclass=_MetaClass):
         return cls[s]
 
     @classmethod
-    def from_emoji_character(cls, value: Union[EmojiCharacter, Iterable[EmojiCharacter]]) -> "EmojiSequence":
-        """Get an :class:`EmojiSequence` instance by :class:`EmojiCharacter` object or list
+    def from_characters(cls, value: Union[EmojiCharacter, Iterable[EmojiCharacter]]) -> "EmojiSequence":
+        """Get an :class:`EmojiSequence` instance from :class:`EmojiCharacter` object or list
 
         :param value: Single or iterable object of :class:`EmojiCharacter`, composing the sequence
         :return: Instance from internal dictionary
@@ -187,7 +187,7 @@ class EmojiSequence(metaclass=_MetaClass):
             cps_array = value
         else:
             raise TypeError("The `args` should be one of `str`, `int`, or a sequence of that")
-        return cls.from_emoji_character(EmojiCharacter.from_hex(cp) for cp in cps_array)
+        return cls.from_characters(EmojiCharacter.from_hex(cp) for cp in cps_array)
 
     @property
     def type_field(self) -> str:
