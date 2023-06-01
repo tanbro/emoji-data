@@ -5,7 +5,6 @@ from .character import EmojiCharacter
 from .types import BaseDictContainer
 from .utils import data_file, read_data_file_iterable
 
-
 __all__ = ["EmojiSequence"]
 
 # http://www.unicode.org/reports/tr51/#Data_Files_Table

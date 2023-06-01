@@ -4,7 +4,6 @@ from typing import Iterable, List, Tuple, Union
 from .types import BaseDictContainer
 from .utils import code_point_to_regex, data_file, read_data_file_iterable
 
-
 __all__ = [
     "EmojiCharProperty",
     "EmojiCharacter",

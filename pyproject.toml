@@ -1,19 +1,19 @@
 [build-system]
-requires = ["setuptools>=61.0", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
+requires = ["setuptools>=61.0", "setuptools-scm"]
 
 [project]
-name = "emoji-data"
-description = "A library represents emoji sequences and characters in Unicode® Technical Standard #51 Data Files"
-readme = "README.md"
 authors = [
   {name = "liu xue yan", email = "liu_xue_yan@foxmail.com"},
 ]
+description = "A library represents emoji sequences and characters in Unicode® Technical Standard #51 Data Files"
+name = "emoji-data"
+readme = "README.md"
 
 requires-python = ">=3.7"
 
 dependencies = [
-    "importlib-resources; python_version<'3.9'",
+  "importlib-resources; python_version<'3.9'",
 ]
 
 keywords = ["emoji", "unicode"]
@@ -21,9 +21,9 @@ keywords = ["emoji", "unicode"]
 license = {text = "AGPLv3+"}
 
 classifiers = [
-    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
-    "Topic :: Text Processing",
-    "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+  "Topic :: Text Processing",
+  "Programming Language :: Python",
 ]
 
 dynamic = ["version"]
@@ -42,4 +42,4 @@ where = ["src"]
 write_to = "src/emoji_data/version.py"
 
 [tool.black]
-line-length = 130
+line-length = 128

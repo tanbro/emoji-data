@@ -57,7 +57,9 @@ class SequenceTestCase(unittest.TestCase):
                 elif obj.type_field == "Emoji_Flag_Sequence":
                     self.assertTrue(is_emoji_flag_sequence(s), f"wrong Emoji_Flag_Sequence type_field detected: {obj!r}")
                 elif obj.type_field == "Emoji_Modifier_Sequence":
-                    self.assertTrue(is_emoji_modifier_sequence(s), f"wrong Emoji_Modifier_Sequence type_field detected: {obj!r}")
+                    self.assertTrue(
+                        is_emoji_modifier_sequence(s), f"wrong Emoji_Modifier_Sequence type_field detected: {obj!r}"
+                    )
 
 
 class SequencePatternTestCase(unittest.TestCase):

@@ -6,7 +6,7 @@ from .character import *
 from .definitions import *
 from .sequence import *
 from .utils import *
-from .version import *
+from .version import __version__, __version_tuple__, version, version_tuple
 
 EMOJI_VERSION = "15.0"
 """Starting with Version 11.0 of Unicode® Technical Standard #51(UNICODE EMOJI) specification, the repertoire of emoji characters is synchronized with the Unicode Standard, and has the same version numbering system.

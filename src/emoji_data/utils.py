@@ -39,5 +39,5 @@ def code_points_to_string(code_points: Union[int, str, Iterable[int], Iterable[s
 
 def code_point_to_regex(code_point: int) -> str:
     if code_point > 0xFFFF:
-        return r"\U{:08X}".format(code_point)
-    return r"\u{:04X}".format(code_point)
+        return rf"\U{code_point:08X}"
+    return rf"\u{code_point:04X}"
