@@ -106,12 +106,12 @@ class EmojiCharacter(metaclass=_MetaClass):
                 property_ = EmojiCharProperty(property_text)
                 for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):
                     try:
-                        inst = cls[cp]
+                        inst: "EmojiCharacter" = cls[cp]
                     except KeyError:
                         cls[cp] = cls(cp, property_, comment)
                     else:
-                        inst.add_property(property_)
-                        inst.add_comment(comment)
+                        inst._add_property(property_)
+                        inst._add_comment(comment)
             for cp in TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP:
                 if cp not in cls:
                     cls[cp] = cls(cp)
@@ -137,11 +137,11 @@ class EmojiCharacter(metaclass=_MetaClass):
         """Return an iterator of all emoji-characters of the class"""
         return (cls[k] for k in cls)
 
-    def add_property(self, val: EmojiCharProperty):
+    def _add_property(self, val: EmojiCharProperty):
         if val not in self._properties:
             self._properties.append(val)
 
-    def add_comment(self, val: str):
+    def _add_comment(self, val: str):
         if val not in self._properties:
             self._comments.append(val)
 

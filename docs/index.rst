@@ -8,8 +8,6 @@ emoji-data
 Contents
 --------
 
-----
-
 .. toctree::
    :caption: Documentations
    :titlesonly:
@@ -18,15 +16,11 @@ Contents
    CHANGELOG <CHANGELOG.md>
    AUTHORS <AUTHORS.md>
 
-----
-
 .. toctree::
-    :caption: API References
+    :caption: References
     :titlesonly:
 
     emoji_data
-
-----
 
 .. toctree::
    :caption: Notebooks
@@ -34,8 +28,6 @@ Contents
    :titlesonly:
 
    notebooks/*.ipynb
-
-----
 
 Indices and tables
 ------------------
