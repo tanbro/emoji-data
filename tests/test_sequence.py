@@ -2,6 +2,8 @@ import os
 import unittest
 
 from emoji_data import (
+    EmojiCharacter,
+    EmojiCharProperty,
     EmojiSequence,
     QualifiedType,
     code_points_to_string,
@@ -25,29 +27,36 @@ class SequenceTestCase(unittest.TestCase):
 
     def test_len(self):
         for code_points, *_ in self.test_data:
-            obj = EmojiSequence.from_hex(code_points)
-            self.assertEqual(len(code_points.split()), len(obj), f"code_points: {code_points}")
+            s = code_points_to_string(code_points)
+            self.assertEqual(len(code_points.split()), len(s), f"code_points: {code_points}")
 
     def test_status(self):
         for code_points, status in self.test_data:
-            obj = EmojiSequence.from_hex(code_points)
-            s = obj.string
-            self.assertEqual(obj.status, status, f"wrong status detected: {obj!r}")
-            if obj.type_field:
-                self.assertEqual(detect_qualified(s), QualifiedType(status), f"wrong qualified detected: {obj!r}")
+            s = code_points_to_string(code_points)
+            if status in ("fully-qualified", "minimally-qualified", "unqualified"):
+                self.assertEqual(
+                    detect_qualified(s), QualifiedType(status), f"wrong qualified detected: {s!r}({code_points}, {status})"
+                )
+            elif status == "component":
+                ec = EmojiCharacter.from_character(s)
+                self.assertTrue(EmojiCharProperty.ECOMP in ec.properties, f"{ec!r} has no {status}({s!r}<{code_points}>)")
 
     def test_type_field(self):
         for code_points, *_ in self.test_data:
-            obj = EmojiSequence.from_hex(code_points)
-            s = obj.string
-            if obj.type_field == "Basic_Emoji":
-                self.assertTrue(is_emoji_character(s), f"wrong Basic_Emoji type_field detected: {obj!r}")
-            elif obj.type_field == "Emoji_Keycap_Sequence":
-                self.assertTrue(is_emoji_keycap_sequence(s), f"wrong Emoji_Keycap_Sequence type_field detected: {obj!r}")
-            elif obj.type_field == "Emoji_Flag_Sequence":
-                self.assertTrue(is_emoji_flag_sequence(s), f"wrong Emoji_Flag_Sequence type_field detected: {obj!r}")
-            elif obj.type_field == "Emoji_Modifier_Sequence":
-                self.assertTrue(is_emoji_modifier_sequence(s), f"wrong Emoji_Modifier_Sequence type_field detected: {obj!r}")
+            try:
+                obj = EmojiSequence.from_hex(code_points)
+            except KeyError:
+                pass
+            else:
+                s = obj.string
+                if obj.type_field == "Basic_Emoji":
+                    self.assertTrue(is_emoji_character(s), f"wrong Basic_Emoji type_field detected: {obj!r}")
+                elif obj.type_field == "Emoji_Keycap_Sequence":
+                    self.assertTrue(is_emoji_keycap_sequence(s), f"wrong Emoji_Keycap_Sequence type_field detected: {obj!r}")
+                elif obj.type_field == "Emoji_Flag_Sequence":
+                    self.assertTrue(is_emoji_flag_sequence(s), f"wrong Emoji_Flag_Sequence type_field detected: {obj!r}")
+                elif obj.type_field == "Emoji_Modifier_Sequence":
+                    self.assertTrue(is_emoji_modifier_sequence(s), f"wrong Emoji_Modifier_Sequence type_field detected: {obj!r}")
 
 
 class SequencePatternTestCase(unittest.TestCase):

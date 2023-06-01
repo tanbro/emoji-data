@@ -13,7 +13,6 @@ _DATA_FILES = [
     "emoji-variation-sequences.txt",
     "emoji-zwj-sequences.txt",
     "emoji-sequences.txt",
-    "emoji-test.txt",
 ]
 
 
@@ -106,17 +105,6 @@ class EmojiSequence(metaclass=_MetaClass):
                     elif fname == "emoji-variation-sequences.txt":
                         cps, description = (part.strip() for part in content.split(";", 1))
                         _decode_code_points(cps, description=description, comment=comment)
-                    elif fname == "emoji-test.txt":
-                        cps, status = (part.strip() for part in content.split(";", 1))
-                        cp_arr = [int(cp, 16) for cp in cps.split()]
-                        inst = cls(cp_arr, status=status, comment=comment)
-                        s = inst.string
-                        try:
-                            inst_0 = cls[s]
-                        except KeyError:
-                            cls[s] = inst
-                        else:
-                            inst_0.status = status
                     else:
                         raise RuntimeError(f"Invalid data file name {fname}")
         # build regex
@@ -157,7 +145,7 @@ class EmojiSequence(metaclass=_MetaClass):
         """
         value = value.strip()
         if not all(ord(s) in EmojiCharacter for s in value):
-            raise RuntimeError("Not all characters in the text is Emoji character.")
+            raise ValueError("Not all characters in the text is Emoji character.")
         try:
             return cls[value]
         except KeyError:
