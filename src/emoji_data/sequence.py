@@ -57,7 +57,7 @@ class EmojiSequence(metaclass=_MetaClass):
     def __repr__(self):
         return "<{} code_points={!r} string={!r}, description={!r}>".format(
             type(self).__name__,
-            " ".join("{:04X}".format(n) for n in self._code_points),
+            self.code_points_string,
             self._string,
             self._description,
         )
@@ -218,8 +218,11 @@ class EmojiSequence(metaclass=_MetaClass):
 
     @property
     def hex(self) -> str:
-        """Return code points in hex format string, separated by spaces"""
-        return " ".join(c.hex for c in self._characters)
+        """Python style hex string of each emoji-characters's code-point, separated by spaces
+
+        eg: ``0xa9 0xfe0f``
+        """
+        return " ".join(c.hex for c in self.characters)
 
     @property
     def string(self) -> str:
@@ -240,6 +243,14 @@ class EmojiSequence(metaclass=_MetaClass):
     def code_points(self) -> List[int]:
         """List of unicode integer value of the characters who make up Emoji Sequence"""
         return self._code_points
+
+    @property
+    def code_points_string(self) -> str:
+        """Unicode style hex string of each emoji-characters's code-point, separated by spaces
+
+        eg: ``00A9 FE0F``
+        """
+        return " ".join(c.code_point_string for c in self.characters)
 
     @classmethod
     def find_all(cls, s: str) -> List[Tuple["EmojiSequence", int, int]]:

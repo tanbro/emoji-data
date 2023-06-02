@@ -195,12 +195,20 @@ class EmojiCharacter(metaclass=_MetaClass):
 
     @property
     def code_point(self) -> int:
-        """Unicode integer value of the Emoji"""
+        """Unicode integer value of the emoji-characters"""
         return self._code_point
 
     @property
+    def code_point_string(self) -> str:
+        """Unicode style hex string of the emoji-characters's code-point
+
+        eg: ``25FB``
+        """
+        return f"{self._code_point:04X}"
+
+    @property
     def properties(self) -> List[EmojiCharProperty]:
-        """Property description text of the Emoji"""
+        """Property description text of the emoji-characters"""
         return self._properties
 
     @property
@@ -210,12 +218,15 @@ class EmojiCharacter(metaclass=_MetaClass):
 
     @property
     def regex(self) -> str:
-        """Regular express for the Emoji"""
+        """Regular express for the emoji-characters"""
         return self._regex
 
     @property
     def hex(self) -> str:
-        """Hex style text of the Emoji's Unicode"""
+        """Python style hex string of the emoji-characters's code-pint
+
+        eg: ``0x25fb``
+        """
         return hex(self._code_point)
 
     @property
