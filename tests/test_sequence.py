@@ -56,7 +56,7 @@ class SequenceTestCase(unittest.TestCase):
                         self.assertTrue(
                             is_emoji_presentation_sequence(es.string)
                             or all(EmojiCharProperty.EPRES not in c.properties for c in es.characters),
-                            f"wrong Emoji_Keycap_Sequence type_field detected: {es!r}",
+                            f"wrong Basic_Emoji type_field detected: {es!r}",
                         )
                     else:
                         self.assertTrue(EmojiCharProperty.EPRES in es.characters[0].properties)
