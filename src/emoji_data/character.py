@@ -48,15 +48,36 @@ TAGS = list(range(0xE0020, 0xE007F + 1))
 class EmojiCharProperty(Enum):
     """Emoji Character Properties
 
+    character properties are available for emoji characters.
+
     see: http://www.unicode.org/reports/tr51/#Emoji_Properties
     """
 
     EMOJI = "Emoji"
+    """for characters that are emoji"""
+
     EPRES = "Emoji_Presentation"
+    """ for characters that have emoji presentation by default"""
+
     EMOD = "Emoji_Modifier"
+    """for characters that are emoji modifiers"""
+
     EBASE = "Emoji_Modifier_Base"
+    """for characters that can serve as a base for emoji modifiers"""
+
     ECOMP = "Emoji_Component"
+    """for characters used in emoji sequences that normally do not appear on emoji keyboards as separate choices, such as keycap base characters or Regional_Indicator characters.
+
+    All characters in emoji sequences are either Emoji or Emoji_Component.
+    Implementations must not, however, assume that all Emoji_Component characters are also Emoji.
+    There are some non-emoji characters that are used in various emoji sequences, such as tag characters and ZWJ.
+    """
+
     EXTPICT = "Extended_Pictographic"
+    """for characters that are used to future-proof segmentation.
+    
+    The Extended_Pictographic characters contain all the Emoji characters except for some Emoji_Component characters.
+    """
 
 
 class _MetaClass(BaseDictContainer):
@@ -64,7 +85,9 @@ class _MetaClass(BaseDictContainer):
 
 
 class EmojiCharacter(metaclass=_MetaClass):
-    """emoji character — A character that has the Emoji property. These characters are recommended for use as emoji.
+    """emoji character — A character that has the Emoji property.
+
+    These characters are recommended for use as emoji.
 
     see: http://www.unicode.org/reports/tr51/#Emoji_Characters
     """
