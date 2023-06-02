@@ -126,9 +126,9 @@ class EmojiCharacter(metaclass=_MetaClass):
         return self._string
 
     def __repr__(self):
-        return "<{} hex={} char={!r}>".format(
+        return "<{} code_point={} char={!r}>".format(
             type(self).__name__,
-            self.hex,
+            self.code_point_string,
             self.string,
         )
 

@@ -58,8 +58,8 @@ class EmojiSequence(metaclass=_MetaClass):
         return "<{} code_points={!r} string={!r}, description={!r}>".format(
             type(self).__name__,
             self.code_points_string,
-            self._string,
-            self._description,
+            self.string,
+            self.description,
         )
 
     _initialed = False
