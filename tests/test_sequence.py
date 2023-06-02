@@ -55,7 +55,7 @@ class SequenceTestCase(unittest.TestCase):
                     if len(es.characters) > 1:
                         self.assertTrue(
                             is_emoji_presentation_sequence(es.string)
-                            or all(EmojiCharProperty.EPRES not in c.properties for c in es.characters),
+                            and all(EmojiCharProperty.EPRES not in c.properties for c in es.characters),
                             f"wrong Basic_Emoji type_field detected: {es!r}",
                         )
                     else:
