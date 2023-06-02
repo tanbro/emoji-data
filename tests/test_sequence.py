@@ -7,13 +7,14 @@ from emoji_data import (
     EmojiSequence,
     QualifiedType,
     code_points_to_string,
+    data_file,
     detect_qualified,
-    is_emoji_character,
     is_emoji_flag_sequence,
     is_emoji_keycap_sequence,
     is_emoji_modifier_sequence,
+    is_emoji_presentation_sequence,
+    read_data_file_iterable,
 )
-from emoji_data.utils import data_file, read_data_file_iterable
 
 
 class SequenceTestCase(unittest.TestCase):
@@ -40,6 +41,35 @@ class SequenceTestCase(unittest.TestCase):
             elif status == "component":
                 ec = EmojiCharacter.from_character(s)
                 self.assertTrue(EmojiCharProperty.ECOMP in ec.properties, f"{ec!r} has no {status}({s!r}<{code_points}>)")
+
+    def test_type_field(self):
+        """https://unicode.org/reports/tr51/#Emoji_Sets"""
+        for code_points, *_ in self.test_data:
+            try:
+                es = EmojiSequence.from_hex(code_points)
+            except KeyError:
+                pass
+            else:
+                if es.type_field == "Basic_Emoji":
+                    # https://unicode.org/reports/tr51/#def_basic_emoji_set
+                    if len(es.characters) > 1:
+                        self.assertTrue(
+                            is_emoji_presentation_sequence(es.string)
+                            or all(EmojiCharProperty.EPRES not in c.properties for c in es.characters),
+                            f"wrong Emoji_Keycap_Sequence type_field detected: {es!r}",
+                        )
+                    else:
+                        self.assertTrue(EmojiCharProperty.EPRES in es.characters[0].properties)
+                elif es.type_field == "Emoji_Keycap_Sequence":
+                    self.assertTrue(
+                        is_emoji_keycap_sequence(es.string), f"wrong Emoji_Keycap_Sequence type_field detected: {es!r}"
+                    )
+                elif es.type_field == "Emoji_Flag_Sequence":
+                    self.assertTrue(is_emoji_flag_sequence(es.string), f"wrong Emoji_Flag_Sequence type_field detected: {es!r}")
+                elif es.type_field == "Emoji_Modifier_Sequence":
+                    self.assertTrue(
+                        is_emoji_modifier_sequence(es.string), f"wrong Emoji_Modifier_Sequence type_field detected: {es!r}"
+                    )
 
 
 class SequencePatternTestCase(unittest.TestCase):
