@@ -1,4 +1,4 @@
-Sphinx
+Sphinx>=6.2
 myst-parser
 nbsphinx
 importlib_metadata;python_version<"3.8"

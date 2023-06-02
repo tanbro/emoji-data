@@ -42,4 +42,4 @@ where = ["src"]
 write_to = "src/emoji_data/version.py"
 
 [tool.black]
-line-length = 128
+line-length = 127
