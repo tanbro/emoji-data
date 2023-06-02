@@ -27,7 +27,7 @@ Contents
    :glob:
    :titlesonly:
 
-   example
+   notebooks/*
 
 Indices and tables
 ------------------
