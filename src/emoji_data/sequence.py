@@ -29,7 +29,6 @@ class EmojiSequence(metaclass=_MetaClass):
     def __init__(
         self,
         code_points: Union[Iterable[int], int],
-        status: str = "",
         type_field: str = "",
         description: str = "",
         comment: str = "",
@@ -38,7 +37,6 @@ class EmojiSequence(metaclass=_MetaClass):
             self._code_points = list(code_points)
         else:
             self._code_points = [code_points]
-        self._status = status.strip()
         self._string = "".join(chr(n) for n in self._code_points)
         self._characters = [EmojiCharacter.from_hex(n) for n in self._code_points]
         self._type_field = type_field.strip()
@@ -57,10 +55,9 @@ class EmojiSequence(metaclass=_MetaClass):
         return self._string
 
     def __repr__(self):
-        return "<{} code_points={!r} status={!r}, string={!r}, description={!r}>".format(
+        return "<{} code_points={!r} string={!r}, description={!r}>".format(
             type(self).__name__,
             " ".join("{:04X}".format(n) for n in self._code_points),
-            self._status,
             self._string,
             self._description,
         )
@@ -213,14 +210,6 @@ class EmojiSequence(metaclass=_MetaClass):
     @property
     def comment(self) -> str:
         return self._comment
-
-    @property
-    def status(self) -> str:
-        return self._status
-
-    @status.setter
-    def status(self, value: str):
-        self._status = value
 
     @property
     def characters(self) -> List[EmojiCharacter]:
