@@ -86,14 +86,12 @@ class EmojiSequence(metaclass=_MetaClass):
             except ValueError:
                 _arr_cp = [int(x, 16) for x in _cps.split()]
                 _seq = cls(_arr_cp, **_kwargs)
-                if _seq.string not in cls:
-                    cls[_seq.string] = _seq
+                cls[_seq.string] = _seq
             else:
                 # begin..end form: A range of single char emoji-seq
                 for _cp in range(int(_cp_head, 16), 1 + int(_cp_tail, 16)):
                     _seq = cls(_cp, **_kwargs)
-                    if _seq.string not in cls:
-                        cls[_seq.string] = _seq
+                    cls[_seq.string] = _seq
 
         for fname in _DATA_FILES:
             with data_file(fname).open(encoding="utf8") as fp:

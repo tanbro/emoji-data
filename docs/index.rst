@@ -27,7 +27,7 @@ Contents
    :glob:
    :titlesonly:
 
-   notebooks/*.ipynb
+   example
 
 Indices and tables
 ------------------
