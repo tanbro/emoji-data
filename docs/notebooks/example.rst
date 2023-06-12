@@ -1,7 +1,7 @@
 Example
 =======
 
-Class ``EmojiSequence`` is most usefule. To use it:
+Class ``EmojiSequence`` is most useful To use it:
 
 Usages
 ------
