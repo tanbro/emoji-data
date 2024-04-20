@@ -17,4 +17,3 @@ Submodules
    emoji_data.sequence
    emoji_data.types
    emoji_data.utils
-   emoji_data.version
