@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 0.3
+
+> 📅 **Date** 2024-4-21
+
+- 🌞 Highlights:
+  - Update to Emoji version 15.1
+- 🆕 New Features:
+  - #44: Add `py.typed` file, make the package PEP-561 friendly
+- Misc:
+  - Add lots of typeshed code
+  - Add pre-commit
+  - Update Sphinx-docs
+  - Other modifications
+
 ## 0.2
 
 - Update:
