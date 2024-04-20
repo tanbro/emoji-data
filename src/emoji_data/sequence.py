@@ -1,5 +1,18 @@
+from __future__ import annotations
+
 import re
-from typing import Iterable, List, Pattern, Tuple, Union
+import sys
+from typing import Pattern, Union
+
+if sys.version_info < (3, 11):  # pragma: no cover
+    from typing_extensions import Self
+else:  # pragma: no cover
+    from typing import Self
+
+if sys.version_info < (3, 9):  # pragma: no cover
+    from typing import Iterable, Sequence, Tuple, Generator
+else:  # pragma: no cover
+    from collections.abc import Iterable, Sequence, Generator
 
 from .character import EmojiCharacter
 from .types import BaseDictContainer
@@ -9,18 +22,18 @@ __all__ = ["EmojiSequence"]
 
 # http://www.unicode.org/reports/tr51/#Data_Files_Table
 # keep the order!
-_DATA_FILES = [
+DATA_FILES = [
     "emoji-variation-sequences.txt",
     "emoji-zwj-sequences.txt",
     "emoji-sequences.txt",
 ]
 
 
-class _MetaClass(BaseDictContainer):
+class MetaClass(BaseDictContainer):
     pass
 
 
-class EmojiSequence(metaclass=_MetaClass):
+class EmojiSequence(metaclass=MetaClass):
     """Emoji and Text Presentation Sequences used to represent emoji
 
     see: http://www.unicode.org/reports/tr51/#Emoji_Sequences
@@ -91,7 +104,7 @@ class EmojiSequence(metaclass=_MetaClass):
                     _seq = cls(_cp, **_kwargs)
                     cls[_seq.string] = _seq
 
-        for fname in _DATA_FILES:
+        for fname in DATA_FILES:
             with data_file(fname).open(encoding="utf8") as fp:
                 for content, comment in read_data_file_iterable(fp):
                     if fname in ("emoji-sequences.txt", "emoji-zwj-sequences.txt"):
@@ -118,10 +131,18 @@ class EmojiSequence(metaclass=_MetaClass):
             del cls[k]
         cls._initialed = False
 
-    @classmethod
-    def items(cls) -> Iterable[Tuple[str, "EmojiSequence"]]:
-        """Return an iterator of all string -> emoji-sequence pairs of the class"""
-        return ((k, cls[k]) for k in cls)
+    if sys.version_info < (3, 9):
+
+        @classmethod
+        def items(cls) -> Iterable[Tuple[str, Self]]:
+            return ((k, cls[k]) for k in cls)
+
+    else:
+
+        @classmethod
+        def items(cls) -> Iterable[tuple[str, Self]]:
+            """Return an iterator of all string -> emoji-sequence pairs of the class"""
+            return ((k, cls[k]) for k in cls)
 
     @classmethod
     def keys(cls) -> Iterable[str]:
@@ -129,12 +150,12 @@ class EmojiSequence(metaclass=_MetaClass):
         return (k for k in cls)
 
     @classmethod
-    def values(cls) -> Iterable["EmojiSequence"]:
+    def values(cls) -> Iterable[Self]:
         """Return an iterator of all emoji-sequences of the class"""
         return (cls[k] for k in cls)
 
     @classmethod
-    def from_string(cls, s: str) -> "EmojiSequence":
+    def from_string(cls, s: str) -> Self:
         """Get an :class:`EmojiSequence` instance from string
 
         :param s: Emoji string
@@ -144,7 +165,7 @@ class EmojiSequence(metaclass=_MetaClass):
         return cls[s]
 
     @classmethod
-    def from_characters(cls, value: Union[EmojiCharacter, Iterable[EmojiCharacter]]) -> "EmojiSequence":
+    def from_characters(cls, value: Union[EmojiCharacter, Iterable[EmojiCharacter]]) -> Self:
         """Get an :class:`EmojiSequence` instance from :class:`EmojiCharacter` object or list
 
         :param value: Single or iterable object of :class:`EmojiCharacter`, composing the sequence
@@ -161,7 +182,7 @@ class EmojiSequence(metaclass=_MetaClass):
         return cls.from_string(s)
 
     @classmethod
-    def from_hex(cls, value: Union[str, int, Iterable[str], Iterable[int]]) -> "EmojiSequence":
+    def from_hex(cls, value: Union[str, int, Iterable[str], Iterable[int]]) -> Self:
         """Get an :class:`EmojiSequence` instance by unicode code point(s)
 
         :type value: Union[str, int, Iterable[str], Iterable[int]]
@@ -179,13 +200,15 @@ class EmojiSequence(metaclass=_MetaClass):
         :raise KeyError: When passed-in value not found in the class' internal dictionary
         """
         if isinstance(value, str):
-            cps_array = value.split()
+            cps_array = value.split()  # type: ignore[assignment]
         elif isinstance(value, int):
-            cps_array = (value,)
-        elif isinstance(value, Iterable):
-            cps_array = value
+            cps_array = (value,)  # type: ignore[assignment]
+        elif isinstance(value, Iterable) and not isinstance(value, str) and all(isinstance(m, (str, int)) for m in value):
+            cps_array = value  # type: ignore[assignment]
         else:
-            raise TypeError("The `args` should be one of `str`, `int`, or a sequence of that")
+            raise TypeError(
+                f"Argument `value` expects to be one of `str`, `bytes`, `int`, or a sequence of that, but actual is {type(value)}"
+            )
         return cls.from_characters(EmojiCharacter.from_hex(cp) for cp in cps_array)
 
     @property
@@ -212,7 +235,7 @@ class EmojiSequence(metaclass=_MetaClass):
         return self._comment
 
     @property
-    def characters(self) -> List[EmojiCharacter]:
+    def characters(self) -> Sequence[EmojiCharacter]:
         """Emoji character objects list which makes up the Emoji Sequence"""
         return self._characters
 
@@ -240,7 +263,7 @@ class EmojiSequence(metaclass=_MetaClass):
         return self._regex_pat
 
     @property
-    def code_points(self) -> List[int]:
+    def code_points(self) -> Sequence[int]:
         """List of unicode integer value of the characters who make up Emoji Sequence"""
         return self._code_points
 
@@ -252,38 +275,57 @@ class EmojiSequence(metaclass=_MetaClass):
         """
         return " ".join(c.code_point_string for c in self.characters)
 
-    @classmethod
-    def find_all(cls, s: str) -> List[Tuple["EmojiSequence", int, int]]:
-        """Find out all emoji sequences in a string, and return them in a list
+    if sys.version_info < (3, 9):
 
-        Item of the returned list is as same as that in the iterator of :meth:`find`
+        @classmethod
+        def find_all(cls, s: str) -> Sequence[Tuple[Self, int, int]]:
+            return list(cls.find(s))
 
-        The function equals::
+    else:
 
-            list(EmojiSequence.find(s))
+        @classmethod
+        def find_all(cls, s: str) -> Sequence[tuple[Self, int, int]]:
+            """Find out all emoji sequences in a string, and return them in a list
 
-        or ::
+            Item of the returned list is as same as that in the iterator of :meth:`find`
 
-            [x for x in EmojiSequence.find(s)]
-        """
-        return list(cls.find(s))
+            The function equals::
 
-    @classmethod
-    def find(cls, s: str) -> Iterable[Tuple["EmojiSequence", int, int]]:
-        """Return an iterator which yields all emoji sequences in a string, without actually storing them all simultaneously.
+                list(EmojiSequence.find(s))
 
-        :param s: The string to find emoji sequences in it
+            or ::
 
-        :return: Item of the iterator is a 3-member tuple:
+                [x for x in EmojiSequence.find(s)]
+            """
+            return list(cls.find(s))
 
-            0. The found :class:`.EmojiSequence` object
-            1. Begin position of the emoji sequence in the string
-            2. End position of the emoji sequence in the string
-        """
-        m = cls.pattern.search(s)
-        while m:
-            yield cls.from_string(m.group()), m.start(), m.end()
-            m = cls.pattern.search(s, m.end())
+    if sys.version_info < (3, 9):
+
+        @classmethod
+        def find(cls, s: str) -> Generator[Tuple[Self, int, int], None, None]:
+            m = cls.pattern.search(s)
+            while m:
+                yield cls.from_string(m.group()), m.start(), m.end()
+                m = cls.pattern.search(s, m.end())
+
+    else:
+
+        @classmethod
+        def find(cls, s: str) -> Generator[tuple[Self, int, int], None, None]:
+            """Return an iterator which yields all emoji sequences in a string, without actually storing them all simultaneously.
+
+            :param s: The string to find emoji sequences in it
+
+            :return: Item of the iterator is a 3-member tuple:
+
+                0. The found :class:`.EmojiSequence` object
+                1. Begin position of the emoji sequence in the string
+                2. End position of the emoji sequence in the string
+            """
+            m = cls.pattern.search(s)
+            while m:
+                yield cls.from_string(m.group()), m.start(), m.end()
+                m = cls.pattern.search(s, m.end())
 
 
 EmojiSequence.initial()

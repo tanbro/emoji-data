@@ -1,25 +1,36 @@
+import sys
+from typing import Generic, TypeVar
+
+if sys.version_info < (3, 9):  # pragma: no cover
+    from typing import Generator, MutableMapping
+else:  # pragma: no cover
+    from collections.abc import Generator, MutableMapping
+
 __all__ = ["BaseDictContainer"]
 
+TK = TypeVar("TK")
+TV = TypeVar("TV")
 
-class BaseDictContainer(type):
+
+class BaseDictContainer(Generic[TK, TV], type):
     def __new__(cls, name, bases, attrs):
-        cls.__data__ = dict()
+        cls.__data__: MutableMapping[TK, TV] = {}  # type:ignore[annotation-unchecked]
         return super().__new__(cls, name, bases, attrs)
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: TK, value: TV):
         self.__data__[key] = value
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: TK):
         del self.__data__[key]
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: TK) -> TV:
         return self.__data__[key]
 
-    def __contains__(self, key):
+    def __contains__(self, key: TK) -> bool:
         return key in self.__data__
 
-    def __iter__(self):
+    def __iter__(self) -> Generator[TK, None, None]:
         yield from self.__data__
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.__data__)

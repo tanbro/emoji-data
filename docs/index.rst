@@ -1,37 +1,41 @@
 emoji-data
 ==========
 
-:release:  |release|
-:version:  |version|
-:built at: |today|
+========== ========= =========
+Release    Version   Built at
+========== ========= =========
+|release|  |version| |today|
+========== ========= =========
 
 Contents
 --------
 
 .. toctree::
-   :caption: Documentations
+   :caption: Documentation
    :titlesonly:
 
-   README <README.md>
-   CHANGELOG <CHANGELOG.md>
-   AUTHORS <AUTHORS.md>
+   README
+   CHANGELOG
+   AUTHORS
 
 .. toctree::
-    :caption: References
-    :titlesonly:
+   :caption: API Reference
+   :titlesonly:
 
-    emoji_data
+   apidocs/emoji_data
 
 .. toctree::
    :caption: Notebooks
    :glob:
    :titlesonly:
 
-   notebooks/*
+   ../notebooks/*
 
 Indices and tables
 ------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`
+
+.. .. furo has no search page!
+.. * :ref:`search`

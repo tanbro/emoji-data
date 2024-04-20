@@ -1,5 +1,18 @@
+from __future__ import annotations
+
+import sys
 from enum import Enum
-from typing import Iterable, List, Tuple, Union
+from typing import Union
+
+if sys.version_info < (3, 11):  # pragma: no cover
+    from typing_extensions import Self
+else:  # pragma: no cover
+    from typing import Self
+
+if sys.version_info < (3, 9):  # pragma: no cover
+    from typing import Iterable, MutableSequence, Sequence, Tuple
+else:  # pragma: no cover
+    from collections.abc import Iterable, Sequence, MutableSequence
 
 from .types import BaseDictContainer
 from .utils import code_point_to_regex, data_file, read_data_file_iterable
@@ -75,16 +88,16 @@ class EmojiCharProperty(Enum):
 
     EXTPICT = "Extended_Pictographic"
     """for characters that are used to future-proof segmentation.
-    
+
     The Extended_Pictographic characters contain all the Emoji characters except for some Emoji_Component characters.
     """
 
 
-class _MetaClass(BaseDictContainer):
+class MetaClass(BaseDictContainer):
     pass
 
 
-class EmojiCharacter(metaclass=_MetaClass):
+class EmojiCharacter(metaclass=MetaClass):
     """emoji character — A character that has the Emoji property.
 
     These characters are recommended for use as emoji.
@@ -103,7 +116,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         self._regex = code_point_to_regex(code_point)
         #
         if properties is None:
-            self._properties: List[EmojiCharProperty] = list()
+            self._properties: MutableSequence[EmojiCharProperty] = []
         elif isinstance(properties, EmojiCharProperty):
             self._properties = [properties]
         elif isinstance(properties, Iterable):
@@ -114,7 +127,7 @@ class EmojiCharacter(metaclass=_MetaClass):
             )
         #
         if comments is None:
-            self._comments: List[str] = list()
+            self._comments: MutableSequence[str] = []
         elif isinstance(comments, str):
             self._comments = [comments]
         elif isinstance(comments, Iterable):
@@ -149,7 +162,7 @@ class EmojiCharacter(metaclass=_MetaClass):
                 property_ = EmojiCharProperty(property_text)
                 for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):
                     try:
-                        inst: "EmojiCharacter" = cls[cp]
+                        inst: Self = cls[cp]  # type:ignore[annotation-unchecked]
                     except KeyError:
                         cls[cp] = cls(cp, property_, comment)
                     else:
@@ -170,10 +183,18 @@ class EmojiCharacter(metaclass=_MetaClass):
             del cls[k]
         cls._initialed = False
 
-    @classmethod
-    def items(cls) -> Iterable[Tuple[int, "EmojiCharacter"]]:
-        """Return an iterator of all code-point -> emoji-character pairs of the class"""
-        return ((k, cls[k]) for k in cls)
+    if sys.version_info < (3, 9):  # pragma: no cover
+
+        @classmethod
+        def items(cls) -> Iterable[Tuple[int, Self]]:
+            return ((k, cls[k]) for k in cls)
+
+    else:
+
+        @classmethod
+        def items(cls) -> Iterable[tuple[int, Self]]:
+            """Return an iterator of all code-point -> emoji-character pairs of the class"""
+            return ((k, cls[k]) for k in cls)
 
     @classmethod
     def keys(cls) -> Iterable[int]:
@@ -181,7 +202,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         return (k for k in cls)
 
     @classmethod
-    def values(cls) -> Iterable["EmojiCharacter"]:
+    def values(cls) -> Iterable[Self]:
         """Return an iterator of all emoji-characters of the class"""
         return (cls[k] for k in cls)
 
@@ -207,12 +228,12 @@ class EmojiCharacter(metaclass=_MetaClass):
         return f"{self._code_point:04X}"
 
     @property
-    def properties(self) -> List[EmojiCharProperty]:
+    def properties(self) -> Sequence[EmojiCharProperty]:
         """Property description text of the emoji-characters"""
         return self._properties
 
     @property
-    def comments(self) -> List[str]:
+    def comments(self) -> Sequence[str]:
         """Comments of the Emoji"""
         return self._comments
 
@@ -235,7 +256,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         return self._string
 
     @classmethod
-    def from_character(cls, c: str) -> "EmojiCharacter":
+    def from_character(cls, c: str) -> Self:
         """Get :class:`EmojiCharacter` instance from a single Emoji Unicode character
 
         .. note::
@@ -248,7 +269,7 @@ class EmojiCharacter(metaclass=_MetaClass):
         return cls[ord(c)]
 
     @classmethod
-    def from_hex(cls, value: Union[int, str]) -> "EmojiCharacter":
+    def from_hex(cls, value: Union[int, str]) -> Self:
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode integer value or it's hex string
 
         :param value: Emoji Unicode, either integer value or hex string

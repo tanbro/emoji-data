@@ -3,8 +3,15 @@
 ref: http://www.unicode.org/reports/tr51/#Definitions
 """
 
+import sys
 import re
 from enum import Enum
+from typing import Pattern
+
+if sys.version_info < (3, 9):  # pragma: no cover
+    from typing import Mapping, MutableMapping
+else:  # pragma: no cover
+    from collections.abc import Mapping, MutableMapping
 
 from .character import (
     EMOJI_KEYCAP,
@@ -53,8 +60,8 @@ class QualifiedType(Enum):
     UNQUALIFIED = "unqualified"
 
 
-def _make_regex_dict():
-    d = dict()
+def _make_regex_dict() -> Mapping[str, str]:
+    d: MutableMapping[str, str] = {}
     d.update(
         {
             "EMOJI_CHARACTER": r"["
@@ -133,7 +140,7 @@ def _make_regex_dict():
     return d
 
 
-EMOJI_PATTERNS = {k: re.compile(v) for k, v in _make_regex_dict().items()}
+EMOJI_PATTERNS: Mapping[str, Pattern[str]] = {k: re.compile(v) for k, v in _make_regex_dict().items()}
 
 
 def is_emoji_character(c: str) -> bool:

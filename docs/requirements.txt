@@ -1,6 +1,15 @@
-Sphinx>=6.2
-myst-parser
-nbsphinx
 importlib_metadata;python_version<"3.8"
-sphinx-inline-tabs
+
+Sphinx>=7
+myst-parser
+
+furo
+
+nbsphinx
+
+linkify-it-py
+# sphinx-autodoc2
 sphinx-copybutton
+sphinx-inline-tabs
+sphinx_tippy
+sphinx-version-warning

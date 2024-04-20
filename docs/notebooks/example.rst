@@ -8,7 +8,7 @@ Usages
 
 Import ``emoji_data``:
 
-.. code:: ipython3
+.. code:: python
 
     from emoji_data import EmojiSequence
 
@@ -17,7 +17,7 @@ Print Emojis
 
 Print first 50 emojis
 
-.. code:: ipython3
+.. code:: python
 
     for es, _ in zip(EmojiSequence.values(), range(50)):
         print(repr(es))
@@ -75,12 +75,12 @@ Print first 50 emojis
     <EmojiSequence code_points='2199 FE0F' status='', string='↙️', description='down-left arrow'>
     <EmojiSequence code_points='21A9 FE0E' status='', string='↩︎', description='text style;'>
     <EmojiSequence code_points='21A9 FE0F' status='', string='↩️', description='right arrow curving left'>
-    
+
 
 Check if hex list represents an EmojiSequence
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: python
 
     emojis_data = [
         '1F6A3',
@@ -91,7 +91,7 @@ Check if hex list represents an EmojiSequence
         '1F468 200D 1F468 200D 1F467 200D 1F467',
         '1F441 FE0F 200D 1F5E8 FE0E'
     ]
-    
+
     for hex_data in emojis_data:
         try:
             es = EmojiSequence.from_hex(hex_data)
@@ -110,12 +110,12 @@ Check if hex list represents an EmojiSequence
     1F469 200D 1F52C is EmojiSequence 👩‍🔬
     1F468 200D 1F468 200D 1F467 200D 1F467 is EmojiSequence 👨‍👨‍👧‍👧
     1F441 FE0F 200D 1F5E8 FE0E is NOT EmojiSequence!
-    
+
 
 Check if a string is EmojiSequence
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: python
 
     print('👨' in EmojiSequence)
     print('©' in EmojiSequence)  # 00AE, unqualified
@@ -129,12 +129,12 @@ Check if a string is EmojiSequence
     False
     True
     False
-    
+
 
 Search EmojiSequence inside texts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code:: ipython3
+.. code:: python
 
     strings = [
         "First:👨🏻‍⚕️. Second:👨🏻.",
@@ -143,7 +143,7 @@ Search EmojiSequence inside texts
         "9⃣ 0039 20E3 is also unqualified, it will not be matched!",
         "and no more emoji."
     ]
-    
+
     for s in strings:
         for es, begin, end in EmojiSequence.find(s):
             print(f'[{begin}:{end}] - {es} {es!r}')
@@ -165,4 +165,3 @@ Search EmojiSequence inside texts
     ---
     ---
     ---
-    
