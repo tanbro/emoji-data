@@ -14,4 +14,4 @@ pip install emoji-data
 
 ## How to use
 
-See `notebooks/example.ipynb`
+See `docs/notebooks/example.ipynb`

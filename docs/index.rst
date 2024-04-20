@@ -29,7 +29,7 @@ Contents
    :glob:
    :titlesonly:
 
-   ../notebooks/*
+   notebooks/*
 
 Indices and tables
 ------------------
