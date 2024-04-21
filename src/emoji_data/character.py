@@ -176,17 +176,17 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
 
     @classmethod
     def items(cls) -> Iterator[Tuple[int, EmojiCharacter]]:
-        """Return an iterator of all code-point -> emoji-character pairs of the class"""
+        """Returns an iterator of all code-point -> emoji-character pairs of the class"""
         return ((k, cls[k]) for k in cls)
 
     @classmethod
     def keys(cls) -> Iterator[int]:
-        """Return an iterator of each emoji-character's key code-point of the class"""
+        """Returns an iterator of each emoji-character's key code-point of the class"""
         yield from cls
 
     @classmethod
     def values(cls) -> Iterator[EmojiCharacter]:
-        """Return an iterator of all emoji-characters of the class"""
+        """Returns an iterator of all emoji-characters of the class"""
         return (cls[k] for k in cls)
 
     def _add_property(self, val: EmojiCharProperty):

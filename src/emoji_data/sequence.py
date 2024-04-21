@@ -26,7 +26,8 @@ class MetaClass(BaseDictContainer[str, "EmojiSequence"]):
 class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIssues]
     """Emoji and Text Presentation Sequences used to represent emoji
 
-    see: http://www.unicode.org/reports/tr51/#Emoji_Sequences
+    See also:
+        http://www.unicode.org/reports/tr51/#Emoji_Sequences
     """
 
     def __init__(
@@ -130,17 +131,17 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
 
     @classmethod
     def items(cls) -> Iterator[Tuple[str, EmojiSequence]]:
-        """Return an iterator of all string -> emoji-sequence pairs of the class"""
+        """Returns an iterator of all string -> emoji-sequence pairs of the class"""
         return ((k, cls[k]) for k in cls)
 
     @classmethod
     def keys(cls) -> Iterator[str]:
-        """Return an iterator of each emoji-sequence's key string of the class"""
+        """Returns an iterator of each emoji-sequence's key string of the class"""
         yield from cls
 
     @classmethod
     def values(cls) -> Iterator[EmojiSequence]:
-        """Return an iterator of all emoji-sequences of the class"""
+        """Returns an iterator of all emoji-sequences of the class"""
         return (cls[k] for k in cls)
 
     @classmethod
@@ -179,19 +180,21 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
     def from_hex(cls, value: Union[str, int, Iterable[Union[int, str]]]) -> EmojiSequence:
         """Get an :class:`EmojiSequence` instance by unicode code point(s)
 
-        :type value: Union[str, int, Iterable[str], Iterable[int]]
-        :param value: A single or sequence of HEX string/code.
+        Args:
+            value: A single or sequence of HEX string/code.
 
-            - it could be:
+                - it could be:
 
-              - one or more code-point(s) in HEX format string, separated by spaces
-              - a single code-point integer
-              - An iterable object whose members are code-point string in HEX format
-              - An iterable object whose members are code-point integer
+                - one or more code-point(s) in HEX format string, separated by spaces
+                - a single code-point integer
+                - An iterable object whose members are code-point string in HEX format
+                - An iterable object whose members are code-point integer
 
-        :return: Instance returned from the class's internal dictionary
+        Returns:
+            Instance returned from the class's internal dictionary
 
-        :raise KeyError: When passed-in value not found in the class' internal dictionary
+        Raises:
+            KeyError: When passed-in value not found in the class' internal dictionary
         """
         cps_array: Iterable[Union[int, str]]
         if isinstance(value, str):
@@ -293,12 +296,12 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         Args:
             s: The string to find emoji sequences in it
 
-        Returns:
-            Returns a :term:`iterator` object, type of it's ``yield`` result is a 3-members tuple:
+        Yields:
+            : Yields at every matched emoji sequence as a 3-members tuple, whose members are:
 
-            0. The found :class:`.EmojiSequence` object
-            1. Begin position of the emoji sequence in the string
-            2. End position of the emoji sequence in the string
+                0. The found :class:`.EmojiSequence` object
+                1. Begin position of the emoji sequence in the string
+                2. End position of the emoji sequence in the string
         """
         for m in cls.pattern.finditer(s):
             yield cls.from_string(m.group()), m.start(), m.end()
