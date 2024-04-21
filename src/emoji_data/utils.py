@@ -1,24 +1,27 @@
 from __future__ import annotations
 
 import sys
-from typing import Union, TextIO
+from typing import Union, IO, Generator, Iterable, Tuple
 
 if sys.version_info < (3, 9):  # pragma: no cover
-    from typing import Generator, Iterable, Tuple
     from importlib_resources import files
 else:  # pragma: no cover
-    from collections.abc import Generator, Iterable
     from importlib.resources import files
 
 
-__all__ = ["code_points_to_string", "code_point_to_regex", "data_file", "read_data_file_iterable"]
+__all__ = [
+    "code_points_to_string",
+    "code_point_to_regex",
+    "data_file",
+    "read_data_file_iterable",
+]
 
 
 def data_file(file):
     return files(__package__).joinpath("data").joinpath(file)
 
 
-def _read_data_file_iterable(handle: TextIO):
+def _read_data_file_iterable(handle):
     for line in handle:
         line = line.strip()
         if not line:
@@ -34,15 +37,8 @@ def _read_data_file_iterable(handle: TextIO):
         yield content, comment
 
 
-if sys.version_info < (3, 9):
-
-    def read_data_file_iterable(handle) -> Generator[Tuple[str, str], None, None]:
-        yield from _read_data_file_iterable(handle)
-
-else:
-
-    def read_data_file_iterable(handle) -> Generator[tuple[str, str], None, None]:
-        yield from _read_data_file_iterable(handle)
+def read_data_file_iterable(handle: IO[str]) -> Generator[Tuple[str, str], None, None]:
+    yield from _read_data_file_iterable(handle)
 
 
 def code_points_to_string(code_points: Union[int, str, Iterable[int], Iterable[str]]) -> str:

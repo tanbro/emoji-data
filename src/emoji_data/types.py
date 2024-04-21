@@ -1,10 +1,4 @@
-import sys
-from typing import Generic, TypeVar
-
-if sys.version_info < (3, 9):  # pragma: no cover
-    from typing import Generator, MutableMapping
-else:  # pragma: no cover
-    from collections.abc import Generator, MutableMapping
+from typing import Generic, TypeVar, Generator, MutableMapping
 
 __all__ = ["BaseDictContainer"]
 

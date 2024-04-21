@@ -3,15 +3,9 @@
 ref: http://www.unicode.org/reports/tr51/#Definitions
 """
 
-import sys
 import re
 from enum import Enum
-from typing import Pattern
-
-if sys.version_info < (3, 9):  # pragma: no cover
-    from typing import Mapping, MutableMapping
-else:  # pragma: no cover
-    from collections.abc import Mapping, MutableMapping
+from typing import Pattern, Mapping, MutableMapping
 
 from .character import (
     EMOJI_KEYCAP,

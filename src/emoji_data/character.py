@@ -2,17 +2,12 @@ from __future__ import annotations
 
 import sys
 from enum import Enum
-from typing import Union
+from typing import Iterable, MutableSequence, Sequence, Tuple, Union
 
 if sys.version_info < (3, 11):  # pragma: no cover
     from typing_extensions import Self
 else:  # pragma: no cover
     from typing import Self
-
-if sys.version_info < (3, 9):  # pragma: no cover
-    from typing import Iterable, MutableSequence, Sequence, Tuple
-else:  # pragma: no cover
-    from collections.abc import Iterable, Sequence, MutableSequence
 
 from .types import BaseDictContainer
 from .utils import code_point_to_regex, data_file, read_data_file_iterable
@@ -168,7 +163,11 @@ class EmojiCharacter(metaclass=MetaClass):
                     else:
                         inst._add_property(property_)
                         inst._add_comment(comment)
-            for cp in TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP:
+            for cp in (
+                TEXT_PRESENTATION_SELECTOR,
+                EMOJI_PRESENTATION_SELECTOR,
+                EMOJI_KEYCAP,
+            ):
                 if cp not in cls:
                     cls[cp] = cls(cp)
         # OK!
@@ -183,18 +182,10 @@ class EmojiCharacter(metaclass=MetaClass):
             del cls[k]
         cls._initialed = False
 
-    if sys.version_info < (3, 9):  # pragma: no cover
-
-        @classmethod
-        def items(cls) -> Iterable[Tuple[int, Self]]:
-            return ((k, cls[k]) for k in cls)
-
-    else:
-
-        @classmethod
-        def items(cls) -> Iterable[tuple[int, Self]]:
-            """Return an iterator of all code-point -> emoji-character pairs of the class"""
-            return ((k, cls[k]) for k in cls)
+    @classmethod
+    def items(cls) -> Iterable[Tuple[int, Self]]:
+        """Return an iterator of all code-point -> emoji-character pairs of the class"""
+        return ((k, cls[k]) for k in cls)
 
     @classmethod
     def keys(cls) -> Iterable[int]:
