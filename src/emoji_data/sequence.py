@@ -140,9 +140,14 @@ class EmojiSequence(metaclass=MetaClass):  # type: ignore
     def from_string(cls, s: str) -> EmojiSequence:
         """Get an :class:`EmojiSequence` instance from string
 
-        :param s: Emoji string
-        :return: Instance from internal dictionary
-        :raise KeyError: When passed-in ``s`` not found in internal dictionary
+        Args:
+            s: Emoji string
+
+        Returns:
+            Instance from internal dictionary
+
+        Raises:
+            KeyError: When passed-in ``s`` not found in internal dictionary
         """
         return cls[s]
 
@@ -247,7 +252,7 @@ class EmojiSequence(metaclass=MetaClass):  # type: ignore
 
     @property
     def code_points(self) -> Sequence[int]:
-        """List of unicode integer value of the characters who make up Emoji Sequence"""
+        """List of unicode integer value of the characters who make up this Emoji Sequence"""
         return self._code_points
 
     @property
@@ -262,7 +267,7 @@ class EmojiSequence(metaclass=MetaClass):  # type: ignore
     def find_all(cls, s: str) -> Sequence[Tuple[EmojiSequence, int, int]]:
         """Find out all emoji sequences in a string, and return them in a list
 
-        Item of the returned list is as same as that in the iterator of :meth:`find`
+        Items of the returned list is the same as ``yield`` result of :meth:`find`
 
         The function equals::
 
@@ -281,7 +286,8 @@ class EmojiSequence(metaclass=MetaClass):  # type: ignore
         Args:
             s: The string to find emoji sequences in it
 
-        Return: Returns a :term:`generator` object, whose ``yield`` type is a 3-members tuple:
+        Returns:
+            Returns a :term:`generator` object, type of it's ``yield`` result is a 3-members tuple:
 
             0. The found :class:`.EmojiSequence` object
             1. Begin position of the emoji sequence in the string

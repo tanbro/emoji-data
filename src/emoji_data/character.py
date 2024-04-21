@@ -248,7 +248,8 @@ class EmojiCharacter(metaclass=MetaClass):  # type: ignore
                 Note:
                     ``c`` should be a **single** unicode character.
 
-        Returns: Instance returned from the class's internal dictionary
+        Returns:
+            Instance returned from the class's internal dictionary
 
         Raises:
             KeyError: When character not found in the class' internal dictionary
@@ -262,7 +263,8 @@ class EmojiCharacter(metaclass=MetaClass):  # type: ignore
         Args:
             value: Emoji Unicode, either integer value or hex string
 
-        Returns: Instance returned from the class's internal dictionary
+        Returns:
+            Instance returned from the class's internal dictionary
 
         Raises:
             KeyError: When code not found in the class' internal dictionary
