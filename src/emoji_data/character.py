@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Iterable, MutableSequence, Sequence, Tuple, Union, final
+from typing import Iterable, Iterator, MutableSequence, Sequence, Tuple, Union, final
 
 from .types import BaseDictContainer
 from .utils import code_point_to_regex, data_file, read_data_file_iterable
@@ -175,17 +175,17 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         cls._initialed = False
 
     @classmethod
-    def items(cls) -> Iterable[Tuple[int, EmojiCharacter]]:
+    def items(cls) -> Iterator[Tuple[int, EmojiCharacter]]:
         """Return an iterator of all code-point -> emoji-character pairs of the class"""
         return ((k, cls[k]) for k in cls)
 
     @classmethod
-    def keys(cls) -> Iterable[int]:
+    def keys(cls) -> Iterator[int]:
         """Return an iterator of each emoji-character's key code-point of the class"""
-        return (k for k in cls)
+        yield from cls
 
     @classmethod
-    def values(cls) -> Iterable[EmojiCharacter]:
+    def values(cls) -> Iterator[EmojiCharacter]:
         """Return an iterator of all emoji-characters of the class"""
         return (cls[k] for k in cls)
 

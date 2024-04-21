@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import ClassVar, Generator, Iterable, Pattern, Sequence, Tuple, Union, final
+from typing import ClassVar, Iterable, Iterator, Pattern, Sequence, Tuple, Union, final
 
 from .character import EmojiCharacter
 from .types import BaseDictContainer
@@ -129,17 +129,17 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         cls._initialed = False
 
     @classmethod
-    def items(cls) -> Iterable[Tuple[str, EmojiSequence]]:
+    def items(cls) -> Iterator[Tuple[str, EmojiSequence]]:
         """Return an iterator of all string -> emoji-sequence pairs of the class"""
         return ((k, cls[k]) for k in cls)
 
     @classmethod
-    def keys(cls) -> Iterable[str]:
+    def keys(cls) -> Iterator[str]:
         """Return an iterator of each emoji-sequence's key string of the class"""
-        return (k for k in cls)
+        yield from cls
 
     @classmethod
-    def values(cls) -> Iterable[EmojiSequence]:
+    def values(cls) -> Iterator[EmojiSequence]:
         """Return an iterator of all emoji-sequences of the class"""
         return (cls[k] for k in cls)
 
@@ -266,7 +266,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
     def code_points_string(self) -> str:
         """Unicode style hex string of each emoji-characters's code-point, separated by spaces
 
-        eg: ``00A9 FE0F``
+        eg: ``"00A9 FE0F"``
         """
         return " ".join(c.code_point_string for c in self.characters)
 
@@ -287,14 +287,14 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         return list(cls.find(s))
 
     @classmethod
-    def find(cls, s: str) -> Generator[Tuple[EmojiSequence, int, int], None, None]:
+    def find(cls, s: str) -> Iterator[Tuple[EmojiSequence, int, int]]:
         """Return an iterator which yields all emoji sequences in a string, without actually storing them all simultaneously.
 
         Args:
             s: The string to find emoji sequences in it
 
         Returns:
-            Returns a :term:`generator` object, type of it's ``yield`` result is a 3-members tuple:
+            Returns a :term:`iterator` object, type of it's ``yield`` result is a 3-members tuple:
 
             0. The found :class:`.EmojiSequence` object
             1. Begin position of the emoji sequence in the string
