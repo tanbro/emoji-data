@@ -87,7 +87,7 @@ class MetaClass(BaseDictContainer[int, "EmojiCharacter"]):
 
 
 @final
-class EmojiCharacter(metaclass=MetaClass):  # type: ignore
+class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIssues]
     """emoji character — A character that has the Emoji property.
 
     These characters are recommended for use as emoji.

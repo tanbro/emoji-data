@@ -23,7 +23,7 @@ class MetaClass(BaseDictContainer[str, "EmojiSequence"]):
 
 
 @final
-class EmojiSequence(metaclass=MetaClass):  # type: ignore
+class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIssues]
     """Emoji and Text Presentation Sequences used to represent emoji
 
     see: http://www.unicode.org/reports/tr51/#Emoji_Sequences
@@ -107,7 +107,14 @@ class EmojiSequence(metaclass=MetaClass):  # type: ignore
                         raise RuntimeError(f"Invalid data file name {fname}")
         # build regex
         cls.pattern = re.compile(
-            r"|".join(m.regex for m in sorted((m for m in cls.values()), key=lambda x: len(x.code_points), reverse=True))
+            r"|".join(
+                m.regex
+                for m in sorted(
+                    (m for m in cls.values()),
+                    key=lambda x: len(x.code_points),
+                    reverse=True,
+                )
+            )
         )
         # initialed OK
         cls._initialed = True
