@@ -169,7 +169,7 @@ class EmojiSequence(metaclass=MetaClass):  # type: ignore
         return cls.from_string(s)
 
     @classmethod
-    def from_hex(cls, value: Union[str, int, Iterable[str], Iterable[int]]) -> EmojiSequence:
+    def from_hex(cls, value: Union[str, int, Iterable[Union[int, str]]]) -> EmojiSequence:
         """Get an :class:`EmojiSequence` instance by unicode code point(s)
 
         :type value: Union[str, int, Iterable[str], Iterable[int]]
@@ -191,7 +191,7 @@ class EmojiSequence(metaclass=MetaClass):  # type: ignore
             cps_array = value.split()
         elif isinstance(value, int):
             cps_array = (value,)
-        elif isinstance(value, Iterable) and not isinstance(value, str) and all(isinstance(m, (str, int)) for m in value):
+        elif isinstance(value, Iterable):
             cps_array = value
         else:
             raise TypeError(
