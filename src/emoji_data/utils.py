@@ -21,7 +21,7 @@ def data_file(file):
     return files(__package__).joinpath("data").joinpath(file)
 
 
-def _read_data_file_iterable(handle):
+def read_data_file_iterable(handle: IO[str]) -> Generator[Tuple[str, str], None, None]:
     for line in handle:
         line = line.strip()
         if not line:
@@ -37,11 +37,7 @@ def _read_data_file_iterable(handle):
         yield content, comment
 
 
-def read_data_file_iterable(handle: IO[str]) -> Generator[Tuple[str, str], None, None]:
-    yield from _read_data_file_iterable(handle)
-
-
-def code_points_to_string(code_points: Union[int, str, Iterable[int], Iterable[str]]) -> str:
+def code_points_to_string(code_points: Union[int, str, Iterable[Union[int, str]]]) -> str:
     if isinstance(code_points, str):
         return "".join(chr(int(s, 16)) for s in code_points.split())
     if isinstance(code_points, Iterable):

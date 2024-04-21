@@ -54,7 +54,7 @@ class QualifiedType(Enum):
     UNQUALIFIED = "unqualified"
 
 
-def _make_regex_dict() -> Mapping[str, str]:
+def make_regex_dict() -> Mapping[str, str]:
     d: MutableMapping[str, str] = {}
     d.update(
         {
@@ -134,7 +134,7 @@ def _make_regex_dict() -> Mapping[str, str]:
     return d
 
 
-EMOJI_PATTERNS: Mapping[str, Pattern[str]] = {k: re.compile(v) for k, v in _make_regex_dict().items()}
+EMOJI_PATTERNS: Mapping[str, Pattern[str]] = {k: re.compile(v) for k, v in make_regex_dict().items()}
 
 
 def is_emoji_character(c: str) -> bool:
@@ -148,7 +148,8 @@ def is_emoji_character(c: str) -> bool:
 
     - These characters are recommended for use as emoji.
 
-    ref: https://unicode.org/reports/tr51/#Emoji_Characters
+    See also:
+        https://unicode.org/reports/tr51/#Emoji_Characters
     """
     _c = chr(ord(c))
     return EMOJI_PATTERNS["EMOJI_CHARACTER"].fullmatch(_c) is not None
@@ -165,7 +166,8 @@ def is_default_emoji_presentation_character(c: str) -> bool:
 
     - These characters have the Emoji_Presentation property.
 
-    ref: https://unicode.org/reports/tr51/#def_emoji_presentation
+    See also:
+        https://unicode.org/reports/tr51/#def_emoji_presentation
     """
     _c = chr(ord(c))
     return EMOJI_PATTERNS["DEFAULT_EMOJI_PRESENTATION_CHARACTER"].fullmatch(_c) is not None
@@ -176,7 +178,8 @@ def is_default_text_presentation_character(c: str) -> bool:
 
     A character that, by default, should appear with a text presentation, rather than an emoji presentation.
 
-    ref: https://unicode.org/reports/tr51/#def_text_presentation_sequence
+    See also:
+        https://unicode.org/reports/tr51/#def_text_presentation_sequence
     """
     _c = chr(ord(c))
     return EMOJI_PATTERNS["DEFAULT_TEXT_PRESENTATION_CHARACTER"].fullmatch(_c) is not None
@@ -187,7 +190,8 @@ def is_text_presentation_selector(c: str) -> bool:
 
     The character U+FE0E VARIATION SELECTOR-15 (VS15), used to request a text presentation for an emoji character. (Also known as text variation selector in prior versions of this specification.)
 
-    ref: https://unicode.org/reports/tr51/#def_emoji_presentation_selector
+    See also:
+        https://unicode.org/reports/tr51/#def_emoji_presentation_selector
     """
     return EMOJI_PATTERNS["TEXT_PRESENTATION_SELECTOR"].fullmatch(c) is not None
 
@@ -197,7 +201,8 @@ def is_text_presentation_sequence(s: str) -> bool:
 
     The character U+FE0E VARIATION SELECTOR-15 (VS15), used to request a text presentation for an emoji character. (Also known as text variation selector in prior versions of this specification.)
 
-    ref: https://unicode.org/reports/tr51/#def_text_presentation_sequence
+    See also:
+        https://unicode.org/reports/tr51/#def_text_presentation_sequence
     """
     return EMOJI_PATTERNS["TEXT_PRESENTATION_SEQUENCE"].fullmatch(s) is not None
 
@@ -207,7 +212,8 @@ def is_emoji_presentation_selector(c: str) -> bool:
 
     The character U+FE0F VARIATION SELECTOR-16 (VS16), used to request an emoji presentation for an emoji character. (Also known as emoji variation selector in prior versions of this specification.)
 
-    ref: https://unicode.org/reports/tr51/#def_emoji_presentation_selector
+    See also:
+        https://unicode.org/reports/tr51/#def_emoji_presentation_selector
     """
     return EMOJI_PATTERNS["EMOJI_PRESENTATION_SELECTOR"].fullmatch(c) is not None
 
@@ -223,7 +229,8 @@ def is_emoji_presentation_sequence(s: str) -> bool:
 
     - The only valid emoji presentation sequences are those listed in emoji-variation-sequences.txt
 
-    ref: https://unicode.org/reports/tr51/#def_emoji_presentation_sequence
+    See also:
+        https://unicode.org/reports/tr51/#def_emoji_presentation_sequence
     """
     return EMOJI_PATTERNS["EMOJI_PRESENTATION_SEQUENCE"].fullmatch(s) is not None
 
@@ -233,7 +240,8 @@ def is_emoji_modifier(c: str) -> bool:
 
     A character that can be used to modify the appearance of a preceding emoji in an emoji modifier sequence.
 
-    ref: https://unicode.org/reports/tr51/#def_emoji_modifier
+    See also:
+        https://unicode.org/reports/tr51/#def_emoji_modifier
     """
     _c = chr(ord(c))
     return EMOJI_PATTERNS["EMOJI_MODIFIER"].fullmatch(_c) is not None
@@ -244,7 +252,8 @@ def is_emoji_modifier_base(c: str) -> bool:
 
     A character whose appearance can be modified by a subsequent emoji modifier in an emoji modifier sequence.
 
-    ref: https://unicode.org/reports/tr51/#def_emoji_modifier_base
+    See also:
+        https://unicode.org/reports/tr51/#def_emoji_modifier_base
     """
     _c = chr(ord(c))
     return EMOJI_PATTERNS["EMOJI_MODIFIER_BASE"].fullmatch(_c) is not None
@@ -316,17 +325,24 @@ def is_emoji_sequence(s: str) -> bool:
 
 
 def is_qualified_emoji_character(s: str, i: int) -> bool:
-    """An emoji character in a string that
+    """check if an emoji character in a string is qualified.
+
+    An emoji character in a string that
 
     - (a) has default emoji presentation or
     - (b) is the first character in an emoji modifier sequence or
     - (c) is not a default emoji presentation character, but is the first character in an emoji presentation sequence.
 
-    :param s: the string where the character in it
-    :param i: index of the character in the string to check if qualified
-    :return: ``True`` or ``False``
+    is qualified.
 
-    ref: http://www.unicode.org/reports/tr51/#def_qualified_emoji_character
+    Args:
+        s: the string where the character in it
+        i: index of the character in the string to check if qualified
+
+    Returns: :data:`True` if qualified else :data:`False`
+
+    See also:
+        http://www.unicode.org/reports/tr51/#def_qualified_emoji_character
     """
     c = s[i]
     if not is_emoji_character(c):
@@ -353,7 +369,8 @@ def detect_qualified(s: str) -> QualifiedType:
     - minimally-qualified emoji — An emoji sequence in which the first character is qualified but the sequence is not fully qualified.
     - unqualified emoji — An emoji that is neither fully-qualified nor minimally qualified.
 
-    :param s: string to detect
+    Args:
+        s: string to detect
     """
     if not s:
         raise ValueError("Argument `s` should not be empty or null")

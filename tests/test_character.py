@@ -5,7 +5,7 @@ from emoji_data.utils import data_file, read_data_file_iterable
 
 
 class CharacterTestCase(unittest.TestCase):
-    test_data = []
+    test_data = []  # type:ignore[var-annotated]
 
     @classmethod
     def setUpClass(cls):

@@ -1,13 +1,7 @@
 from __future__ import annotations
 
-import sys
 from enum import Enum
-from typing import Iterable, MutableSequence, Sequence, Tuple, Union
-
-if sys.version_info < (3, 11):  # pragma: no cover
-    from typing_extensions import Self
-else:  # pragma: no cover
-    from typing import Self
+from typing import Iterable, MutableSequence, Sequence, Tuple, Union, final
 
 from .types import BaseDictContainer
 from .utils import code_point_to_regex, data_file, read_data_file_iterable
@@ -88,16 +82,18 @@ class EmojiCharProperty(Enum):
     """
 
 
-class MetaClass(BaseDictContainer):
+class MetaClass(BaseDictContainer[int, "EmojiCharacter"]):
     pass
 
 
-class EmojiCharacter(metaclass=MetaClass):
+@final
+class EmojiCharacter(metaclass=MetaClass):  # type: ignore
     """emoji character — A character that has the Emoji property.
 
     These characters are recommended for use as emoji.
 
-    see: http://www.unicode.org/reports/tr51/#Emoji_Characters
+    See also:
+        http://www.unicode.org/reports/tr51/#Emoji_Characters
     """
 
     def __init__(
@@ -157,17 +153,13 @@ class EmojiCharacter(metaclass=MetaClass):
                 property_ = EmojiCharProperty(property_text)
                 for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):
                     try:
-                        inst: Self = cls[cp]  # type:ignore[annotation-unchecked]
+                        inst = cls[cp]
                     except KeyError:
                         cls[cp] = cls(cp, property_, comment)
                     else:
                         inst._add_property(property_)
                         inst._add_comment(comment)
-            for cp in (
-                TEXT_PRESENTATION_SELECTOR,
-                EMOJI_PRESENTATION_SELECTOR,
-                EMOJI_KEYCAP,
-            ):
+            for cp in (TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP):
                 if cp not in cls:
                     cls[cp] = cls(cp)
         # OK!
@@ -183,7 +175,7 @@ class EmojiCharacter(metaclass=MetaClass):
         cls._initialed = False
 
     @classmethod
-    def items(cls) -> Iterable[Tuple[int, Self]]:
+    def items(cls) -> Iterable[Tuple[int, EmojiCharacter]]:
         """Return an iterator of all code-point -> emoji-character pairs of the class"""
         return ((k, cls[k]) for k in cls)
 
@@ -193,7 +185,7 @@ class EmojiCharacter(metaclass=MetaClass):
         return (k for k in cls)
 
     @classmethod
-    def values(cls) -> Iterable[Self]:
+    def values(cls) -> Iterable[EmojiCharacter]:
         """Return an iterator of all emoji-characters of the class"""
         return (cls[k] for k in cls)
 
@@ -247,25 +239,33 @@ class EmojiCharacter(metaclass=MetaClass):
         return self._string
 
     @classmethod
-    def from_character(cls, c: str) -> Self:
+    def from_character(cls, c: str) -> EmojiCharacter:
         """Get :class:`EmojiCharacter` instance from a single Emoji Unicode character
 
-        .. note::
-            ``c`` should be a single unicode character.
+        Args:
+            c: Emoji character
 
-        :param c: Emoji character
-        :return: Instance returned from the class's internal dictionary
-        :raise KeyError: When character not found in the class' internal dictionary
+                Note:
+                    ``c`` should be a **single** unicode character.
+
+        Returns: Instance returned from the class's internal dictionary
+
+        Raises:
+            KeyError: When character not found in the class' internal dictionary
         """
         return cls[ord(c)]
 
     @classmethod
-    def from_hex(cls, value: Union[int, str]) -> Self:
+    def from_hex(cls, value: Union[int, str]) -> EmojiCharacter:
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode integer value or it's hex string
 
-        :param value: Emoji Unicode, either integer value or hex string
-        :return: Instance returned from the class's internal dictionary
-        :raises KeyError: When code not found in the class' internal dictionary
+        Args:
+            value: Emoji Unicode, either integer value or hex string
+
+        Returns: Instance returned from the class's internal dictionary
+
+        Raises:
+            KeyError: When code not found in the class' internal dictionary
         """
         if isinstance(value, str):
             return cls[int(value, 16)]

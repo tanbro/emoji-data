@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Generator, MutableMapping
+from typing import Any, Dict, Generator, Generic, MutableMapping, Tuple, Type, TypeVar
 
 __all__ = ["BaseDictContainer"]
 
@@ -6,9 +6,11 @@ TK = TypeVar("TK")
 TV = TypeVar("TV")
 
 
-class BaseDictContainer(Generic[TK, TV], type):
-    def __new__(cls, name, bases, attrs):
-        cls.__data__: MutableMapping[TK, TV] = {}  # type:ignore[annotation-unchecked]
+class BaseDictContainer(type, Generic[TK, TV]):
+    __data__: MutableMapping[TK, TV]
+
+    def __new__(cls, name: str, bases: Tuple[Type, ...], attrs: Dict[str, Any]):
+        cls.__data__ = {}
         return super().__new__(cls, name, bases, attrs)
 
     def __setitem__(self, key: TK, value: TV):

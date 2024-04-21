@@ -18,7 +18,7 @@ from emoji_data import (
 
 
 class SequenceTestCase(unittest.TestCase):
-    test_data = []
+    test_data = []  # type:ignore[var-annotated]
 
     @classmethod
     def setUpClass(cls):
@@ -36,11 +36,16 @@ class SequenceTestCase(unittest.TestCase):
             s = code_points_to_string(code_points)
             if status in ("fully-qualified", "minimally-qualified", "unqualified"):
                 self.assertEqual(
-                    detect_qualified(s), QualifiedType(status), f"wrong qualified detected: {s!r}({code_points}, {status})"
+                    detect_qualified(s),
+                    QualifiedType(status),
+                    f"wrong qualified detected: {s!r}({code_points}, {status})",
                 )
             elif status == "component":
                 ec = EmojiCharacter.from_character(s)
-                self.assertTrue(EmojiCharProperty.ECOMP in ec.properties, f"{ec!r} has no {status}({s!r}<{code_points}>)")
+                self.assertTrue(
+                    EmojiCharProperty.ECOMP in ec.properties,
+                    f"{ec!r} has no {status}({s!r}<{code_points}>)",
+                )
 
     def test_type_field(self):
         """https://unicode.org/reports/tr51/#Emoji_Sets"""
@@ -62,20 +67,25 @@ class SequenceTestCase(unittest.TestCase):
                         self.assertTrue(EmojiCharProperty.EPRES in es.characters[0].properties)
                 elif es.type_field == "Emoji_Keycap_Sequence":
                     self.assertTrue(
-                        is_emoji_keycap_sequence(es.string), f"wrong Emoji_Keycap_Sequence type_field detected: {es!r}"
+                        is_emoji_keycap_sequence(es.string),
+                        f"wrong Emoji_Keycap_Sequence type_field detected: {es!r}",
                     )
                 elif es.type_field == "Emoji_Flag_Sequence":
-                    self.assertTrue(is_emoji_flag_sequence(es.string), f"wrong Emoji_Flag_Sequence type_field detected: {es!r}")
+                    self.assertTrue(
+                        is_emoji_flag_sequence(es.string),
+                        f"wrong Emoji_Flag_Sequence type_field detected: {es!r}",
+                    )
                 elif es.type_field == "Emoji_Modifier_Sequence":
                     self.assertTrue(
-                        is_emoji_modifier_sequence(es.string), f"wrong Emoji_Modifier_Sequence type_field detected: {es!r}"
+                        is_emoji_modifier_sequence(es.string),
+                        f"wrong Emoji_Modifier_Sequence type_field detected: {es!r}",
                     )
 
 
 class SequencePatternTestCase(unittest.TestCase):
     def test_no_emoji(self):
         for s in ("", " ", "\n", "abc", " abc\n bcd"):
-            self.assertListEqual(EmojiSequence.find_all(s), [])
+            self.assertEqual(len(EmojiSequence.find_all(s)), 0)
 
     def test_single_one_char_emoji(self):
         s = "😀"
@@ -124,7 +134,10 @@ class SequencePatternTestCase(unittest.TestCase):
         self.assertEqual(cnt, 3)
 
     def test_continues_two_with_same_start_part(self):
-        emojis = ["1F468 200D 1F468 200D 1F467", "1F468 200D 1F468 200D 1F467 200D 1F467"]
+        emojis = [
+            "1F468 200D 1F468 200D 1F467",
+            "1F468 200D 1F468 200D 1F467 200D 1F467",
+        ]
         s = "".join(code_points_to_string(m) for m in emojis)
         cnt = sum(1 for _ in EmojiSequence.find(s))
         self.assertEqual(cnt, 2)

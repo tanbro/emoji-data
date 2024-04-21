@@ -1,13 +1,7 @@
 from __future__ import annotations
 
 import re
-import sys
-from typing import Generator, Iterable, Pattern, Sequence, Tuple, Union
-
-if sys.version_info < (3, 11):  # pragma: no cover
-    from typing_extensions import Self
-else:  # pragma: no cover
-    from typing import Self
+from typing import ClassVar, Generator, Iterable, Pattern, Sequence, Tuple, Union, final
 
 from .character import EmojiCharacter
 from .types import BaseDictContainer
@@ -17,18 +11,19 @@ __all__ = ["EmojiSequence"]
 
 # http://www.unicode.org/reports/tr51/#Data_Files_Table
 # keep the order!
-DATA_FILES = [
+DATA_FILES = (
     "emoji-variation-sequences.txt",
     "emoji-zwj-sequences.txt",
     "emoji-sequences.txt",
-]
+)
 
 
-class MetaClass(BaseDictContainer):
+class MetaClass(BaseDictContainer[str, "EmojiSequence"]):
     pass
 
 
-class EmojiSequence(metaclass=MetaClass):
+@final
+class EmojiSequence(metaclass=MetaClass):  # type: ignore
     """Emoji and Text Presentation Sequences used to represent emoji
 
     see: http://www.unicode.org/reports/tr51/#Emoji_Sequences
@@ -72,7 +67,7 @@ class EmojiSequence(metaclass=MetaClass):
 
     _initialed = False
 
-    pattern: Pattern
+    pattern: ClassVar[Pattern[str]]
     """Compiled regular expression pattern object for all-together Emoji sequences.
     """
 
@@ -104,12 +99,7 @@ class EmojiSequence(metaclass=MetaClass):
                 for content, comment in read_data_file_iterable(fp):
                     if fname in ("emoji-sequences.txt", "emoji-zwj-sequences.txt"):
                         cps, type_field, description = (part.strip() for part in content.split(";", 2))
-                        _decode_code_points(
-                            cps,
-                            type_field=type_field,
-                            description=description,
-                            comment=comment,
-                        )
+                        _decode_code_points(cps, type_field=type_field, description=description, comment=comment)
                     elif fname == "emoji-variation-sequences.txt":
                         cps, description = (part.strip() for part in content.split(";", 1))
                         _decode_code_points(cps, description=description, comment=comment)
@@ -117,14 +107,7 @@ class EmojiSequence(metaclass=MetaClass):
                         raise RuntimeError(f"Invalid data file name {fname}")
         # build regex
         cls.pattern = re.compile(
-            r"|".join(
-                m.regex
-                for m in sorted(
-                    (m for m in cls.values()),
-                    key=lambda x: len(x.code_points),
-                    reverse=True,
-                )
-            )
+            r"|".join(m.regex for m in sorted((m for m in cls.values()), key=lambda x: len(x.code_points), reverse=True))
         )
         # initialed OK
         cls._initialed = True
@@ -139,7 +122,7 @@ class EmojiSequence(metaclass=MetaClass):
         cls._initialed = False
 
     @classmethod
-    def items(cls) -> Iterable[Tuple[str, Self]]:
+    def items(cls) -> Iterable[Tuple[str, EmojiSequence]]:
         """Return an iterator of all string -> emoji-sequence pairs of the class"""
         return ((k, cls[k]) for k in cls)
 
@@ -149,12 +132,12 @@ class EmojiSequence(metaclass=MetaClass):
         return (k for k in cls)
 
     @classmethod
-    def values(cls) -> Iterable[Self]:
+    def values(cls) -> Iterable[EmojiSequence]:
         """Return an iterator of all emoji-sequences of the class"""
         return (cls[k] for k in cls)
 
     @classmethod
-    def from_string(cls, s: str) -> Self:
+    def from_string(cls, s: str) -> EmojiSequence:
         """Get an :class:`EmojiSequence` instance from string
 
         :param s: Emoji string
@@ -164,7 +147,7 @@ class EmojiSequence(metaclass=MetaClass):
         return cls[s]
 
     @classmethod
-    def from_characters(cls, value: Union[EmojiCharacter, Iterable[EmojiCharacter]]) -> Self:
+    def from_characters(cls, value: Union[EmojiCharacter, Iterable[EmojiCharacter]]) -> EmojiSequence:
         """Get an :class:`EmojiSequence` instance from :class:`EmojiCharacter` object or list
 
         :param value: Single or iterable object of :class:`EmojiCharacter`, composing the sequence
@@ -181,7 +164,7 @@ class EmojiSequence(metaclass=MetaClass):
         return cls.from_string(s)
 
     @classmethod
-    def from_hex(cls, value: Union[str, int, Iterable[str], Iterable[int]]) -> Self:
+    def from_hex(cls, value: Union[str, int, Iterable[str], Iterable[int]]) -> EmojiSequence:
         """Get an :class:`EmojiSequence` instance by unicode code point(s)
 
         :type value: Union[str, int, Iterable[str], Iterable[int]]
@@ -276,7 +259,7 @@ class EmojiSequence(metaclass=MetaClass):
         return " ".join(c.code_point_string for c in self.characters)
 
     @classmethod
-    def find_all(cls, s: str) -> Sequence[Tuple[Self, int, int]]:
+    def find_all(cls, s: str) -> Sequence[Tuple[EmojiSequence, int, int]]:
         """Find out all emoji sequences in a string, and return them in a list
 
         Item of the returned list is as same as that in the iterator of :meth:`find`
@@ -292,21 +275,20 @@ class EmojiSequence(metaclass=MetaClass):
         return list(cls.find(s))
 
     @classmethod
-    def find(cls, s: str) -> Generator[Tuple[Self, int, int], None, None]:
+    def find(cls, s: str) -> Generator[Tuple[EmojiSequence, int, int], None, None]:
         """Return an iterator which yields all emoji sequences in a string, without actually storing them all simultaneously.
 
-        :param s: The string to find emoji sequences in it
+        Args:
+            s: The string to find emoji sequences in it
 
-        :return: Returns a :term:`generator` object, whose ``yield`` type is a 3-members tuple:
+        Return: Returns a :term:`generator` object, whose ``yield`` type is a 3-members tuple:
 
             0. The found :class:`.EmojiSequence` object
             1. Begin position of the emoji sequence in the string
             2. End position of the emoji sequence in the string
         """
-        m = cls.pattern.search(s)
-        while m:
+        for m in cls.pattern.finditer(s):
             yield cls.from_string(m.group()), m.start(), m.end()
-            m = cls.pattern.search(s, m.end())
 
 
 EmojiSequence.initial()
