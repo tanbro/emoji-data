@@ -5,17 +5,13 @@ from typing import ClassVar, Iterable, Iterator, Pattern, Sequence, Tuple, Union
 
 from .character import EmojiCharacter
 from .types import BaseDictContainer
-from .utils import data_file, read_data_file_iterable
+from .utils import read_data_file_iterable
 
 __all__ = ["EmojiSequence"]
 
 # http://www.unicode.org/reports/tr51/#Data_Files_Table
 # keep the order!
-DATA_FILES = (
-    "emoji-variation-sequences.txt",
-    "emoji-zwj-sequences.txt",
-    "emoji-sequences.txt",
-)
+DATA_FILES = ("emoji-variation-sequences.txt", "emoji-zwj-sequences.txt", "emoji-sequences.txt")
 
 
 class MetaClass(BaseDictContainer[str, "EmojiSequence"]):
@@ -96,16 +92,15 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
                     cls[_seq.string] = _seq
 
         for fname in DATA_FILES:
-            with data_file(fname).open(encoding="utf8") as fp:
-                for content, comment in read_data_file_iterable(fp):
-                    if fname in ("emoji-sequences.txt", "emoji-zwj-sequences.txt"):
-                        cps, type_field, description = (part.strip() for part in content.split(";", 2))
-                        _decode_code_points(cps, type_field=type_field, description=description, comment=comment)
-                    elif fname == "emoji-variation-sequences.txt":
-                        cps, description = (part.strip() for part in content.split(";", 1))
-                        _decode_code_points(cps, description=description, comment=comment)
-                    else:
-                        raise RuntimeError(f"Invalid data file name {fname}")
+            for content, comment in read_data_file_iterable(fname):
+                if fname in ("emoji-sequences.txt", "emoji-zwj-sequences.txt"):
+                    cps, type_field, description = (part.strip() for part in content.split(";", 2))
+                    _decode_code_points(cps, type_field=type_field, description=description, comment=comment)
+                elif fname == "emoji-variation-sequences.txt":
+                    cps, description = (part.strip() for part in content.split(";", 1))
+                    _decode_code_points(cps, description=description, comment=comment)
+                else:
+                    raise RuntimeError(f"Invalid data file name {fname}")
         # build regex
         cls.pattern = re.compile(
             r"|".join(
@@ -177,7 +172,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         return cls.from_string(s)
 
     @classmethod
-    def from_hex(cls, value: Union[str, int, Iterable[Union[int, str]]]) -> EmojiSequence:
+    def from_hex(cls, value: Union[int, str, Iterable[Union[int, str]]]) -> EmojiSequence:
         """Get an :class:`EmojiSequence` instance by unicode code point(s)
 
         Args:
@@ -241,7 +236,8 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
     def hex(self) -> str:
         """Python style hex string of each emoji-characters's code-point, separated by spaces
 
-        eg: ``0xa9 0xfe0f``
+        Example:
+            ``"0xa9 0xfe0f"``
         """
         return " ".join(c.hex for c in self.characters)
 

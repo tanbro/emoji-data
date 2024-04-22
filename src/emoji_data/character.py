@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Iterable, Iterator, MutableSequence, Sequence, Tuple, Union, final
 
 from .types import BaseDictContainer
-from .utils import code_point_to_regex, data_file, read_data_file_iterable
+from .utils import code_point_to_regex, read_data_file_iterable
 
 __all__ = [
     "EmojiCharProperty",
@@ -52,7 +52,8 @@ class EmojiCharProperty(Enum):
 
     character properties are available for emoji characters.
 
-    see: http://www.unicode.org/reports/tr51/#Emoji_Properties
+    See also:
+        http://www.unicode.org/reports/tr51/#Emoji_Properties
     """
 
     EMOJI = "Emoji"
@@ -146,22 +147,21 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         """
         if cls._initialed:
             return
-        with data_file("emoji-data.txt").open(encoding="utf8") as fp:
-            for content, comment in read_data_file_iterable(fp):
-                cps, property_text = (part.strip() for part in content.split(";", 1))
-                cps_parts = cps.split("..", 1)
-                property_ = EmojiCharProperty(property_text)
-                for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):
-                    try:
-                        inst = cls[cp]
-                    except KeyError:
-                        cls[cp] = cls(cp, property_, comment)
-                    else:
-                        inst._add_property(property_)
-                        inst._add_comment(comment)
-            for cp in (TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP):
-                if cp not in cls:
-                    cls[cp] = cls(cp)
+        for content, comment in read_data_file_iterable("emoji-data.txt"):
+            cps, property_text = (part.strip() for part in content.split(";", 1))
+            cps_parts = cps.split("..", 1)
+            property_ = EmojiCharProperty(property_text)
+            for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):
+                try:
+                    inst = cls[cp]
+                except KeyError:
+                    cls[cp] = cls(cp, property_, comment)
+                else:
+                    inst._add_property(property_)
+                    inst._add_comment(comment)
+        for cp in (TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP):
+            if cp not in cls:
+                cls[cp] = cls(cp)
         # OK!
         cls._initialed = True
 
@@ -206,7 +206,8 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
     def code_point_string(self) -> str:
         """Unicode style hex string of the emoji-characters's code-point
 
-        eg: ``25FB``
+        Example:
+            ``"25FB"``
         """
         return f"{self._code_point:04X}"
 
@@ -229,7 +230,8 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
     def hex(self) -> str:
         """Python style hex string of the emoji-characters's code-pint
 
-        eg: ``0x25fb``
+        Example:
+            ``"0x25fb"``
         """
         return hex(self._code_point)
 
@@ -246,7 +248,7 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
             c: Emoji character
 
                 Note:
-                    ``c`` should be a **single** unicode character.
+                    ``c`` should be a **single** unicode character, that is: ``len(c) == 1``.
 
         Returns:
             Instance returned from the class's internal dictionary

@@ -1,40 +1,38 @@
 from __future__ import annotations
 
 import sys
-from typing import Union, IO, Generator, Iterable, Tuple
+from typing import Union, Generator, Iterable, Tuple
 
 if sys.version_info < (3, 9):  # pragma: no cover
-    from importlib_resources import files
+    import importlib_resources
 else:  # pragma: no cover
-    from importlib.resources import files
+    import importlib.resources as importlib_resources
 
 
 __all__ = [
     "code_points_to_string",
     "code_point_to_regex",
-    "data_file",
     "read_data_file_iterable",
 ]
 
 
-def data_file(file):
-    return files(__package__).joinpath("data").joinpath(file)
-
-
-def read_data_file_iterable(handle: IO[str]) -> Generator[Tuple[str, str], None, None]:
-    for line in handle:
-        line = line.strip()
-        if not line:
-            continue
-        if line[0] in "#;":
-            continue
-        parts = [s.strip() for s in line.split("#", 1)]
-        content = parts[0]
-        try:
-            comment = parts[1]
-        except IndexError:
-            comment = ""
-        yield content, comment
+def read_data_file_iterable(file: str) -> Generator[Tuple[str, str], None, None]:
+    ft = importlib_resources.files().joinpath("data", file)
+    with importlib_resources.as_file(ft) as pth:
+        with pth.open(encoding="utf-8") as fp:
+            for line in fp:
+                line = line.strip()
+                if not line:
+                    continue
+                if line[0] in "#;":
+                    continue
+                parts = [s.strip() for s in line.split("#", 1)]
+                content = parts[0]
+                try:
+                    comment = parts[1]
+                except IndexError:
+                    comment = ""
+                yield content, comment
 
 
 def code_points_to_string(code_points: Union[int, str, Iterable[Union[int, str]]]) -> str:

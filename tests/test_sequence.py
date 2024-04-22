@@ -7,7 +7,6 @@ from emoji_data import (
     EmojiSequence,
     QualifiedType,
     code_points_to_string,
-    data_file,
     detect_qualified,
     is_emoji_flag_sequence,
     is_emoji_keycap_sequence,
@@ -22,9 +21,8 @@ class SequenceTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        with data_file("emoji-test.txt").open(encoding="utf8") as fp:
-            for content, _ in read_data_file_iterable(fp):
-                cls.test_data.append(tuple(s.strip() for s in content.split(";", 1)))
+        for content, _ in read_data_file_iterable("emoji-test.txt"):
+            cls.test_data.append(tuple(s.strip() for s in content.split(";", 1)))
 
     def test_length(self):
         for code_points, *_ in self.test_data:
