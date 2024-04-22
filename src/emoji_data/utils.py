@@ -9,10 +9,10 @@ else:  # pragma: no cover
     import importlib.resources as importlib_resources
 
 
-__all__ = ["code_points_to_string", "code_point_to_regex", "iter_emoji_data_lines"]
+__all__ = ["code_points_to_string", "code_point_to_regex", "emoji_data_lines"]
 
 
-def iter_emoji_data_lines(data_file: str) -> Generator[Tuple[str, str], None, None]:
+def emoji_data_lines(data_file: str) -> Generator[Tuple[str, str], None, None]:
     ft = importlib_resources.files().joinpath("data", data_file)
     for line in ft.read_text("utf-8").splitlines():
         line = line.strip()

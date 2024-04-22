@@ -1,7 +1,7 @@
 import unittest
 
 from emoji_data import code_points_to_string, EmojiCharacter
-from emoji_data.utils import iter_emoji_data_lines
+from emoji_data.utils import emoji_data_lines
 
 
 class CharacterTestCase(unittest.TestCase):
@@ -9,7 +9,7 @@ class CharacterTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        for content, _ in iter_emoji_data_lines("emoji-test.txt"):
+        for content, _ in emoji_data_lines("emoji-test.txt"):
             cls.test_data.append([s.strip() for s in content.split(";", 1)])
 
     def test_code_points(self):
