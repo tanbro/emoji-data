@@ -5,7 +5,7 @@ from typing import ClassVar, Iterable, Iterator, Pattern, Sequence, Tuple, Union
 
 from .character import EmojiCharacter
 from .types import BaseDictContainer
-from .utils import read_data_file_iterable
+from .utils import iter_emoji_data_lines
 
 __all__ = ["EmojiSequence"]
 
@@ -92,7 +92,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
                     cls[_seq.string] = _seq
 
         for fname in DATA_FILES:
-            for content, comment in read_data_file_iterable(fname):
+            for content, comment in iter_emoji_data_lines(fname):
                 if fname in ("emoji-sequences.txt", "emoji-zwj-sequences.txt"):
                     cps, type_field, description = (part.strip() for part in content.split(";", 2))
                     _decode_code_points(cps, type_field=type_field, description=description, comment=comment)

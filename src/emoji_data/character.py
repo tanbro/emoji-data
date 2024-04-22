@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Iterable, Iterator, MutableSequence, Sequence, Tuple, Union, final
 
 from .types import BaseDictContainer
-from .utils import code_point_to_regex, read_data_file_iterable
+from .utils import code_point_to_regex, iter_emoji_data_lines
 
 __all__ = [
     "EmojiCharProperty",
@@ -147,7 +147,7 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         """
         if cls._initialed:
             return
-        for content, comment in read_data_file_iterable("emoji-data.txt"):
+        for content, comment in iter_emoji_data_lines("emoji-data.txt"):
             cps, property_text = (part.strip() for part in content.split(";", 1))
             cps_parts = cps.split("..", 1)
             property_ = EmojiCharProperty(property_text)
