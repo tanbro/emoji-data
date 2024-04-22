@@ -123,9 +123,11 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         elif isinstance(comments, str):
             self._comments = [comments]
         elif isinstance(comments, Iterable):
-            self._comments = [s for s in comments if isinstance(s, str)]
-        else:
-            raise TypeError(f"Argument `comments` expects `str`, `Iterable[str]`, or `None`, but actual {type(comments)}")
+            comments_ = list(comments)
+            if all(isinstance(s, str) for s in comments_):
+                self._comments = comments_
+        if not hasattr(self, "_comments"):
+            raise TypeError(f"Argument `comments` expects type `str | Iterable[str] | None`, but actual `{type(comments)}`")
 
     def __str__(self):
         return self._string
