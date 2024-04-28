@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import sys
 from enum import Enum
 from typing import Iterable, Iterator, MutableSequence, Optional, Sequence, Tuple, Union, final
@@ -135,6 +136,8 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
             type(self).__name__, self.code_point_string, self.string, self.version, self.description
         )
 
+    _comment_split_regex = re.compile(r"\[\d+\]\s*\(.*\)")
+
     _initialed = False
 
     @classmethod
@@ -149,14 +152,7 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
             cps, property_text = (part.strip() for part in content.split(";", 1))
             cps_parts = cps.split("..", 1)
             property_ = EmojiCharProperty(property_text)
-
-            comment_parts = comment.split(maxsplit=3)
-            version = description = None
-            if len(comment_parts) > 0:
-                version = comment_parts[0].strip()
-            if len(comment_parts) > 3:
-                description = comment_parts[3].strip()
-
+            version, description = (s.strip() for s in cls._comment_split_regex.split(comment, maxsplit=1))
             for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):
                 try:
                     inst = cls[cp]

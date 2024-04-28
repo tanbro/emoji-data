@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import ClassVar, Iterable, Iterator, Optional, Pattern, Sequence, Tuple, Union, final
+from typing import ClassVar, Generator, Iterable, Iterator, Optional, Pattern, Sequence, Tuple, Union, final
 
 if sys.version_info < (3, 11):  # pragma: no cover
     from typing_extensions import Self
@@ -34,8 +34,8 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
 
     def __init__(
         self,
-        code_points: Union[Iterable[int], int],
-        type_field: str = "",
+        code_points: Union[int, Iterable[int]],
+        type_field: Optional[str] = None,
         version: Optional[str] = None,
         variation: Optional[str] = None,
         description: Optional[str] = None,
@@ -46,7 +46,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
             self._code_points = [code_points]
         self._string = "".join(chr(n) for n in self._code_points)
         self._characters = [EmojiCharacter.from_hex(n) for n in self._code_points]
-        self._type_field = type_field.strip()
+        self._type_field = type_field or ""
         self._version = version or ""
         self._variation = variation or ""
         self._description = description or ""
@@ -167,10 +167,15 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
     def from_characters(cls, value: Union[EmojiCharacter, Iterable[EmojiCharacter]]) -> Self:
         """Get an :class:`EmojiSequence` instance from :class:`EmojiCharacter` object or list
 
-        :param value: Single or iterable object of :class:`EmojiCharacter`, composing the sequence
-        :return: Instance from internal dictionary
-        :raise KeyError: When passed-in value not found in internal dictionary
-        :raise TypeError: When passed-in value is not :class:`.EmojiCharacter` object or list
+        Args:
+            value: Single or iterable object of :class:`EmojiCharacter`, composing the sequence
+
+        Returns:
+            Instance from internal dictionary
+
+        Raises:
+            KeyError: When passed-in value not found in internal dictionary
+            TypeError: When passed-in value is not :class:`.EmojiCharacter` object or list
         """
         if isinstance(value, EmojiCharacter):
             s = value.string
@@ -187,7 +192,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         Args:
             value: A single or sequence of HEX string/code.
 
-                - it could be:
+                it could be:
 
                 - one or more code-point(s) in HEX format string, separated by spaces
                 - a single code-point integer
@@ -198,7 +203,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
             Instance returned from the class's internal dictionary
 
         Raises:
-            KeyError: When passed-in value not found in the class' internal dictionary
+            KeyError: When passed-in value not found in the class internal dictionary
         """
         cps_array: Iterable[Union[int, str]]
         if isinstance(value, str):
@@ -306,7 +311,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         return list(cls.find(s))  # pyright: ignore[reportReturnType]
 
     @classmethod
-    def find(cls, s: str) -> Iterator[Tuple[Self, int, int]]:
+    def find(cls, s: str) -> Generator[Tuple[Self, int, int], None, None]:
         """Return an iterator which yields all emoji sequences in a string, without actually storing them all simultaneously.
 
         Args:
