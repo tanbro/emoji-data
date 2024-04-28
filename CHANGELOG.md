@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 0.3.1
+
+> 📅 **Date** 2024-4-28
+
+- 🆕 New:
+  - `version` property for `EmojiCharacter` and `EmojiSequence` class, it records in which Emoji version the character or sequence was defined.
+  - `variation` property for `EmojiSequence` class
+
 ## 0.3
 
 > 📅 **Date** 2024-4-21
