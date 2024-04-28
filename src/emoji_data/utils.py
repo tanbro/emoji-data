@@ -26,7 +26,7 @@ def emoji_data_lines(data_file: str) -> Generator[Tuple[str, str], None, None]:
             comment = parts[1]
         except IndexError:
             comment = ""
-        yield content, comment
+        yield content.strip(), comment.strip()
 
 
 def code_points_to_string(code_points: Union[int, str, Iterable[Union[int, str]]]) -> str:

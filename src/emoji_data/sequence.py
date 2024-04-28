@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import ClassVar, Iterable, Iterator, Pattern, Sequence, Tuple, Union, final
+from typing import ClassVar, Iterable, Iterator, Optional, Pattern, Sequence, Tuple, Union, final
 
 if sys.version_info < (3, 11):  # pragma: no cover
     from typing_extensions import Self
@@ -36,8 +36,9 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         self,
         code_points: Union[Iterable[int], int],
         type_field: str = "",
-        description: str = "",
-        comment: str = "",
+        version: Optional[str] = None,
+        variation: Optional[str] = None,
+        description: Optional[str] = None,
     ):
         if isinstance(code_points, Iterable):
             self._code_points = list(code_points)
@@ -46,8 +47,9 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         self._string = "".join(chr(n) for n in self._code_points)
         self._characters = [EmojiCharacter.from_hex(n) for n in self._code_points]
         self._type_field = type_field.strip()
-        self._comment = comment.strip()
-        self._description = description
+        self._version = version or ""
+        self._variation = variation or ""
+        self._description = description or ""
         # regex
         self._regex = r""
         if not self._regex:
@@ -61,11 +63,8 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         return self._string
 
     def __repr__(self):
-        return "<{} code_points={!r} string={!r}, description={!r}>".format(
-            type(self).__name__,
-            self.code_points_string,
-            self.string,
-            self.description,
+        return "<{} code_points={!r} string={!r} version={!r} description={!r}>".format(
+            type(self).__name__, self.code_points_string, self.string, self.version, self.description
         )
 
     _initialed = False
@@ -101,10 +100,14 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
             for content, comment in emoji_data_lines(fname):
                 if fname in ("emoji-sequences.txt", "emoji-zwj-sequences.txt"):
                     cps, type_field, description = (part.strip() for part in content.split(";", 2))
-                    _decode_code_points(cps, type_field=type_field, description=description, comment=comment)
+                    version = comment.split(maxsplit=1)[0]
+                    _decode_code_points(cps, type_field=type_field, version=version, description=description)
                 elif fname == "emoji-variation-sequences.txt":
-                    cps, description = (part.strip() for part in content.split(";", 1))
-                    _decode_code_points(cps, description=description, comment=comment)
+                    cps, variation, _ = (part.strip() for part in content.split(";", 2))
+                    version, description = (x.strip() for x in comment.split(maxsplit=1))
+                    version = "E" + version.lstrip("(").rstrip(")").strip()
+                    description = f"{description.lower()} ({variation})"
+                    _decode_code_points(cps, version=version, variation=variation, description=description)
                 else:
                     raise RuntimeError(f"Invalid data file name {fname}")
         # build regex
@@ -227,11 +230,22 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
 
     @property
     def description(self) -> str:
+        """Description"""
         return self._description
 
     @property
-    def comment(self) -> str:
-        return self._comment
+    def version(self) -> str:
+        """Version of the Emoji.
+
+        Example:
+            ``E0.0``, ``E0.6``, ``E11.0``
+        """
+        return self._version
+
+    @property
+    def variation(self) -> str:
+        """``"emoji style"`` or ``"text style"`` of a variable sequence"""
+        return self._variation
 
     @property
     def characters(self) -> Sequence[EmojiCharacter]:

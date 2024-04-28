@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 from enum import Enum
-from typing import Iterable, Iterator, MutableSequence, Sequence, Tuple, Union, final
+from typing import Iterable, Iterator, MutableSequence, Optional, Sequence, Tuple, Union, final
 
 if sys.version_info < (3, 11):  # pragma: no cover
     from typing_extensions import Self
@@ -106,43 +106,33 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
     def __init__(
         self,
         code_point: int,
-        properties: Union[Iterable[EmojiCharProperty], EmojiCharProperty, None] = None,
-        comments: Union[Iterable[str], str, None] = None,
+        properties: Union[EmojiCharProperty, Iterable[EmojiCharProperty], None] = None,
+        version: Optional[str] = None,
+        description: Optional[str] = None,
     ):
         self._code_point = code_point
         self._string = chr(self._code_point)
         self._regex = code_point_to_regex(code_point)
         #
+        self._properties: MutableSequence[EmojiCharProperty]
         if properties is None:
-            self._properties: MutableSequence[EmojiCharProperty] = []
+            self._properties = []
         elif isinstance(properties, EmojiCharProperty):
             self._properties = [properties]
         elif isinstance(properties, Iterable):
             self._properties = list(properties)
         else:
-            raise TypeError(
-                f"Argument `properties` expects `EmojiCharProperty`, `Iterable[EmojiCharProperty]`, or `None`, but actual {type(properties)}"
-            )
+            raise TypeError(f"{type(properties)}")
         #
-        if comments is None:
-            self._comments: MutableSequence[str] = []
-        elif isinstance(comments, str):
-            self._comments = [comments]
-        elif isinstance(comments, Iterable):
-            comments_ = list(comments)
-            if all(isinstance(s, str) for s in comments_):
-                self._comments = comments_
-        if not hasattr(self, "_comments"):
-            raise TypeError(f"Argument `comments` expects type `str | Iterable[str] | None`, but actual `{type(comments)}`")
+        self._version = version or ""
+        self._description = description or ""
 
     def __str__(self):
         return self._string
 
     def __repr__(self):
-        return "<{} code_point={} char={!r}>".format(
-            type(self).__name__,
-            self.code_point_string,
-            self.string,
+        return "<{} code_point={} char={!r} version={!r} description={!r}>".format(
+            type(self).__name__, self.code_point_string, self.string, self.version, self.description
         )
 
     _initialed = False
@@ -159,17 +149,24 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
             cps, property_text = (part.strip() for part in content.split(";", 1))
             cps_parts = cps.split("..", 1)
             property_ = EmojiCharProperty(property_text)
+
+            comment_parts = comment.split(maxsplit=3)
+            version = description = None
+            if len(comment_parts) > 0:
+                version = comment_parts[0].strip()
+            if len(comment_parts) > 3:
+                description = comment_parts[3].strip()
+
             for cp in range(int(cps_parts[0], 16), 1 + int(cps_parts[-1], 16)):
                 try:
                     inst = cls[cp]
                 except KeyError:
-                    cls[cp] = cls(cp, property_, comment)
+                    cls[cp] = cls(cp, property_, version, description)
                 else:
                     inst._add_property(property_)
-                    inst._add_comment(comment)
         for cp in (TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP):
             if cp not in cls:
-                cls[cp] = cls(cp)
+                cls[cp] = cls(cp, [])
         # OK!
         cls._initialed = True
 
@@ -201,10 +198,6 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         if val not in self._properties:
             self._properties.append(val)
 
-    def _add_comment(self, val: str):
-        if val not in self._properties:
-            self._comments.append(val)
-
     @property
     def code_point(self) -> int:
         """Unicode integer value of the emoji-characters"""
@@ -225,9 +218,18 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         return self._properties
 
     @property
-    def comments(self) -> Sequence[str]:
-        """Comments of the Emoji"""
-        return self._comments
+    def version(self) -> str:
+        """Version of the Emoji.
+
+        Example:
+            ``E0.0``, ``E0.6``, ``E11.0``
+        """
+        return self._description
+
+    @property
+    def description(self) -> str:
+        """Description comment of the Emoji"""
+        return self._description
 
     @property
     def regex(self) -> str:
