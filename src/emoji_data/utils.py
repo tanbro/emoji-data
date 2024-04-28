@@ -13,7 +13,7 @@ __all__ = ["code_points_to_string", "code_point_to_regex", "emoji_data_lines"]
 
 
 def emoji_data_lines(data_file: str) -> Generator[Tuple[str, str], None, None]:
-    ft = importlib_resources.files().joinpath("data", data_file)
+    ft = importlib_resources.files(__package__).joinpath("data").joinpath(data_file)
     for line in ft.read_text("utf-8").splitlines():
         line = line.strip()
         if not line:
@@ -26,7 +26,7 @@ def emoji_data_lines(data_file: str) -> Generator[Tuple[str, str], None, None]:
             comment = parts[1]
         except IndexError:
             comment = ""
-        yield content, comment
+        yield content.strip(), comment.strip()
 
 
 def code_points_to_string(code_points: Union[int, str, Iterable[Union[int, str]]]) -> str:
