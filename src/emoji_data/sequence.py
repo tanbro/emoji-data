@@ -1,7 +1,13 @@
 from __future__ import annotations
 
 import re
+import sys
 from typing import ClassVar, Iterable, Iterator, Pattern, Sequence, Tuple, Union, final
+
+if sys.version_info < (3, 11):  # pragma: no cover
+    from typing_extensions import Self
+else:  # pragma: no cover
+    from typing import Self
 
 from .character import EmojiCharacter
 from .types import BaseDictContainer
@@ -125,9 +131,9 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         cls._initialed = False
 
     @classmethod
-    def items(cls) -> Iterator[Tuple[str, EmojiSequence]]:
+    def items(cls) -> Iterator[Tuple[str, Self]]:
         """Returns an iterator of all string -> emoji-sequence pairs of the class"""
-        return ((k, cls[k]) for k in cls)
+        return ((k, cls[k]) for k in cls)  # pyright: ignore[reportReturnType]
 
     @classmethod
     def keys(cls) -> Iterator[str]:
@@ -135,12 +141,12 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         yield from cls
 
     @classmethod
-    def values(cls) -> Iterator[EmojiSequence]:
+    def values(cls) -> Iterator[Self]:
         """Returns an iterator of all emoji-sequences of the class"""
-        return (cls[k] for k in cls)
+        return (cls[k] for k in cls)  # pyright: ignore[reportReturnType]
 
     @classmethod
-    def from_string(cls, s: str) -> EmojiSequence:
+    def from_string(cls, s: str) -> Self:
         """Get an :class:`EmojiSequence` instance from string
 
         Args:
@@ -152,10 +158,10 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         Raises:
             KeyError: When passed-in ``s`` not found in internal dictionary
         """
-        return cls[s]
+        return cls[s]  # pyright: ignore[reportReturnType]
 
     @classmethod
-    def from_characters(cls, value: Union[EmojiCharacter, Iterable[EmojiCharacter]]) -> EmojiSequence:
+    def from_characters(cls, value: Union[EmojiCharacter, Iterable[EmojiCharacter]]) -> Self:
         """Get an :class:`EmojiSequence` instance from :class:`EmojiCharacter` object or list
 
         :param value: Single or iterable object of :class:`EmojiCharacter`, composing the sequence
@@ -172,7 +178,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         return cls.from_string(s)
 
     @classmethod
-    def from_hex(cls, value: Union[int, str, Iterable[Union[int, str]]]) -> EmojiSequence:
+    def from_hex(cls, value: Union[int, str, Iterable[Union[int, str]]]) -> Self:
         """Get an :class:`EmojiSequence` instance by unicode code point(s)
 
         Args:
@@ -202,7 +208,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
             raise TypeError(
                 f"Argument `value` expects to be one of `str`, `bytes`, `int`, or a sequence of that, but actual is {type(value)}"
             )
-        return cls.from_characters(EmojiCharacter.from_hex(cp) for cp in cps_array)
+        return cls.from_characters(EmojiCharacter.from_hex(cp) for cp in cps_array)  # pyright: ignore[reportReturnType]
 
     @property
     def type_field(self) -> str:
@@ -270,7 +276,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         return " ".join(c.code_point_string for c in self.characters)
 
     @classmethod
-    def find_all(cls, s: str) -> Sequence[Tuple[EmojiSequence, int, int]]:
+    def find_all(cls, s: str) -> Sequence[Tuple[Self, int, int]]:
         """Find out all emoji sequences in a string, and return them in a list
 
         Items of the returned list is the same as ``yield`` result of :meth:`find`
@@ -283,10 +289,10 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
 
             [x for x in EmojiSequence.find(s)]
         """
-        return list(cls.find(s))
+        return list(cls.find(s))  # pyright: ignore[reportReturnType]
 
     @classmethod
-    def find(cls, s: str) -> Iterator[Tuple[EmojiSequence, int, int]]:
+    def find(cls, s: str) -> Iterator[Tuple[Self, int, int]]:
         """Return an iterator which yields all emoji sequences in a string, without actually storing them all simultaneously.
 
         Args:
