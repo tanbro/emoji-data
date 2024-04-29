@@ -220,7 +220,7 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         Example:
             ``E0.0``, ``E0.6``, ``E11.0``
         """
-        return self._description
+        return self._version
 
     @property
     def description(self) -> str:

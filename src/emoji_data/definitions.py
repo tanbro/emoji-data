@@ -56,81 +56,53 @@ class QualifiedType(Enum):
 
 def make_regex_dict() -> Mapping[str, str]:
     d: MutableMapping[str, str] = {}
-    d.update(
-        {
-            "EMOJI_CHARACTER": r"["
-            + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EMOJI in m.properties)
-            + r"]"
-        }
+
+    d["EMOJI_CHARACTER"] = (
+        r"[" + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EMOJI in m.properties) + r"]"
     )
-    d.update(
-        {
-            "DEFAULT_EMOJI_PRESENTATION_CHARACTER": r"["
-            + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EPRES in m.properties)
-            + r"]"
-        }
+
+    d["DEFAULT_EMOJI_PRESENTATION_CHARACTER"] = (
+        r"[" + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EPRES in m.properties) + r"]"
     )
-    d.update(
-        {
-            "DEFAULT_TEXT_PRESENTATION_CHARACTER": r"["
-            + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EPRES not in m.properties)
-            + r"]"
-        }
+
+    d["DEFAULT_TEXT_PRESENTATION_CHARACTER"] = (
+        r"[" + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EPRES not in m.properties) + r"]"
     )
-    d.update({"TEXT_PRESENTATION_SELECTOR": code_point_to_regex(TEXT_PRESENTATION_SELECTOR)})
-    d.update({"TEXT_PRESENTATION_SEQUENCE": r"({EMOJI_CHARACTER}{TEXT_PRESENTATION_SELECTOR})".format(**d)})
-    d.update({"EMOJI_PRESENTATION_SELECTOR": code_point_to_regex(EMOJI_PRESENTATION_SELECTOR)})
-    d.update({"EMOJI_PRESENTATION_SEQUENCE": r"({EMOJI_CHARACTER}{EMOJI_PRESENTATION_SELECTOR})".format(**d)})
-    d.update(
-        {
-            "EMOJI_MODIFIER": r"["
-            + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EMOD in m.properties)
-            + r"]"
-        }
+    d["TEXT_PRESENTATION_SELECTOR"] = code_point_to_regex(TEXT_PRESENTATION_SELECTOR)
+    d["TEXT_PRESENTATION_SEQUENCE"] = r"({EMOJI_CHARACTER}{TEXT_PRESENTATION_SELECTOR})".format(**d)
+    d["EMOJI_PRESENTATION_SELECTOR"] = code_point_to_regex(EMOJI_PRESENTATION_SELECTOR)
+    d["EMOJI_PRESENTATION_SEQUENCE"] = r"({EMOJI_CHARACTER}{EMOJI_PRESENTATION_SELECTOR})".format(**d)
+    d["EMOJI_MODIFIER"] = (
+        r"[" + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EMOD in m.properties) + r"]"
     )
-    d.update(
-        {
-            "EMOJI_MODIFIER_BASE": r"["
-            + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EBASE in m.properties)
-            + r"]"
-        }
+    d["EMOJI_MODIFIER_BASE"] = (
+        r"[" + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EBASE in m.properties) + r"]"
     )
-    d.update({"EMOJI_MODIFIER_SEQUENCE": r"({EMOJI_MODIFIER_BASE}{EMOJI_MODIFIER})".format(**d)})
-    d.update(
-        {
-            "REGIONAL_INDICATOR": r"["
-            + code_point_to_regex(REGIONAL_INDICATORS[0])
-            + r"-"
-            + code_point_to_regex(REGIONAL_INDICATORS[-1])
-            + r"]"
-        }
+    d["EMOJI_MODIFIER_SEQUENCE"] = r"({EMOJI_MODIFIER_BASE}{EMOJI_MODIFIER})".format(**d)
+    d["REGIONAL_INDICATOR"] = (
+        r"[" + code_point_to_regex(REGIONAL_INDICATORS[0]) + r"-" + code_point_to_regex(REGIONAL_INDICATORS[-1]) + r"]"
     )
-    d.update({"EMOJI_FLAG_SEQUENCE": r"({REGIONAL_INDICATOR}{REGIONAL_INDICATOR})".format(**d)})
-    d.update({"TAG_BASE": r"({EMOJI_CHARACTER}|{EMOJI_MODIFIER_SEQUENCE}|{EMOJI_PRESENTATION_SEQUENCE})".format(**d)})
-    d.update({"TAG_SPEC": r"[" + code_point_to_regex(TAGS[0]) + r"-" + code_point_to_regex(TAGS[-2]) + r"]"})
-    d.update({"TAG_TERM": code_point_to_regex(TAGS[-1])})
-    d.update({"EMOJI_TAG_SEQUENCE": r"({TAG_BASE}{TAG_SPEC}{TAG_TERM})".format(**d)})
-    d.update(
-        {
-            "EMOJI_KEYCAP_SEQUENCE": r"([0-9#*]{}{})".format(
-                *(code_point_to_regex(n) for n in (EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP))
-            )
-        }
+    d["EMOJI_FLAG_SEQUENCE"] = r"({REGIONAL_INDICATOR}{REGIONAL_INDICATOR})".format(**d)
+    d["TAG_BASE"] = r"({EMOJI_CHARACTER}|{EMOJI_MODIFIER_SEQUENCE}|{EMOJI_PRESENTATION_SEQUENCE})".format(**d)
+    d["TAG_SPEC"] = r"[" + code_point_to_regex(TAGS[0]) + r"-" + code_point_to_regex(TAGS[-2]) + r"]"
+    d["TAG_TERM"] = code_point_to_regex(TAGS[-1])
+    d["EMOJI_TAG_SEQUENCE"] = r"({TAG_BASE}{TAG_SPEC}{TAG_TERM})".format(**d)
+    d["EMOJI_KEYCAP_SEQUENCE"] = r"([0-9#*]{}{})".format(
+        *(code_point_to_regex(x) for x in (EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP))
     )
-    d.update(
-        {
-            "EMOJI_CORE_SEQUENCE": r"("
-            r"{EMOJI_CHARACTER}"
-            r"|{EMOJI_PRESENTATION_SEQUENCE}"
-            r"|{EMOJI_KEYCAP_SEQUENCE}"
-            r"|{EMOJI_MODIFIER_SEQUENCE}"
-            r"|{EMOJI_FLAG_SEQUENCE}"
-            r")".format(**d)
-        }
+    d["EMOJI_CORE_SEQUENCE"] = (
+        r"("
+        r"{EMOJI_CHARACTER}"
+        r"|{EMOJI_PRESENTATION_SEQUENCE}"
+        r"|{EMOJI_KEYCAP_SEQUENCE}"
+        r"|{EMOJI_MODIFIER_SEQUENCE}"
+        r"|{EMOJI_FLAG_SEQUENCE}"
+        r")".format(**d)
     )
-    d.update({"EMOJI_ZWJ_ELEMENT": r"({EMOJI_CHARACTER}|{EMOJI_PRESENTATION_SEQUENCE}|{EMOJI_MODIFIER_SEQUENCE})".format(**d)})
-    d.update({"EMOJI_ZWJ_SEQUENCE": r"({EMOJI_ZWJ_ELEMENT}({0}{EMOJI_ZWJ_ELEMENT})+)".format(code_point_to_regex(ZWJ), **d)})
-    d.update({"EMOJI_SEQUENCE": r"({EMOJI_CORE_SEQUENCE}|{EMOJI_ZWJ_SEQUENCE}|{EMOJI_TAG_SEQUENCE})".format(**d)})
+    d["EMOJI_ZWJ_ELEMENT"] = r"({EMOJI_CHARACTER}|{EMOJI_PRESENTATION_SEQUENCE}|{EMOJI_MODIFIER_SEQUENCE})".format(**d)
+    d["EMOJI_ZWJ_SEQUENCE"] = r"({EMOJI_ZWJ_ELEMENT}({0}{EMOJI_ZWJ_ELEMENT})+)".format(code_point_to_regex(ZWJ), **d)
+    d["EMOJI_SEQUENCE"] = r"({EMOJI_CORE_SEQUENCE}|{EMOJI_ZWJ_SEQUENCE}|{EMOJI_TAG_SEQUENCE})".format(**d)
+
     return d
 
 
@@ -275,9 +247,25 @@ def is_regional_indicator(s: str) -> bool:
 
 
 def is_emoji_flag_sequence(s: str) -> bool:
-    """Detect emoji flag sequence
+    """emoji flag sequence — A sequence of two Regional Indicator characters,
+    where the corresponding ASCII characters are valid region sequences as specified by `Unicode region subtags <https://www.unicode.org/reports/tr35/#unicode_region_subtag>`_ in [`CLDR <https://www.unicode.org/reports/tr51/#CLDR>`_],
+    with idStatus = “regular”, “deprecated”, or “macroregion”.
 
-    A sequence of two Regional Indicator characters, where the corresponding ASCII characters are valid region sequences as specified by Unicode region subtags in [CLDR], with idStatus = “regular”, “deprecated”, or “macroregion”.
+    See also:
+        `Annex B: Valid Emoji Flag Sequences <https://www.unicode.org/reports/tr51/#Flags>`_.
+
+    ::
+
+        emoji_flag_sequence :=
+        regional_indicator regional_indicator
+
+        regional_indicator := \\p{Regional_Indicator}
+
+    A singleton Regional Indicator character is not a well-formed **emoji flag sequence**.
+
+    See also:
+        https://www.unicode.org/reports/tr51/#def_emoji_flag_sequence
+
     """
     return EMOJI_PATTERNS["EMOJI_FLAG_SEQUENCE"].fullmatch(s) is not None
 
@@ -295,51 +283,115 @@ def is_tag_term(c: str) -> bool:
 
 
 def is_emoji_tag_sequence(s: str) -> bool:
+    """emoji tag sequence (ETS) — A sequence of the following form::
+
+        emoji_tag_sequence := tag_base tag_spec tag_end
+        tag_base           := emoji_character
+                            | emoji_modifier_sequence
+                            | emoji_presentation_sequence
+        tag_spec           := [\\x{E0020}-\\x{E007E}]+
+        tag_end            := \\x{E007F}
+
+    * The `tag_spec` consists of all characters from U+E0020 TAG SPACE to U+E007E TAG TILDE. Each tag_spec defines a particular visual variant to be applied to the tag_base character(s). Though tag_spec includes the values U+E0041 TAG LATIN CAPITAL LETTER A .. U+E005A TAG LATIN CAPITAL LETTER Z, they are not used currently and are reserved for future extensions.
+    * The `tag_end` consists of the character U+E007F CANCEL TAG, and must be used to terminate the sequence.
+    * A sequence of tag characters that is not part of an `emoji_tag_sequence` is not a well-formed **emoji tag sequence**.
+
+    See also:
+        https://www.unicode.org/reports/tr51/#def_emoji_tag_sequence
+    """
     return EMOJI_PATTERNS["EMOJI_TAG_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_emoji_keycap_sequence(s: str) -> bool:
-    """Detect emoji keycap sequence
-
-    A sequence of the following form::
+    """A sequence of the following form::
 
         emoji_keycap_sequence := [0-9#*] \\x{FE0F 20E3}
+
+    * These sequences are in the emoji-sequences.txt file listed under the type_field **Emoji_Keycap_Sequence**
+
+    See also:
+        https://www.unicode.org/reports/tr51/#def_emoji_keycap_sequence
     """
     return EMOJI_PATTERNS["EMOJI_KEYCAP_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_emoji_core_sequence(s: str) -> bool:
+    """emoji core sequence — A sequence of the following form::
+
+        emoji_core_sequence :=
+            emoji_character
+        | emoji_presentation_sequence
+        | emoji_keycap_sequence
+        | emoji_modifier_sequence
+        | emoji_flag_sequence
+
+    See also:
+        https://www.unicode.org/reports/tr51/#def_emoji_core_sequence
+    """
     return EMOJI_PATTERNS["EMOJI_CORE_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_emoji_zwj_element(s: str) -> bool:
+    """emoji ZWJ element — An element that can be used in an emoji ZWJ sequence, as follows::
+
+        emoji_zwj_element :=
+            emoji_core_sequence
+        | emoji_tag_sequence
+
+    See also:
+        https://www.unicode.org/reports/tr51/#def_emoji_zwj_element
+    """
     return EMOJI_PATTERNS["EMOJI_ZWJ_ELEMENT"].fullmatch(s) is not None
 
 
 def is_emoji_zwj_sequence(s: str) -> bool:
+    """emoji sequence — A core sequence, tag sequence, or ZWJ sequence, as follows::
+
+        emoji_sequence :=
+            emoji_core_sequence
+        | emoji_zwj_sequence
+        | emoji_tag_sequence
+
+    Note:
+        all emoji sequences are single grapheme clusters: there is never a grapheme cluster boundary within an emoji sequence.
+        This affects editing operations, such as cursor movement or deletion, as well as word break, line break, and so on.
+        For more information, see [`UAX29 <https://www.unicode.org/reports/tr51/#UAX29>`_].
+
+    See also:
+        https://www.unicode.org/reports/tr51/#def_emoji_sequence
+    """
     return EMOJI_PATTERNS["EMOJI_ZWJ_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_emoji_sequence(s: str) -> bool:
+    """emoji sequence — A core sequence, tag sequence, or ZWJ sequence, as follows::
+
+        emoji_sequence :=
+            emoji_core_sequence
+        | emoji_zwj_sequence
+        | emoji_tag_sequence
+
+    Note:
+        all emoji sequences are single grapheme clusters: there is never a grapheme cluster boundary within an emoji sequence.
+        This affects editing operations, such as cursor movement or deletion, as well as word break, line break, and so on.
+        For more information, see [`UAX29 <https://www.unicode.org/reports/tr51/#UAX29>`_].
+
+    See also:
+        https://www.unicode.org/reports/tr51/#def_emoji_sequence
+    """
     return EMOJI_PATTERNS["EMOJI_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_qualified_emoji_character(s: str, i: int) -> bool:
-    """check if an emoji character in a string is qualified.
-
-    An emoji character in a string that
+    """An emoji character in a string that
 
     - (a) has default emoji presentation or
     - (b) is the first character in an emoji modifier sequence or
     - (c) is not a default emoji presentation character, but is the first character in an emoji presentation sequence.
 
-    is qualified.
-
     Args:
         s: the string where the character in it
         i: index of the character in the string to check if qualified
-
-    Returns: :data:`True` if qualified else :data:`False`
 
     See also:
         http://www.unicode.org/reports/tr51/#def_qualified_emoji_character
