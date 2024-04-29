@@ -128,15 +128,13 @@ def is_emoji_character(c: str) -> bool:
 
 
 def is_default_emoji_presentation_character(c: str) -> bool:
-    """detect default emoji presentation character
-
-    A character that, by default, should appear with an emoji presentation, rather than a text presentation.
+    """default emoji presentation character — A character that, by default, should appear with an emoji presentation, rather than a text presentation.
 
     ::
 
         default_emoji_presentation_character := \\p{Emoji_Presentation}
 
-    - These characters have the Emoji_Presentation property.
+    - These characters have the **Emoji_Presentation** property. See `Annex A: Emoji Properties and Data Files <https://unicode.org/reports/tr51/#Emoji_Properties_and_Data_Files>`_.
 
     See also:
         https://unicode.org/reports/tr51/#def_emoji_presentation
@@ -146,32 +144,46 @@ def is_default_emoji_presentation_character(c: str) -> bool:
 
 
 def is_default_text_presentation_character(c: str) -> bool:
-    """detect default text presentation character
+    """default text presentation character — A character that, by default, should appear with a text presentation, rather than an emoji presentation.
 
-    A character that, by default, should appear with a text presentation, rather than an emoji presentation.
+    ::
+
+        default_text_presentation_character := \\P{Emoji_Presentation}
+
+    - These characters do not have the **Emoji_Presentation** property; that is, their **Emoji_Presentation** property value is **No**.
+      See `Annex A: Emoji Properties and Data Files <https://unicode.org/reports/tr51/#Emoji_Properties_and_Data_Files>`_.
 
     See also:
-        https://unicode.org/reports/tr51/#def_text_presentation_sequence
+        https://unicode.org/reports/tr51/#def_text_presentation
     """
     _c = chr(ord(c))
     return EMOJI_PATTERNS["DEFAULT_TEXT_PRESENTATION_CHARACTER"].fullmatch(_c) is not None
 
 
 def is_text_presentation_selector(c: str) -> bool:
-    """detect text presentation selector
+    """text presentation selector
+    — The character U+FE0E VARIATION SELECTOR-15 (VS15), used to request a text presentation for an emoji character.
+    (Also known as text variation selector in prior versions of this specification.)
 
-    The character U+FE0E VARIATION SELECTOR-15 (VS15), used to request a text presentation for an emoji character. (Also known as text variation selector in prior versions of this specification.)
+    ::
+
+        text_presentation_selector := \\x{FE0E}
 
     See also:
-        https://unicode.org/reports/tr51/#def_emoji_presentation_selector
+        https://unicode.org/reports/tr51/#def_text_presentation_selector
     """
     return EMOJI_PATTERNS["TEXT_PRESENTATION_SELECTOR"].fullmatch(c) is not None
 
 
 def is_text_presentation_sequence(s: str) -> bool:
-    """detect text presentation selector
+    """text presentation sequence
+    — A variation sequence consisting of an emoji character followed by a text presentation selector.
 
-    The character U+FE0E VARIATION SELECTOR-15 (VS15), used to request a text presentation for an emoji character. (Also known as text variation selector in prior versions of this specification.)
+    ::
+
+        text_presentation_sequence := emoji_character text_presentation_selector
+
+    - The only valid **text presentation sequences** are those listed in **emoji-variation-sequences.txt** [`emoji-data <https://unicode.org/reports/tr51/#emoji_data>`_].
 
     See also:
         https://unicode.org/reports/tr51/#def_text_presentation_sequence
@@ -180,9 +192,13 @@ def is_text_presentation_sequence(s: str) -> bool:
 
 
 def is_emoji_presentation_selector(c: str) -> bool:
-    """detect emoji presentation selector
+    """emoji presentation selector
+    — The character U+FE0F VARIATION SELECTOR-16 (VS16), used to request an emoji presentation for an emoji character.
+    (Also known as emoji variation selector in prior versions of this specification.)
 
-    The character U+FE0F VARIATION SELECTOR-16 (VS16), used to request an emoji presentation for an emoji character. (Also known as emoji variation selector in prior versions of this specification.)
+    ::
+
+        emoji_presentation_selector := \\x{FE0F}
 
     See also:
         https://unicode.org/reports/tr51/#def_emoji_presentation_selector
@@ -191,15 +207,14 @@ def is_emoji_presentation_selector(c: str) -> bool:
 
 
 def is_emoji_presentation_sequence(s: str) -> bool:
-    """detect emoji presentation sequence
-
-    A variation sequence consisting of an emoji character followed by a emoji presentation selector.
+    """emoji presentation sequence
+    — A variation sequence consisting of an emoji character followed by a emoji presentation selector.
 
     ::
 
         emoji_presentation_sequence := emoji_character emoji_presentation_selector
 
-    - The only valid emoji presentation sequences are those listed in emoji-variation-sequences.txt
+    - The only valid **emoji presentation sequences** are those listed in **emoji-variation-sequences.txt** [`emoji-data <https://unicode.org/reports/tr51/#emoji_data>`_].
 
     See also:
         https://unicode.org/reports/tr51/#def_emoji_presentation_sequence
@@ -208,9 +223,14 @@ def is_emoji_presentation_sequence(s: str) -> bool:
 
 
 def is_emoji_modifier(c: str) -> bool:
-    """detect emoji modifier
+    """emoji modifier
+    — A character that can be used to modify the appearance of a preceding emoji in an emoji modifier sequence.
 
-    A character that can be used to modify the appearance of a preceding emoji in an emoji modifier sequence.
+    ::
+
+        emoji_modifier := \\p{Emoji_Modifier}
+
+    - These characters have the **Emoji_Modifier** property. See `Annex A: Emoji Properties and Data Files <https://unicode.org/reports/tr51/#Emoji_Properties_and_Data_Files>`_.
 
     See also:
         https://unicode.org/reports/tr51/#def_emoji_modifier
@@ -220,9 +240,15 @@ def is_emoji_modifier(c: str) -> bool:
 
 
 def is_emoji_modifier_base(c: str) -> bool:
-    """Detect emoji modifier base
+    """emoji modifier base
+    — A character whose appearance can be modified by a subsequent emoji modifier in an emoji modifier sequence.
 
-    A character whose appearance can be modified by a subsequent emoji modifier in an emoji modifier sequence.
+    ::
+
+        emoji_modifier_base := \\p{Emoji_Modifier_Base}
+
+    - These characters have the **Emoji_Modifier_Base property**. See `Annex A: Emoji Properties and Data Files <https://unicode.org/reports/tr51/#Emoji_Properties_and_Data_Files>`_.
+    - They are also listed in `Characters Subject to Emoji Modifiers <https://unicode.org/reports/tr51/#Subject_Emoji_Modifiers>`_.
 
     See also:
         https://unicode.org/reports/tr51/#def_emoji_modifier_base
@@ -232,11 +258,11 @@ def is_emoji_modifier_base(c: str) -> bool:
 
 
 def is_emoji_modifier_sequence(s: str) -> bool:
-    """Detect emoji modifier sequence
+    """emoji modifier sequence
+    — A sequence of the following form::
 
-    A sequence of the following form::
-
-        emoji_modifier_sequence := emoji_modifier_base emoji_modifier
+        emoji_modifier_sequence :=
+            emoji_modifier_base emoji_modifier
     """
     return EMOJI_PATTERNS["EMOJI_MODIFIER_SEQUENCE"].fullmatch(s) is not None
 
@@ -247,17 +273,18 @@ def is_regional_indicator(s: str) -> bool:
 
 
 def is_emoji_flag_sequence(s: str) -> bool:
-    """emoji flag sequence — A sequence of two Regional Indicator characters,
-    where the corresponding ASCII characters are valid region sequences as specified by `Unicode region subtags <https://www.unicode.org/reports/tr35/#unicode_region_subtag>`_ in [`CLDR <https://www.unicode.org/reports/tr51/#CLDR>`_],
+    """emoji flag sequence
+    — A sequence of two Regional Indicator characters,
+    where the corresponding ASCII characters are valid region sequences
+    as specified by `Unicode region subtags <https://www.unicode.org/reports/tr35/#unicode_region_subtag>`_
+    in [`CLDR <https://www.unicode.org/reports/tr51/#CLDR>`_],
     with idStatus = “regular”, “deprecated”, or “macroregion”.
-
-    See also:
-        `Annex B: Valid Emoji Flag Sequences <https://www.unicode.org/reports/tr51/#Flags>`_.
+    See also `Annex B: Valid Emoji Flag Sequences <https://www.unicode.org/reports/tr51/#Flags>`_.
 
     ::
 
         emoji_flag_sequence :=
-        regional_indicator regional_indicator
+            regional_indicator regional_indicator
 
         regional_indicator := \\p{Regional_Indicator}
 
@@ -283,7 +310,8 @@ def is_tag_term(c: str) -> bool:
 
 
 def is_emoji_tag_sequence(s: str) -> bool:
-    """emoji tag sequence (ETS) — A sequence of the following form::
+    """emoji tag sequence (ETS)
+    — A sequence of the following form::
 
         emoji_tag_sequence := tag_base tag_spec tag_end
         tag_base           := emoji_character
@@ -292,9 +320,9 @@ def is_emoji_tag_sequence(s: str) -> bool:
         tag_spec           := [\\x{E0020}-\\x{E007E}]+
         tag_end            := \\x{E007F}
 
-    * The `tag_spec` consists of all characters from U+E0020 TAG SPACE to U+E007E TAG TILDE. Each tag_spec defines a particular visual variant to be applied to the tag_base character(s). Though tag_spec includes the values U+E0041 TAG LATIN CAPITAL LETTER A .. U+E005A TAG LATIN CAPITAL LETTER Z, they are not used currently and are reserved for future extensions.
-    * The `tag_end` consists of the character U+E007F CANCEL TAG, and must be used to terminate the sequence.
-    * A sequence of tag characters that is not part of an `emoji_tag_sequence` is not a well-formed **emoji tag sequence**.
+    - The `tag_spec` consists of all characters from U+E0020 TAG SPACE to U+E007E TAG TILDE. Each tag_spec defines a particular visual variant to be applied to the tag_base character(s). Though tag_spec includes the values U+E0041 TAG LATIN CAPITAL LETTER A .. U+E005A TAG LATIN CAPITAL LETTER Z, they are not used currently and are reserved for future extensions.
+    - The `tag_end` consists of the character U+E007F CANCEL TAG, and must be used to terminate the sequence.
+    - A sequence of tag characters that is not part of an `emoji_tag_sequence` is not a well-formed **emoji tag sequence**.
 
     See also:
         https://www.unicode.org/reports/tr51/#def_emoji_tag_sequence
@@ -303,11 +331,12 @@ def is_emoji_tag_sequence(s: str) -> bool:
 
 
 def is_emoji_keycap_sequence(s: str) -> bool:
-    """A sequence of the following form::
+    """emoji keycap sequence
+    — A sequence of the following form::
 
         emoji_keycap_sequence := [0-9#*] \\x{FE0F 20E3}
 
-    * These sequences are in the emoji-sequences.txt file listed under the type_field **Emoji_Keycap_Sequence**
+    - These sequences are in the **emoji-sequences.txt** file listed under the type_field **Emoji_Keycap_Sequence**
 
     See also:
         https://www.unicode.org/reports/tr51/#def_emoji_keycap_sequence
@@ -316,7 +345,8 @@ def is_emoji_keycap_sequence(s: str) -> bool:
 
 
 def is_emoji_core_sequence(s: str) -> bool:
-    """emoji core sequence — A sequence of the following form::
+    """emoji core sequence
+    — A sequence of the following form::
 
         emoji_core_sequence :=
             emoji_character
@@ -332,7 +362,8 @@ def is_emoji_core_sequence(s: str) -> bool:
 
 
 def is_emoji_zwj_element(s: str) -> bool:
-    """emoji ZWJ element — An element that can be used in an emoji ZWJ sequence, as follows::
+    """emoji ZWJ element
+    — An element that can be used in an emoji ZWJ sequence, as follows::
 
         emoji_zwj_element :=
             emoji_core_sequence
@@ -345,26 +376,25 @@ def is_emoji_zwj_element(s: str) -> bool:
 
 
 def is_emoji_zwj_sequence(s: str) -> bool:
-    """emoji sequence — A core sequence, tag sequence, or ZWJ sequence, as follows::
+    """emoji ZWJ sequence
+    — An emoji sequence with at least one joiner character.
 
-        emoji_sequence :=
-            emoji_core_sequence
-        | emoji_zwj_sequence
-        | emoji_tag_sequence
+    ::
 
-    Note:
-        all emoji sequences are single grapheme clusters: there is never a grapheme cluster boundary within an emoji sequence.
-        This affects editing operations, such as cursor movement or deletion, as well as word break, line break, and so on.
-        For more information, see [`UAX29 <https://www.unicode.org/reports/tr51/#UAX29>`_].
+        emoji_zwj_sequence :=
+        emoji_zwj_element ( ZWJ emoji_zwj_element )+
+
+        ZWJ := \\x{200d}
 
     See also:
-        https://www.unicode.org/reports/tr51/#def_emoji_sequence
+        https://www.unicode.org/reports/tr51/#def_emoji_zwj_sequence
     """
     return EMOJI_PATTERNS["EMOJI_ZWJ_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_emoji_sequence(s: str) -> bool:
-    """emoji sequence — A core sequence, tag sequence, or ZWJ sequence, as follows::
+    """emoji sequence
+    — A core sequence, tag sequence, or ZWJ sequence, as follows::
 
         emoji_sequence :=
             emoji_core_sequence
@@ -412,7 +442,6 @@ def detect_qualified(s: str) -> QualifiedType:
     """Detect qualified type of emoji string
 
     - qualified emoji character — An emoji character in a string that
-
         - (a) has default emoji presentation or
         - (b) is the first character in an emoji modifier sequence or
         - (c) is not a default emoji presentation character, but is the first character in an emoji presentation sequence.
@@ -422,7 +451,13 @@ def detect_qualified(s: str) -> QualifiedType:
     - unqualified emoji — An emoji that is neither fully-qualified nor minimally qualified.
 
     Args:
-        s: string to detect
+        s: Emoji string to detect
+
+    See also:
+        - https://www.unicode.org/reports/tr51/#def_qualified_emoji_character
+        - https://www.unicode.org/reports/tr51/#def_fully_qualified_emoji
+        - https://www.unicode.org/reports/tr51/#def_minimally_qualified_emoji
+        - https://www.unicode.org/reports/tr51/#def_unqualified_emoji
     """
     if not s:
         raise ValueError("Argument `s` should not be empty or null")
