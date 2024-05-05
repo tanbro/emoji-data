@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import sys
-from typing import Union, Generator, Iterable, Tuple
+from typing import Union, Iterable, Iterator, Tuple
 
 if sys.version_info < (3, 9):  # pragma: no cover
-    import importlib_resources
+    import importlib_resources  # type: ignore[import-not-found]
 else:  # pragma: no cover
     import importlib.resources as importlib_resources
 
@@ -12,13 +12,11 @@ else:  # pragma: no cover
 __all__ = ["code_points_to_string", "code_point_to_regex", "emoji_data_lines"]
 
 
-def emoji_data_lines(data_file: str) -> Generator[Tuple[str, str], None, None]:
+def emoji_data_lines(data_file: str) -> Iterator[Tuple[str, str]]:
     ft = importlib_resources.files(__package__).joinpath("data").joinpath(data_file)
     for line in ft.read_text("utf-8").splitlines():
         line = line.strip()
-        if not line:
-            continue
-        if line[0] in "#;":
+        if not line or line[0] in "#;":
             continue
         parts = [s.strip() for s in line.split("#", 1)]
         content = parts[0]
@@ -26,7 +24,7 @@ def emoji_data_lines(data_file: str) -> Generator[Tuple[str, str], None, None]:
             comment = parts[1]
         except IndexError:
             comment = ""
-        yield content.strip(), comment.strip()
+        yield content, comment
 
 
 def code_points_to_string(code_points: Union[int, str, Iterable[Union[int, str]]]) -> str:

@@ -255,7 +255,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
     @property
     def characters(self) -> Sequence[EmojiCharacter]:
         """Emoji character objects list which makes up the Emoji Sequence"""
-        return self._characters
+        return list(self._characters)
 
     @property
     def hex(self) -> str:
@@ -284,7 +284,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
     @property
     def code_points(self) -> Sequence[int]:
         """List of unicode integer value of the characters who make up this Emoji Sequence"""
-        return self._code_points
+        return list(self._code_points)
 
     @property
     def code_points_string(self) -> str:

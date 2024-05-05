@@ -211,7 +211,7 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
     @property
     def properties(self) -> Sequence[EmojiCharProperty]:
         """Property description text of the emoji-characters"""
-        return self._properties
+        return list(self._properties)
 
     @property
     def version(self) -> str:
