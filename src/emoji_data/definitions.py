@@ -99,7 +99,7 @@ def make_regex_dict() -> Mapping[str, str]:
         r"|{EMOJI_FLAG_SEQUENCE}"
         r")".format(**d)
     )
-    d["EMOJI_ZWJ_ELEMENT"] = r"({EMOJI_CHARACTER}|{EMOJI_PRESENTATION_SEQUENCE}|{EMOJI_MODIFIER_SEQUENCE})".format(**d)
+    d["EMOJI_ZWJ_ELEMENT"] = r"({EMOJI_CORE_SEQUENCE}|{EMOJI_TAG_SEQUENCE})".format(**d)
     d["EMOJI_ZWJ_SEQUENCE"] = r"({EMOJI_ZWJ_ELEMENT}({0}{EMOJI_ZWJ_ELEMENT})+)".format(code_point_to_regex(ZWJ), **d)
     d["EMOJI_SEQUENCE"] = r"({EMOJI_CORE_SEQUENCE}|{EMOJI_ZWJ_SEQUENCE}|{EMOJI_TAG_SEQUENCE})".format(**d)
 

@@ -1,5 +1,6 @@
 import os
 import unittest
+from typing import ClassVar, MutableSequence, Tuple
 
 from emoji_data import (
     EmojiCharacter,
@@ -8,21 +9,23 @@ from emoji_data import (
     QualifiedType,
     code_points_to_string,
     detect_qualified,
+    emoji_data_lines,
     is_emoji_flag_sequence,
     is_emoji_keycap_sequence,
     is_emoji_modifier_sequence,
     is_emoji_presentation_sequence,
-    emoji_data_lines,
 )
 
 
 class SequenceTestCase(unittest.TestCase):
-    test_data = []  # type:ignore[var-annotated]
+    test_data: ClassVar[MutableSequence[Tuple[str, str, str, str, str]]] = []
 
     @classmethod
     def setUpClass(cls):
-        for content, _ in emoji_data_lines("emoji-test.txt"):
-            cls.test_data.append(tuple(s.strip() for s in content.split(";", 1)))
+        for content, comment in emoji_data_lines("emoji-test.txt"):
+            code_points, qualified = (x.strip() for x in content.split(";", 1))
+            s, ver, desc = (x.strip() for x in comment.strip().split(maxsplit=2))
+            cls.test_data.append((code_points, qualified, s, ver, desc))
 
     def test_length(self):
         for code_points, *_ in self.test_data:
@@ -30,7 +33,7 @@ class SequenceTestCase(unittest.TestCase):
             self.assertEqual(len(code_points.split()), len(s), f"code_points: {code_points}")
 
     def test_qualified(self):
-        for code_points, status in self.test_data:
+        for code_points, status, *_ in self.test_data:
             s = code_points_to_string(code_points)
             if status in ("fully-qualified", "minimally-qualified", "unqualified"):
                 self.assertEqual(
@@ -44,6 +47,21 @@ class SequenceTestCase(unittest.TestCase):
                     EmojiCharProperty.ECOMP in ec.properties,
                     f"{ec!r} has no {status}({s!r}<{code_points}>)",
                 )
+
+    def test_string(self):
+        for code_points, _, s, *_ in self.test_data:
+            s_ = code_points_to_string(code_points)
+            self.assertEqual(s, s_)
+
+    # def test_sequence(self):
+    #     for code_points, status, s, *_ in self.test_data:
+    #         if status == "unqualified": continue
+    #         try:
+    #             em = EmojiSequence.from_hex(code_points)
+    #         except KeyError:
+    #             print(f"!!! KeyError: {code_points}")
+    #             raise
+    #         self.assertEqual(s, em.string)
 
     def test_type_field(self):
         """https://unicode.org/reports/tr51/#Emoji_Sets"""

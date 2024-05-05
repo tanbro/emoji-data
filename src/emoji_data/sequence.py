@@ -13,11 +13,8 @@ from .character import EmojiCharacter
 from .types import BaseDictContainer
 from .utils import emoji_data_lines
 
-__all__ = ["EmojiSequence"]
 
-# http://www.unicode.org/reports/tr51/#Data_Files_Table
-# keep the order!
-DATA_FILES = ("emoji-variation-sequences.txt", "emoji-zwj-sequences.txt", "emoji-sequences.txt")
+__all__ = ["EmojiSequence"]
 
 
 class MetaClass(BaseDictContainer[str, "EmojiSequence"]):
@@ -96,20 +93,17 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
                     _seq = cls(_cp, **_kwargs)
                     cls[_seq.string] = _seq
 
-        for fname in DATA_FILES:
-            for content, comment in emoji_data_lines(fname):
-                if fname in ("emoji-sequences.txt", "emoji-zwj-sequences.txt"):
-                    cps, type_field, description = (part.strip() for part in content.split(";", 2))
-                    version = comment.split(maxsplit=1)[0]
-                    _decode_code_points(cps, type_field=type_field, version=version, description=description)
-                elif fname == "emoji-variation-sequences.txt":
-                    cps, variation, _ = (part.strip() for part in content.split(";", 2))
-                    version, description = (x.strip() for x in comment.split(maxsplit=1))
-                    version = "E" + version.lstrip("(").rstrip(")").strip()
-                    description = f"{description.lower()} ({variation})"
-                    _decode_code_points(cps, version=version, variation=variation, description=description)
-                else:
-                    raise RuntimeError(f"Invalid data file name {fname}")
+        for file in ("emoji-sequences.txt", "emoji-zwj-sequences.txt"):
+            for content, comment in emoji_data_lines(file):
+                cps, type_field, description = (part.strip() for part in content.split(";", 2))
+                version = comment.split(maxsplit=1)[0]
+                _decode_code_points(cps, type_field=type_field, version=version, description=description)
+        for content, comment in emoji_data_lines("emoji-variation-sequences.txt"):
+            cps, variation, _ = (part.strip() for part in content.split(";", 2))
+            version, description = (x.strip() for x in comment.split(maxsplit=1))
+            version = "E" + version.lstrip("(").rstrip(")").strip()
+            _decode_code_points(cps, version=version, variation=variation, description=description)
+
         # build regex
         cls.pattern = re.compile(
             r"|".join(
