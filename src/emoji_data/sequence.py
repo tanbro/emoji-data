@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import ClassVar, Generator, Iterable, Iterator, Optional, Pattern, Sequence, Tuple, Union, final
+from typing import ClassVar, Iterable, Iterator, Optional, Pattern, Sequence, Tuple, Union, final
 
 if sys.version_info < (3, 11):  # pragma: no cover
     from typing_extensions import Self
@@ -311,7 +311,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         return list(cls.find(s))  # pyright: ignore[reportReturnType]
 
     @classmethod
-    def find(cls, s: str) -> Generator[Tuple[Self, int, int], None, None]:
+    def find(cls, s: str) -> Iterator[Tuple[Self, int, int]]:
         """Return an iterator which yields all emoji sequences in a string, without actually storing them all simultaneously.
 
         Args:
