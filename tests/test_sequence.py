@@ -53,49 +53,49 @@ class SequenceTestCase(unittest.TestCase):
             s_ = code_points_to_string(code_points)
             self.assertEqual(s, s_)
 
-    # def test_sequence(self):
-    #     for code_points, status, s, *_ in self.test_data:
-    #         if status == "unqualified": continue
-    #         try:
-    #             em = EmojiSequence.from_hex(code_points)
-    #         except KeyError:
-    #             print(f"!!! KeyError: {code_points}")
-    #             raise
-    #         self.assertEqual(s, em.string)
+    def test_sequence(self):
+        for code_points, status, s, *_ in self.test_data:
+            if status != "fully-qualified":
+                continue
+            em0 = EmojiSequence.from_hex(code_points)
+            em1 = EmojiSequence.from_string(s)
+            self.assertEqual(em0, em1)
+            self.assertEqual(s, em0.string)
+            self.assertEqual(code_points, em0.code_points_string)
+            self.assertEqual(s, em1.string)
+            self.assertEqual(code_points, em1.code_points_string)
 
     def test_type_field(self):
         """https://unicode.org/reports/tr51/#Emoji_Sets"""
-        for code_points, *_ in self.test_data:
-            try:
-                es = EmojiSequence.from_hex(code_points)
-            except KeyError:
-                pass
-            else:
-                if es.type_field == "Basic_Emoji":
-                    # https://unicode.org/reports/tr51/#def_basic_emoji_set
-                    if len(es.characters) > 1:
-                        self.assertTrue(
-                            is_emoji_presentation_sequence(es.string)
-                            and all(EmojiCharProperty.EPRES not in c.properties for c in es.characters),
-                            f"wrong Basic_Emoji type_field detected: {es!r}",
-                        )
-                    else:
-                        self.assertTrue(EmojiCharProperty.EPRES in es.characters[0].properties)
-                elif es.type_field == "Emoji_Keycap_Sequence":
+        for code_points, status, *_ in self.test_data:
+            if status != "fully-qualified":
+                continue
+            es = EmojiSequence.from_hex(code_points)
+            if es.type_field == "Basic_Emoji":
+                # https://unicode.org/reports/tr51/#def_basic_emoji_set
+                if len(es.characters) > 1:
                     self.assertTrue(
-                        is_emoji_keycap_sequence(es.string),
-                        f"wrong Emoji_Keycap_Sequence type_field detected: {es!r}",
+                        is_emoji_presentation_sequence(es.string)
+                        and all(EmojiCharProperty.EPRES not in c.properties for c in es.characters),
+                        f"wrong Basic_Emoji type_field detected: {es!r}",
                     )
-                elif es.type_field == "Emoji_Flag_Sequence":
-                    self.assertTrue(
-                        is_emoji_flag_sequence(es.string),
-                        f"wrong Emoji_Flag_Sequence type_field detected: {es!r}",
-                    )
-                elif es.type_field == "Emoji_Modifier_Sequence":
-                    self.assertTrue(
-                        is_emoji_modifier_sequence(es.string),
-                        f"wrong Emoji_Modifier_Sequence type_field detected: {es!r}",
-                    )
+                else:
+                    self.assertTrue(EmojiCharProperty.EPRES in es.characters[0].properties)
+            elif es.type_field == "Emoji_Keycap_Sequence":
+                self.assertTrue(
+                    is_emoji_keycap_sequence(es.string),
+                    f"wrong Emoji_Keycap_Sequence type_field detected: {es!r}",
+                )
+            elif es.type_field == "Emoji_Flag_Sequence":
+                self.assertTrue(
+                    is_emoji_flag_sequence(es.string),
+                    f"wrong Emoji_Flag_Sequence type_field detected: {es!r}",
+                )
+            elif es.type_field == "Emoji_Modifier_Sequence":
+                self.assertTrue(
+                    is_emoji_modifier_sequence(es.string),
+                    f"wrong Emoji_Modifier_Sequence type_field detected: {es!r}",
+                )
 
 
 class SequencePatternTestCase(unittest.TestCase):
