@@ -55,7 +55,10 @@ class SequenceTestCase(unittest.TestCase):
 
     def test_sequence(self):
         for code_points, status, s, *_ in self.test_data:
+            if status == "component":
+                continue
             if status != "fully-qualified":
+                self.assertNotIn(s, EmojiSequence)
                 continue
             em0 = EmojiSequence.from_hex(code_points)
             em1 = EmojiSequence.from_string(s)
