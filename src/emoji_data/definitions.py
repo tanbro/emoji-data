@@ -5,7 +5,7 @@ ref: http://www.unicode.org/reports/tr51/#Definitions
 
 import re
 from enum import Enum
-from typing import Mapping, MutableMapping, Pattern
+from typing import Mapping, Pattern
 
 from .character import (
     EMOJI_KEYCAP,
@@ -61,7 +61,7 @@ def make_emoji_regex_dict():
     if EMOJI_PATTERNS:
         return
 
-    d: MutableMapping[str, str] = {}
+    d = {}
 
     d["EMOJI_CHARACTER"] = (
         r"[" + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EMOJI in m.properties) + r"]"
@@ -113,14 +113,15 @@ def make_emoji_regex_dict():
 
 
 def clear_emoji_regex_dict():
-    EMOJI_PATTERNS.clear()
+    global EMOJI_PATTERNS
+    EMOJI_PATTERNS = {}
 
 
 def get_emoji_regex_dict() -> Mapping[str, Pattern[str]]:
     return dict(EMOJI_PATTERNS)
 
 
-EMOJI_PATTERNS: MutableMapping[str, Pattern[str]] = {}
+EMOJI_PATTERNS: Mapping[str, Pattern[str]] = {}
 
 
 def is_emoji_character(c: str) -> bool:

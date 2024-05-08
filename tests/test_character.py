@@ -1,7 +1,6 @@
 import unittest
 
-from emoji_data import EmojiCharacter, code_points_to_string, load_emoji_data, unload_emoji_data
-from emoji_data.utils import emoji_data_lines
+from emoji_data import EmojiCharacter, code_points_to_string, emoji_data_lines, load_emoji_data, unload_emoji_data
 
 
 class CharacterTestCase(unittest.TestCase):
