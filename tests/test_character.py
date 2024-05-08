@@ -1,6 +1,6 @@
 import unittest
 
-from emoji_data import code_points_to_string, EmojiCharacter
+from emoji_data import EmojiCharacter, code_points_to_string
 from emoji_data.utils import emoji_data_lines
 
 

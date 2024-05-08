@@ -13,7 +13,6 @@ from .character import EmojiCharacter
 from .types import BaseDictContainer
 from .utils import emoji_data_lines
 
-
 __all__ = ["EmojiSequence"]
 
 

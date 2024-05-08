@@ -5,7 +5,7 @@ ref: http://www.unicode.org/reports/tr51/#Definitions
 
 import re
 from enum import Enum
-from typing import Pattern, Mapping, MutableMapping
+from typing import Mapping, MutableMapping, Pattern
 
 from .character import (
     EMOJI_KEYCAP,

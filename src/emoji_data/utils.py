@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import sys
-from typing import Union, Iterable, Iterator, Tuple
+from typing import Iterable, Iterator, Tuple, Union
 
 if sys.version_info < (3, 9):  # pragma: no cover
     import importlib_resources  # type: ignore[import-not-found]

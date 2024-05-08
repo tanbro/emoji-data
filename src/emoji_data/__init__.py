@@ -9,11 +9,11 @@ See also:
 
 from datetime import date
 
+from ._version import __version__, __version_tuple__
 from .character import *
 from .definitions import *
 from .sequence import *
 from .utils import *
-from ._version import __version__, __version_tuple__
 
 EMOJI_VERSION = "15.1"
 EMOJI_DATE = date.fromisoformat("2023-09-05")
