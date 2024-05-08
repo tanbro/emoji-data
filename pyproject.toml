@@ -10,10 +10,7 @@ readme = "README.md"
 
 requires-python = ">=3.8"
 
-dependencies = [
-  "importlib-resources; python_version<'3.9'",
-  "typing-extensions; python_version<'3.11'",
-]
+dependencies = ["importlib-resources; python_version<'3.9'"]
 
 keywords = ["emoji", "unicode"]
 

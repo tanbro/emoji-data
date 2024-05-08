@@ -1,14 +1,8 @@
 from __future__ import annotations
 
 import re
-import sys
 from enum import Enum
 from typing import Iterable, Iterator, MutableSequence, Optional, Sequence, Tuple, Union, final
-
-if sys.version_info < (3, 11):  # pragma: no cover
-    from typing_extensions import Self
-else:  # pragma: no cover
-    from typing import Self
 
 from .types import BaseDictContainer
 from .utils import code_point_to_regex, emoji_data_lines
@@ -176,9 +170,9 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         cls._initialed = False
 
     @classmethod
-    def items(cls) -> Iterator[Tuple[int, Self]]:
+    def items(cls) -> Iterator[Tuple[int, EmojiCharacter]]:
         """Returns an iterator of all code-point -> emoji-character pairs of the class"""
-        return ((k, cls[k]) for k in cls)  # pyright: ignore[reportReturnType]
+        return ((k, cls[k]) for k in cls)
 
     @classmethod
     def keys(cls) -> Iterator[int]:
@@ -186,9 +180,9 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         yield from cls
 
     @classmethod
-    def values(cls) -> Iterator[Self]:
+    def values(cls) -> Iterator[EmojiCharacter]:
         """Returns an iterator of all emoji-characters of the class"""
-        return (cls[k] for k in cls)  # pyright: ignore[reportReturnType]
+        return (cls[k] for k in cls)
 
     def _add_property(self, val: EmojiCharProperty):
         if val not in self._properties:
@@ -247,7 +241,7 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         return self._string
 
     @classmethod
-    def from_character(cls, c: str) -> Self:
+    def from_character(cls, c: str) -> EmojiCharacter:
         """Get :class:`EmojiCharacter` instance from a single Emoji Unicode character
 
         Args:
@@ -262,10 +256,10 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         Raises:
             KeyError: When character not found in the class' internal dictionary
         """
-        return cls[ord(c)]  # pyright: ignore[reportReturnType]
+        return cls[ord(c)]
 
     @classmethod
-    def from_hex(cls, value: Union[int, str]) -> Self:
+    def from_hex(cls, value: Union[int, str]) -> EmojiCharacter:
         """Get an :class:`EmojiCharacter` instance by Emoji Unicode integer value or it's hex string
 
         Args:
@@ -278,8 +272,8 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
             KeyError: When code not found in the class' internal dictionary
         """
         if isinstance(value, str):
-            return cls[int(value, 16)]  # pyright: ignore[reportReturnType]
-        return cls[int(value)]  # pyright: ignore[reportReturnType]
+            return cls[int(value, 16)]
+        return cls[int(value)]
 
 
 EmojiCharacter.initial()
