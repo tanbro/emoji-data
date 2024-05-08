@@ -7,14 +7,8 @@ See also:
     https://www.unicode.org/reports/tr51/
 """
 
-from datetime import date
-
 from ._version import __version__, __version_tuple__
 from .character import *
 from .definitions import *
 from .sequence import *
 from .utils import *
-
-EMOJI_VERSION = "15.1"
-EMOJI_DATE = date.fromisoformat("2023-09-05")
-EMOJI_REVISION = "25"

@@ -7,7 +7,7 @@ else:  # pragma: no cover
     import importlib.resources as importlib_resources
 
 
-__all__ = ["code_points_to_string", "code_point_to_regex", "emoji_data_lines"]
+__all__ = ["emoji_data_lines", "code_points_to_string", "code_point_to_regex"]
 
 
 def emoji_data_lines(data_file: str) -> Iterator[Tuple[str, str]]:
