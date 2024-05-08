@@ -134,15 +134,13 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
 
     _comment_split_regex = re.compile(r"\[\d+\]\s*\(.*\)")
 
-    _initialed = False
-
     @classmethod
     def initial(cls):
         """Initial the class
 
         Load Emoji Characters and it's properties from package data file into class internal dictionary
         """
-        if cls._initialed:
+        if cls.__data__:  # pyright: ignore[reportGeneralTypeIssues]
             return
         for content, comment in emoji_data_lines("emoji-data.txt"):
             cps, property_text = (part.strip() for part in content.split(";", 1))
@@ -159,17 +157,10 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         for cp in (TEXT_PRESENTATION_SELECTOR, EMOJI_PRESENTATION_SELECTOR, EMOJI_KEYCAP):
             if cp not in cls:
                 cls[cp] = cls(cp, [])
-        # OK!
-        cls._initialed = True
 
     @classmethod
     def release(cls):
-        if not cls._initialed:
-            return
-        keys = list(cls)
-        for k in keys:
-            del cls[k]
-        cls._initialed = False
+        cls.__data__.clear()  # pyright: ignore[reportGeneralTypeIssues]
 
     @classmethod
     def items(cls) -> Iterator[Tuple[int, EmojiCharacter]]:
@@ -276,6 +267,3 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         if isinstance(value, str):
             return cls[int(value, 16)]
         return cls[int(value)]
-
-
-EmojiCharacter.initial()

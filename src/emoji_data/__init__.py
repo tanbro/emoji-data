@@ -10,5 +10,6 @@ See also:
 from ._version import __version__, __version_tuple__
 from .character import *
 from .definitions import *
+from .helpers import *
 from .sequence import *
 from .utils import *

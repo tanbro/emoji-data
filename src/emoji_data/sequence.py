@@ -69,8 +69,9 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
 
         Load Emoji Sequences from package data file into class internal dictionary
         """
-        if cls._initialed:
+        if cls.__data__:  # pyright: ignore[reportGeneralTypeIssues]
             return
+
         EmojiCharacter.initial()
 
         def _decode_code_points(_cps, **_kwargs):
@@ -108,17 +109,10 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
                 )
             )
         )
-        # initialed OK
-        cls._initialed = True
 
     @classmethod
     def release(cls):
-        if not cls._initialed:
-            return
-        keys = list(cls)
-        for k in keys:
-            del cls[k]
-        cls._initialed = False
+        cls.__data__.clear()  # pyright: ignore[reportGeneralTypeIssues]
 
     @classmethod
     def items(cls) -> Iterator[Tuple[str, EmojiSequence]]:

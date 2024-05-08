@@ -14,6 +14,8 @@ from emoji_data import (
     is_emoji_keycap_sequence,
     is_emoji_modifier_sequence,
     is_emoji_presentation_sequence,
+    load_emoji_data,
+    unload_emoji_data,
 )
 
 
@@ -22,10 +24,15 @@ class SequenceTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        load_emoji_data()
         for content, comment in emoji_data_lines("emoji-test.txt"):
             code_points, qualified = (x.strip() for x in content.split(";", 1))
             s, ver, desc = (x.strip() for x in comment.strip().split(maxsplit=2))
             cls.test_data.append((code_points, qualified, s, ver, desc))
+
+    @classmethod
+    def tearDownClass(cls):
+        unload_emoji_data()
 
     def test_length(self):
         for code_points, *_ in self.test_data:
@@ -102,6 +109,14 @@ class SequenceTestCase(unittest.TestCase):
 
 
 class SequencePatternTestCase(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        load_emoji_data()
+
+    @classmethod
+    def tearDownClass(cls):
+        unload_emoji_data()
+
     def test_no_emoji(self):
         for s in ("", " ", "\n", "abc", " abc\n bcd"):
             self.assertEqual(len(EmojiSequence.find_all(s)), 0)

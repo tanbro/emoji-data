@@ -20,7 +20,9 @@ from .character import (
 from .utils import code_point_to_regex
 
 __all__ = [
-    "EMOJI_PATTERNS",
+    "get_emoji_regex_dict",
+    "make_emoji_regex_dict",
+    "clear_emoji_regex_dict",
     "QualifiedType",
     "detect_qualified",
     "is_default_emoji_presentation_character",
@@ -54,7 +56,11 @@ class QualifiedType(Enum):
     UNQUALIFIED = "unqualified"
 
 
-def make_regex_dict() -> Mapping[str, str]:
+def make_emoji_regex_dict():
+    global EMOJI_PATTERNS
+    if EMOJI_PATTERNS:
+        return
+
     d: MutableMapping[str, str] = {}
 
     d["EMOJI_CHARACTER"] = (
@@ -103,10 +109,18 @@ def make_regex_dict() -> Mapping[str, str]:
     d["EMOJI_ZWJ_SEQUENCE"] = r"({EMOJI_ZWJ_ELEMENT}({0}{EMOJI_ZWJ_ELEMENT})+)".format(code_point_to_regex(ZWJ), **d)
     d["EMOJI_SEQUENCE"] = r"({EMOJI_CORE_SEQUENCE}|{EMOJI_ZWJ_SEQUENCE}|{EMOJI_TAG_SEQUENCE})".format(**d)
 
-    return d
+    EMOJI_PATTERNS = {k: re.compile(v) for k, v in d.items()}
 
 
-EMOJI_PATTERNS: Mapping[str, Pattern[str]] = {k: re.compile(v) for k, v in make_regex_dict().items()}
+def clear_emoji_regex_dict():
+    EMOJI_PATTERNS.clear()
+
+
+def get_emoji_regex_dict() -> Mapping[str, Pattern[str]]:
+    return dict(EMOJI_PATTERNS)
+
+
+EMOJI_PATTERNS: MutableMapping[str, Pattern[str]] = {}
 
 
 def is_emoji_character(c: str) -> bool:
