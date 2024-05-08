@@ -115,6 +115,8 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         elif isinstance(properties, EmojiCharProperty):
             self._properties = [properties]
         elif isinstance(properties, Iterable):
+            if not all(isinstance(x, EmojiCharacter) for x in properties):
+                raise TypeError("not all elements of `properties` are `EmojiCharacter`")
             self._properties = list(properties)
         else:
             raise TypeError(f"{type(properties)}")
