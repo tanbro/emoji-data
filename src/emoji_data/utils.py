@@ -12,7 +12,7 @@ __all__ = ["emoji_data_lines", "code_points_to_string", "code_point_to_regex"]
 
 def emoji_data_lines(data_file: str) -> Iterator[Tuple[str, str]]:
     ft = importlib_resources.files(__package__).joinpath("data").joinpath(data_file)
-    for line in ft.read_text("utf-8").splitlines():
+    for line in ft.open(encoding="utf-8"):
         line = line.strip()
         if not line or line[0] in "#;":
             continue

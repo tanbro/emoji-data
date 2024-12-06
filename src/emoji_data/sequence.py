@@ -31,9 +31,9 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         description: Optional[str] = None,
     ):
         if isinstance(code_points, Iterable):
-            self._code_points = list(code_points)
+            self._code_points = [int(x) for x in code_points]
         else:
-            self._code_points = [code_points]
+            self._code_points = [int(code_points)]
         self._string = "".join(chr(n) for n in self._code_points)
         self._characters = [EmojiCharacter.from_hex(n) for n in self._code_points]
         self._type_field = type_field or ""
@@ -57,8 +57,6 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
             type(self).__name__, self.code_points_string, self.string, self.version, self.description
         )
 
-    _initialed = False
-
     pattern: ClassVar[Pattern[str]]
     """Compiled regular expression pattern object for all-together Emoji sequences.
     """
@@ -74,29 +72,16 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
 
         EmojiCharacter.initial()
 
-        def _decode_code_points(_cps, **_kwargs):
-            try:
-                _cp_head, _cp_tail = _cps.split("..", 1)  # begin..end form
-            except ValueError:
-                _arr_cp = [int(x, 16) for x in _cps.split()]
-                _seq = cls(_arr_cp, **_kwargs)
-                cls[_seq.string] = _seq
-            else:
-                # begin..end form: A range of single char emoji-seq
-                for _cp in range(int(_cp_head, 16), 1 + int(_cp_tail, 16)):
-                    _seq = cls(_cp, **_kwargs)
-                    cls[_seq.string] = _seq
-
         for file in ("emoji-sequences.txt", "emoji-zwj-sequences.txt"):
             for content, comment in emoji_data_lines(file):
                 cps, type_field, description = (part.strip() for part in content.split(";", 2))
                 version = comment.split(maxsplit=1)[0]
-                _decode_code_points(cps, type_field=type_field, version=version, description=description)
+                cls._decode_code_points(cps, type_field=type_field, version=version, description=description)
         for content, comment in emoji_data_lines("emoji-variation-sequences.txt"):
             cps, variation, _ = (part.strip() for part in content.split(";", 2))
             version, description = (x.strip() for x in comment.split(maxsplit=1))
             version = "E" + version.lstrip("(").rstrip(")").strip()
-            _decode_code_points(cps, version=version, variation=variation, description=description)
+            cls._decode_code_points(cps, version=version, variation=variation, description=description)
 
         # build regex
         cls.pattern = re.compile(
@@ -111,8 +96,23 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         )
 
     @classmethod
+    def _decode_code_points(cls, cps, **kwargs):
+        try:
+            head, tail = cps.split("..", 1)  # begin..end form
+        except ValueError:
+            _arr_cp = [int(x, 16) for x in cps.split()]
+            seq = cls(_arr_cp, **kwargs)
+            cls[seq.string] = seq
+        else:
+            # begin..end form: A range of single char emoji-seq
+            for cp in range(int(head, 16), 1 + int(tail, 16)):
+                seq = cls(cp, **kwargs)
+                cls[seq.string] = seq
+
+    @classmethod
     def release(cls):
         cls.__data__.clear()  # pyright: ignore[reportGeneralTypeIssues]
+        cls.pattern = re.compile(r"")
 
     @classmethod
     def items(cls) -> Iterator[Tuple[str, EmojiSequence]]:
@@ -307,6 +307,3 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         """
         for m in cls.pattern.finditer(s):
             yield cls.from_string(m.group()), m.start(), m.end()
-
-
-EmojiSequence.initial()

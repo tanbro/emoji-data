@@ -20,9 +20,9 @@ from .character import (
 from .utils import code_point_to_regex
 
 __all__ = [
-    "get_emoji_regex_dict",
-    "make_emoji_regex_dict",
-    "clear_emoji_regex_dict",
+    "get_emoji_patterns",
+    "initial_emoji_patterns",
+    "release_emoji_patterns",
     "QualifiedType",
     "detect_qualified",
     "is_default_emoji_presentation_character",
@@ -56,9 +56,9 @@ class QualifiedType(Enum):
     UNQUALIFIED = "unqualified"
 
 
-def make_emoji_regex_dict():
-    global EMOJI_PATTERNS
-    if EMOJI_PATTERNS:
+def initial_emoji_patterns():
+    global _EMOJI_PATTERNS
+    if _EMOJI_PATTERNS:
         return
 
     d = {}
@@ -109,19 +109,19 @@ def make_emoji_regex_dict():
     d["EMOJI_ZWJ_SEQUENCE"] = r"({EMOJI_ZWJ_ELEMENT}({0}{EMOJI_ZWJ_ELEMENT})+)".format(code_point_to_regex(ZWJ), **d)
     d["EMOJI_SEQUENCE"] = r"({EMOJI_CORE_SEQUENCE}|{EMOJI_ZWJ_SEQUENCE}|{EMOJI_TAG_SEQUENCE})".format(**d)
 
-    EMOJI_PATTERNS = {k: re.compile(v) for k, v in d.items()}
+    _EMOJI_PATTERNS = {k: re.compile(v) for k, v in d.items()}
 
 
-def clear_emoji_regex_dict():
-    global EMOJI_PATTERNS
-    EMOJI_PATTERNS = {}
+def release_emoji_patterns():
+    global _EMOJI_PATTERNS
+    _EMOJI_PATTERNS = {}
 
 
-def get_emoji_regex_dict() -> Mapping[str, Pattern[str]]:
-    return dict(EMOJI_PATTERNS)
+def get_emoji_patterns() -> Mapping[str, Pattern[str]]:
+    return _EMOJI_PATTERNS
 
 
-EMOJI_PATTERNS: Mapping[str, Pattern[str]] = {}
+_EMOJI_PATTERNS: Mapping[str, Pattern[str]] = {}
 
 
 def is_emoji_character(c: str) -> bool:
@@ -139,7 +139,7 @@ def is_emoji_character(c: str) -> bool:
         https://unicode.org/reports/tr51/#Emoji_Characters
     """
     _c = chr(ord(c))
-    return EMOJI_PATTERNS["EMOJI_CHARACTER"].fullmatch(_c) is not None
+    return _EMOJI_PATTERNS["EMOJI_CHARACTER"].fullmatch(_c) is not None
 
 
 def is_default_emoji_presentation_character(c: str) -> bool:
@@ -155,7 +155,7 @@ def is_default_emoji_presentation_character(c: str) -> bool:
         https://unicode.org/reports/tr51/#def_emoji_presentation
     """
     _c = chr(ord(c))
-    return EMOJI_PATTERNS["DEFAULT_EMOJI_PRESENTATION_CHARACTER"].fullmatch(_c) is not None
+    return _EMOJI_PATTERNS["DEFAULT_EMOJI_PRESENTATION_CHARACTER"].fullmatch(_c) is not None
 
 
 def is_default_text_presentation_character(c: str) -> bool:
@@ -172,7 +172,7 @@ def is_default_text_presentation_character(c: str) -> bool:
         https://unicode.org/reports/tr51/#def_text_presentation
     """
     _c = chr(ord(c))
-    return EMOJI_PATTERNS["DEFAULT_TEXT_PRESENTATION_CHARACTER"].fullmatch(_c) is not None
+    return _EMOJI_PATTERNS["DEFAULT_TEXT_PRESENTATION_CHARACTER"].fullmatch(_c) is not None
 
 
 def is_text_presentation_selector(c: str) -> bool:
@@ -187,7 +187,7 @@ def is_text_presentation_selector(c: str) -> bool:
     See also:
         https://unicode.org/reports/tr51/#def_text_presentation_selector
     """
-    return EMOJI_PATTERNS["TEXT_PRESENTATION_SELECTOR"].fullmatch(c) is not None
+    return _EMOJI_PATTERNS["TEXT_PRESENTATION_SELECTOR"].fullmatch(c) is not None
 
 
 def is_text_presentation_sequence(s: str) -> bool:
@@ -203,7 +203,7 @@ def is_text_presentation_sequence(s: str) -> bool:
     See also:
         https://unicode.org/reports/tr51/#def_text_presentation_sequence
     """
-    return EMOJI_PATTERNS["TEXT_PRESENTATION_SEQUENCE"].fullmatch(s) is not None
+    return _EMOJI_PATTERNS["TEXT_PRESENTATION_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_emoji_presentation_selector(c: str) -> bool:
@@ -218,7 +218,7 @@ def is_emoji_presentation_selector(c: str) -> bool:
     See also:
         https://unicode.org/reports/tr51/#def_emoji_presentation_selector
     """
-    return EMOJI_PATTERNS["EMOJI_PRESENTATION_SELECTOR"].fullmatch(c) is not None
+    return _EMOJI_PATTERNS["EMOJI_PRESENTATION_SELECTOR"].fullmatch(c) is not None
 
 
 def is_emoji_presentation_sequence(s: str) -> bool:
@@ -234,7 +234,7 @@ def is_emoji_presentation_sequence(s: str) -> bool:
     See also:
         https://unicode.org/reports/tr51/#def_emoji_presentation_sequence
     """
-    return EMOJI_PATTERNS["EMOJI_PRESENTATION_SEQUENCE"].fullmatch(s) is not None
+    return _EMOJI_PATTERNS["EMOJI_PRESENTATION_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_emoji_modifier(c: str) -> bool:
@@ -251,7 +251,7 @@ def is_emoji_modifier(c: str) -> bool:
         https://unicode.org/reports/tr51/#def_emoji_modifier
     """
     _c = chr(ord(c))
-    return EMOJI_PATTERNS["EMOJI_MODIFIER"].fullmatch(_c) is not None
+    return _EMOJI_PATTERNS["EMOJI_MODIFIER"].fullmatch(_c) is not None
 
 
 def is_emoji_modifier_base(c: str) -> bool:
@@ -269,7 +269,7 @@ def is_emoji_modifier_base(c: str) -> bool:
         https://unicode.org/reports/tr51/#def_emoji_modifier_base
     """
     _c = chr(ord(c))
-    return EMOJI_PATTERNS["EMOJI_MODIFIER_BASE"].fullmatch(_c) is not None
+    return _EMOJI_PATTERNS["EMOJI_MODIFIER_BASE"].fullmatch(_c) is not None
 
 
 def is_emoji_modifier_sequence(s: str) -> bool:
@@ -279,12 +279,12 @@ def is_emoji_modifier_sequence(s: str) -> bool:
         emoji_modifier_sequence :=
             emoji_modifier_base emoji_modifier
     """
-    return EMOJI_PATTERNS["EMOJI_MODIFIER_SEQUENCE"].fullmatch(s) is not None
+    return _EMOJI_PATTERNS["EMOJI_MODIFIER_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_regional_indicator(s: str) -> bool:
     """A singleton Regional Indicator character is not a well-formed emoji flag sequence."""
-    return EMOJI_PATTERNS["REGIONAL_INDICATOR"].fullmatch(s) is not None
+    return _EMOJI_PATTERNS["REGIONAL_INDICATOR"].fullmatch(s) is not None
 
 
 def is_emoji_flag_sequence(s: str) -> bool:
@@ -309,19 +309,19 @@ def is_emoji_flag_sequence(s: str) -> bool:
         https://www.unicode.org/reports/tr51/#def_emoji_flag_sequence
 
     """
-    return EMOJI_PATTERNS["EMOJI_FLAG_SEQUENCE"].fullmatch(s) is not None
+    return _EMOJI_PATTERNS["EMOJI_FLAG_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_tag_base(s: str) -> bool:
-    return EMOJI_PATTERNS["TAG_BASE"].fullmatch(s) is not None
+    return _EMOJI_PATTERNS["TAG_BASE"].fullmatch(s) is not None
 
 
 def is_tag_spec(s: str) -> bool:
-    return EMOJI_PATTERNS["TAG_SPEC"].fullmatch(s) is not None
+    return _EMOJI_PATTERNS["TAG_SPEC"].fullmatch(s) is not None
 
 
 def is_tag_term(c: str) -> bool:
-    return EMOJI_PATTERNS["TAG_TERM"].fullmatch(c) is not None
+    return _EMOJI_PATTERNS["TAG_TERM"].fullmatch(c) is not None
 
 
 def is_emoji_tag_sequence(s: str) -> bool:
@@ -342,7 +342,7 @@ def is_emoji_tag_sequence(s: str) -> bool:
     See also:
         https://www.unicode.org/reports/tr51/#def_emoji_tag_sequence
     """
-    return EMOJI_PATTERNS["EMOJI_TAG_SEQUENCE"].fullmatch(s) is not None
+    return _EMOJI_PATTERNS["EMOJI_TAG_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_emoji_keycap_sequence(s: str) -> bool:
@@ -356,7 +356,7 @@ def is_emoji_keycap_sequence(s: str) -> bool:
     See also:
         https://www.unicode.org/reports/tr51/#def_emoji_keycap_sequence
     """
-    return EMOJI_PATTERNS["EMOJI_KEYCAP_SEQUENCE"].fullmatch(s) is not None
+    return _EMOJI_PATTERNS["EMOJI_KEYCAP_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_emoji_core_sequence(s: str) -> bool:
@@ -373,7 +373,7 @@ def is_emoji_core_sequence(s: str) -> bool:
     See also:
         https://www.unicode.org/reports/tr51/#def_emoji_core_sequence
     """
-    return EMOJI_PATTERNS["EMOJI_CORE_SEQUENCE"].fullmatch(s) is not None
+    return _EMOJI_PATTERNS["EMOJI_CORE_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_emoji_zwj_element(s: str) -> bool:
@@ -387,7 +387,7 @@ def is_emoji_zwj_element(s: str) -> bool:
     See also:
         https://www.unicode.org/reports/tr51/#def_emoji_zwj_element
     """
-    return EMOJI_PATTERNS["EMOJI_ZWJ_ELEMENT"].fullmatch(s) is not None
+    return _EMOJI_PATTERNS["EMOJI_ZWJ_ELEMENT"].fullmatch(s) is not None
 
 
 def is_emoji_zwj_sequence(s: str) -> bool:
@@ -404,7 +404,7 @@ def is_emoji_zwj_sequence(s: str) -> bool:
     See also:
         https://www.unicode.org/reports/tr51/#def_emoji_zwj_sequence
     """
-    return EMOJI_PATTERNS["EMOJI_ZWJ_SEQUENCE"].fullmatch(s) is not None
+    return _EMOJI_PATTERNS["EMOJI_ZWJ_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_emoji_sequence(s: str) -> bool:
@@ -424,7 +424,7 @@ def is_emoji_sequence(s: str) -> bool:
     See also:
         https://www.unicode.org/reports/tr51/#def_emoji_sequence
     """
-    return EMOJI_PATTERNS["EMOJI_SEQUENCE"].fullmatch(s) is not None
+    return _EMOJI_PATTERNS["EMOJI_SEQUENCE"].fullmatch(s) is not None
 
 
 def is_qualified_emoji_character(s: str, i: int) -> bool:
@@ -446,9 +446,9 @@ def is_qualified_emoji_character(s: str, i: int) -> bool:
         return False
     if is_default_emoji_presentation_character(c):  # default emoji presentation
         return True
-    if EMOJI_PATTERNS["EMOJI_MODIFIER_SEQUENCE"].match(s[i:]):  # first character in an emoji modifier sequence
+    if _EMOJI_PATTERNS["EMOJI_MODIFIER_SEQUENCE"].match(s[i:]):  # first character in an emoji modifier sequence
         return True
-    if EMOJI_PATTERNS["EMOJI_PRESENTATION_SEQUENCE"].match(s[i:]):  # first character in an emoji presentation sequence
+    if _EMOJI_PATTERNS["EMOJI_PRESENTATION_SEQUENCE"].match(s[i:]):  # first character in an emoji presentation sequence
         return True
     return False
 
