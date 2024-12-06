@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 0.4
+
+> 📅 **Date** 2024-12-06
+
+- 🌞 Highlights:
+  - Update to Emoji version 16.0
+- ❎ Removed:
+  - `sequence` module no longer initialized when importing.
+- 🖊️ Changes:
+  - Since `sequence` module no longer initialized when importing, users **should manually load emoji data** into memory by calling `helper.load_emoji_data`, and can optionally release it by calling `helper.unload_emoji_data`.
+  - In `helper` module, rename `make_emoji_regex_dict` to `initial_emoji_patterns`, `clear_emoji_regex_dict` to `release_emoji_patterns`, `get_emoji_regex_dict` to `get_emoji_patterns`
+- Misc: Add python 3.13 support in CD/CI
+
 ## 0.3.1
 
 > 📅 **Date** 2024-4-28
