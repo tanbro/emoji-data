@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generator, Generic, MutableMapping, Tuple, Type, TypeVar
+from typing import Any, Dict, Generic, Iterator, MutableMapping, Tuple, Type, TypeVar
 
 __all__ = ["BaseDictContainer"]
 
@@ -25,7 +25,7 @@ class BaseDictContainer(type, Generic[KT, VT]):
     def __contains__(self, key: KT) -> bool:
         return key in self.__data__
 
-    def __iter__(self) -> Generator[KT, None, None]:
+    def __iter__(self) -> Iterator[KT]:
         yield from self.__data__
 
     def __len__(self) -> int:
