@@ -4,7 +4,7 @@ requires = ["setuptools>=64", "setuptools-scm>=8"]
 
 [project]
 authors = [{ name = "liu xue yan", email = "liu_xue_yan@foxmail.com" }]
-description = "A library represents emoji sequences and characters in Unicode® Technical Standard #51 Data Files"
+description = "A library that represents emoji sequences and characters based on the Unicode® Technical Standard #51 Data Files"
 name = "emoji-data"
 readme = "README.md"
 

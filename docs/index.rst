@@ -22,7 +22,7 @@ Contents
    :caption: API Reference
    :titlesonly:
 
-   apidocs/emoji_data
+   apidocs/modules
 
 .. toctree::
    :caption: Notebooks

@@ -1,0 +1,29 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "docs: build",
+            "type": "shell",
+            "command": "${command:python.interpreterPath} -m sphinx -j auto -d _build/doctrees . _build/html",
+            "options": {
+                "cwd": "${workspaceFolder}/docs"
+            },
+            "problemMatcher": [
+                "$python"
+            ]
+        },
+        {
+            "label": "docs: serve",
+            "type": "shell",
+            "command": "${command:python.interpreterPath} -m http.server -d _build/html",
+            "options": {
+                "cwd": "${workspaceFolder}/docs"
+            },
+            "problemMatcher": [
+                "$python"
+            ]
+        }
+    ]
+}
