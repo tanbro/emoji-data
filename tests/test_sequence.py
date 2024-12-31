@@ -15,6 +15,7 @@ from emoji_data import (
     is_emoji_modifier_sequence,
     is_emoji_presentation_sequence,
     load_emoji_data,
+    unload_emoji_data,
 )
 
 
@@ -29,6 +30,9 @@ class SequenceTestCase(unittest.TestCase):
             s, ver, desc = (x.strip() for x in comment.strip().split(maxsplit=2))
             cls.test_data.append((code_points, qualified, s, ver, desc))
 
+    @classmethod
+    def tearDownClass(cls):
+        unload_emoji_data()
     def test_length(self):
         for code_points, *_ in self.test_data:
             s = code_points_to_string(code_points)

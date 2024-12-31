@@ -8,6 +8,7 @@ from emoji_data.definitions import (
     is_emoji_character,
     is_emoji_component,
     is_extended_pictographic_character,
+    release_emoji_patterns,
 )
 
 
@@ -19,6 +20,10 @@ class CharacterTestCase(unittest.TestCase):
         EmojiCharacter.initial()
         for content, _ in emoji_data_lines("emoji-test.txt"):
             cls.test_data.append([s.strip() for s in content.split(";", 1)])
+
+    @classmethod
+    def tearDownClass(cls):
+        EmojiCharacter.release()
 
     def test_code_points(self):
         for code_points, _ in self.test_data:
@@ -32,9 +37,15 @@ class CharacterPropertyDefinitionTestCase(unittest.TestCase):
         EmojiCharacter.initial()
         initial_emoji_patterns()
 
+    @classmethod
+    def tearDownClass(cls):
+        release_emoji_patterns()
+        EmojiCharacter.release()
+
     def test_property_definition(self):
         for c in EmojiCharacter.values():
-            self.assertTrue(is_emoji_character(c.string), f"{c=}")
+            if EmojiCharProperty.EMOJI in c.properties:
+                self.assertTrue(is_emoji_character(c.string), f"{c=}")
             if EmojiCharProperty.EXTPICT in c.properties:
                 self.assertTrue(is_extended_pictographic_character(c.string), f"{c=}")
             if EmojiCharProperty.ECOMP in c.properties:
