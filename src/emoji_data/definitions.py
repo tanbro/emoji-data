@@ -1,6 +1,10 @@
 """Regular expressions for Emoji Definitions
 
-ref: http://www.unicode.org/reports/tr51/#Definitions
+Note:
+    :func:`initial_emoji_patterns` **MUST** be called first before using any of the functions in the module.
+
+See also:
+    http://www.unicode.org/reports/tr51/#Definitions
 """
 
 import re
@@ -73,6 +77,10 @@ class QualifiedType(Enum):
 
 
 def initial_emoji_patterns():
+    """Initial the emoji patterns dictionary
+
+    **MUST** be called first before using any of the functions in the module.
+    """
     global _EMOJI_PATTERNS
     if _EMOJI_PATTERNS:
         return
@@ -137,6 +145,8 @@ def initial_emoji_patterns():
 
 
 def release_emoji_patterns():
+    """Release emoji patterns dictionary
+    """
     global _EMOJI_PATTERNS
     _EMOJI_PATTERNS = {}
 
@@ -162,8 +172,8 @@ def is_emoji_character(c: str) -> bool:
     See also:
         https://unicode.org/reports/tr51/#Emoji_Characters
     """
-    _c = chr(ord(c))
-    return _EMOJI_PATTERNS["EMOJI_CHARACTER"].fullmatch(_c) is not None
+    c = chr(ord(c))
+    return _EMOJI_PATTERNS["EMOJI_CHARACTER"].fullmatch(c) is not None
 
 
 def is_extended_pictographic_character(c: str) -> bool:

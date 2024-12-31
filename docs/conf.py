@@ -64,13 +64,13 @@ html_theme_options = {
 
 # Automatically extract typehints when specified and place them in
 # descriptions of the relevant function/method.
-autodoc_typehints = "both"
+autodoc_typehints = "description"
 
 # Don't show class signature with the class' name.
 # autodoc_class_signature = "separated"
 
 autoclass_content = "both"
-autodoc_member_order = "bysource"
+# autodoc_member_order = "bysource"
 
 # -- Options for myst_parser extension ---------------------------------------
 

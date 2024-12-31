@@ -6,9 +6,11 @@ __all__ = ["load_emoji_data", "unload_emoji_data"]
 
 
 def load_emoji_data():
-    """Load all emoji data from in-package data file.
+    """Load all emoji data to memory.
 
-    Including Emoji characters and sequences
+    Including internal data of :class:`.EmojiCharacter`, :class:`.EmojiSequence` and :mod:`.definitions`
+
+    Its equivalent to calling :meth:`.EmojiCharacter.initial`, :func:`.initial_emoji_patterns` and :meth:`.EmojiSequence.initial`
     """
     EmojiCharacter.initial()
     initial_emoji_patterns()
@@ -16,7 +18,7 @@ def load_emoji_data():
 
 
 def unload_emoji_data():
-    """Release emoji data stored in memory"""
+    """Release emoji data stored"""
     EmojiSequence.release()
     release_emoji_patterns()
     EmojiCharacter.release()
