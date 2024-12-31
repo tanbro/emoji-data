@@ -12,7 +12,7 @@ except ImportError:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "emoji-data"
-copyright = "2023-2024, liu xue yan"
+copyright = "2023-2025, liu xue yan"
 author = "liu xue yan"
 
 # full version
