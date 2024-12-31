@@ -25,6 +25,8 @@ __all__ = [
     "release_emoji_patterns",
     "QualifiedType",
     "detect_qualified",
+    "is_extended_pictographic_character",
+    "is_emoji_component",
     "is_default_emoji_presentation_character",
     "is_default_text_presentation_character",
     "is_emoji_character",
@@ -79,6 +81,14 @@ def initial_emoji_patterns():
 
     d["EMOJI_CHARACTER"] = (
         r"[" + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EMOJI in m.properties) + r"]"
+    )
+
+    d["EXTENDED_PICTOGRAPHIC_CHARACTER"] = (
+        r"[" + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.EXTPICT in m.properties) + r"]"
+    )
+
+    d["EMOJI_COMPONENT"] = (
+        r"[" + "".join(m.regex for m in EmojiCharacter.values() if EmojiCharProperty.ECOMP in m.properties) + r"]"
     )
 
     d["DEFAULT_EMOJI_PRESENTATION_CHARACTER"] = (
@@ -156,6 +166,34 @@ def is_emoji_character(c: str) -> bool:
     return _EMOJI_PATTERNS["EMOJI_CHARACTER"].fullmatch(_c) is not None
 
 
+def is_extended_pictographic_character(c: str) -> bool:
+    """extended pictographic character — a character that has the **Extended_Pictographic** property.
+
+    - These characters are pictographic, or otherwise similar in kind to characters with the Emoji property.
+    - The **Extended_Pictographic** property is used to customize segmentation (as described in [UAX29] and [UAX14]) so that possible future emoji ZWJ sequences will not break grapheme clusters, words, or lines.
+      Unassigned codepoints with Line_Break=ID in some blocks are also assigned the **Extended_Pictographic** property.
+      Those blocks are intended for future allocation of emoji characters.
+
+    See also:
+        https://www.unicode.org/reports/tr51/#def_level1_emoji
+    """
+    c = chr(ord(c))
+    return _EMOJI_PATTERNS["EXTENDED_PICTOGRAPHIC_CHARACTER"].fullmatch(c) is not None
+
+
+def is_emoji_component(c: str) -> bool:
+    """emoji component — A character that has the **Emoji_Component** property.
+
+    - These characters are used in emoji sequences but normally do not appear on emoji keyboards as separate choices, such as keycap base characters or Regional_Indicator characters.
+    - Some **emoji components** are **emoji characters**, and others (such as tag characters and **ZWJ**) are not.
+
+    See also:
+        https://www.unicode.org/reports/tr51/#def_level2_emoji
+    """
+    c = chr(ord(c))
+    return _EMOJI_PATTERNS["EMOJI_COMPONENT"].fullmatch(c) is not None
+
+
 def is_default_emoji_presentation_character(c: str) -> bool:
     """default emoji presentation character — A character that, by default, should appear with an emoji presentation, rather than a text presentation.
 
@@ -168,8 +206,8 @@ def is_default_emoji_presentation_character(c: str) -> bool:
     See also:
         https://unicode.org/reports/tr51/#def_emoji_presentation
     """
-    _c = chr(ord(c))
-    return _EMOJI_PATTERNS["DEFAULT_EMOJI_PRESENTATION_CHARACTER"].fullmatch(_c) is not None
+    c = chr(ord(c))
+    return _EMOJI_PATTERNS["DEFAULT_EMOJI_PRESENTATION_CHARACTER"].fullmatch(c) is not None
 
 
 def is_default_text_presentation_character(c: str) -> bool:
@@ -185,8 +223,8 @@ def is_default_text_presentation_character(c: str) -> bool:
     See also:
         https://unicode.org/reports/tr51/#def_text_presentation
     """
-    _c = chr(ord(c))
-    return _EMOJI_PATTERNS["DEFAULT_TEXT_PRESENTATION_CHARACTER"].fullmatch(_c) is not None
+    c = chr(ord(c))
+    return _EMOJI_PATTERNS["DEFAULT_TEXT_PRESENTATION_CHARACTER"].fullmatch(c) is not None
 
 
 def is_text_presentation_selector(c: str) -> bool:
