@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import re
-from typing import ClassVar, Iterable, Iterator, Optional, Pattern, Sequence, Tuple, Union, final
+from typing import ClassVar, Iterable, Iterator, Literal, Optional, Pattern, Sequence, Tuple, Union, final
 
 from .character import EmojiCharacter
-from .types import BaseDictContainer
+from .container import BaseDictContainer
 from .utils import emoji_data_lines
 
 __all__ = ["EmojiSequence"]
@@ -67,7 +67,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
 
         Load Emoji Sequences from package data file into class internal dictionary
         """
-        if cls.__data__:  # pyright: ignore[reportGeneralTypeIssues]
+        if cls.__data_dict__:  # pyright: ignore[reportGeneralTypeIssues]
             return
 
         EmojiCharacter.initial()
@@ -111,36 +111,48 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
 
     @classmethod
     def release(cls):
-        cls.__data__.clear()  # pyright: ignore[reportGeneralTypeIssues]
+        cls.__data_dict__.clear()  # pyright: ignore[reportGeneralTypeIssues]
         cls.pattern = re.compile(r"")
 
     @classmethod
     def items(cls) -> Iterator[Tuple[str, EmojiSequence]]:
-        """Returns an iterator of all string -> emoji-sequence pairs of the class"""
+        """Return an iterator over all key strings of emoji sequences in the class.
+
+        Yields:
+            : A key string of an emoji sequence.
+        """
         return ((k, cls[k]) for k in cls)
 
     @classmethod
     def keys(cls) -> Iterator[str]:
-        """Returns an iterator of each emoji-sequence's key string of the class"""
+        """Return an iterator over all key strings of emoji sequences in the class.
+
+        Yields:
+            : A key string corresponding to an emoji sequence.
+        """
         yield from cls
 
     @classmethod
     def values(cls) -> Iterator[EmojiSequence]:
-        """Returns an iterator of all emoji-sequences of the class"""
+        """Return an iterator over all emoji sequences in the class.
+
+        Yields:
+            : An emoji sequence instance.
+        """
         return (cls[k] for k in cls)
 
     @classmethod
-    def from_string(cls, s: str) -> EmojiSequence:
-        """Get an :class:`EmojiSequence` instance from string
+    def from_string(cls, s: str) -> "EmojiSequence":
+        """Get an :class:`EmojiSequence` instance from a string.
 
         Args:
-            s: Emoji string
+            s (str): An emoji string.
 
         Returns:
-            Instance from internal dictionary
+            An instance retrieved from the internal dictionary.
 
         Raises:
-            KeyError: When passed-in ``s`` not found in internal dictionary
+            KeyError: If the passed-in string ``s`` is not found in the internal dictionary.
         """
         return cls[s]
 
@@ -168,23 +180,23 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
 
     @classmethod
     def from_hex(cls, value: Union[int, str, Iterable[Union[int, str]]]) -> EmojiSequence:
-        """Get an :class:`EmojiSequence` instance by unicode code point(s)
+        """Get an :class:`EmojiSequence` instance by Unicode code point(s).
 
         Args:
             value: A single or sequence of HEX string/code.
 
-                it could be:
+                It could be:
 
-                - one or more code-point(s) in HEX format string, separated by spaces
-                - a single code-point integer
-                - An iterable object whose members are code-point string in HEX format
-                - An iterable object whose members are code-point integer
+                - One or more code points in HEX format string, separated by spaces.
+                - A single code point integer.
+                - An iterable object whose members are code point strings in HEX format.
+                - An iterable object whose members are code point integers.
 
         Returns:
-            Instance returned from the class's internal dictionary
+            An instance retrieved from the class's internal dictionary.
 
         Raises:
-            KeyError: When passed-in value not found in the class internal dictionary
+            KeyError: If the passed-in value is not found in the class's internal dictionary.
         """
         cps_array: Iterable[Union[int, str]]
         if isinstance(value, str):
@@ -200,19 +212,18 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         return cls.from_characters(EmojiCharacter.from_hex(cp) for cp in cps_array)
 
     @property
-    def type_field(self) -> str:
-        """A convenience for parsing the emoji sequence files, and is not intended to be maintained as a property.
-
-        may be one of:
-
-        - `"Basic_Emoji"`
-        - `"Emoji_Keycap_Sequence"`
-        - `"Emoji_Flag_Sequence"`
-        - `"Emoji_Tag_Sequence"`
-        - `"Emoji_Modifier_Sequence"`
-        - `"RGI_Emoji_ZWJ_Sequence"`
-        """
-        return self._type_field
+    def type_field(
+        self,
+    ) -> Literal[
+        "Basic_Emoji",
+        "Emoji_Keycap_Sequence",
+        "RGI_Emoji_Flag_Sequence",
+        "RGI_Emoji_Tag_Sequence",
+        "RGI_Emoji_Modifier_Sequence",
+        "RGI_Emoji_ZWJ_Sequence",
+    ]:
+        """A convenience for parsing the emoji sequence files, and is not intended to be maintained as a property."""
+        return self._type_field  # type: ignore
 
     @property
     def description(self) -> str:
@@ -229,13 +240,17 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
         return self._version
 
     @property
-    def variation(self) -> str:
-        """``"emoji style"`` or ``"text style"`` of a variable sequence"""
-        return self._variation
+    def variation(self) -> Literal["emoji style", "text style", ""]:
+        """``"emoji style"`` or ``"text style"`` of a variable sequence
+        
+        Available for Emoji Variation Sequences for UTS #51.
+        Used with Emoji Version 16.0 and subsequent minor revisions (if any).
+        """
+        return self._variation # type: ignore
 
     @property
     def characters(self) -> Sequence[EmojiCharacter]:
-        """Emoji character objects list which makes up the Emoji Sequence"""
+        """List of emoji character objects that make up the emoji sequence."""
         return list(self._characters)
 
     @property
@@ -249,7 +264,7 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
 
     @property
     def string(self) -> str:
-        """string of the Emoji Sequence"""
+        """String of the Emoji Sequence"""
         return self._string
 
     @property
@@ -277,11 +292,11 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
 
     @classmethod
     def find_all(cls, s: str) -> Sequence[Tuple[EmojiSequence, int, int]]:
-        """Find out all emoji sequences in a string, and return them in a list
+        """Find all emoji sequences in a string and return them in a list.
 
-        Items of the returned list is the same as ``yield`` result of :meth:`find`
+        Each item in the returned list is the same as the ``yield`` result of :meth:`find`.
 
-        The function equals::
+        This function is equivalent to::
 
             list(EmojiSequence.find(s))
 
@@ -293,17 +308,17 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
 
     @classmethod
     def find(cls, s: str) -> Iterator[Tuple[EmojiSequence, int, int]]:
-        """Return an iterator which yields all emoji sequences in a string, without actually storing them all simultaneously.
+        """Return an iterator that yields all emoji sequences in a string without storing them all simultaneously.
 
         Args:
-            s: The string to find emoji sequences in it
+            s (str): The string to search for emoji sequences.
 
         Yields:
-            : Yields at every matched emoji sequence as a 3-members tuple, whose members are:
+            : A 3-member tuple for each matched emoji sequence, where:
 
-                0. The found :class:`.EmojiSequence` object
-                1. Begin position of the emoji sequence in the string
-                2. End position of the emoji sequence in the string
+                - The first member is the found :class:`EmojiSequence` object.
+                - The second member is the start position of the emoji sequence in the string.
+                - The third member is the end position of the emoji sequence in the string.
         """
         for m in cls.pattern.finditer(s):
             yield cls.from_string(m.group()), m.start(), m.end()

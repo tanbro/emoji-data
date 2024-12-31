@@ -7,26 +7,26 @@ VT = TypeVar("VT")
 
 
 class BaseDictContainer(type, Generic[KT, VT]):
-    __data__: MutableMapping[KT, VT]
+    __data_dict__: MutableMapping[KT, VT]
 
     def __new__(cls, name: str, bases: Tuple[Type, ...], attrs: Dict[str, Any]):
-        cls.__data__ = {}
+        cls.__data_dict__ = {}
         return super().__new__(cls, name, bases, attrs)
 
     def __setitem__(self, key: KT, value: VT):
-        self.__data__[key] = value
+        self.__data_dict__[key] = value
 
     def __delitem__(self, key: KT):
-        del self.__data__[key]
+        del self.__data_dict__[key]
 
     def __getitem__(self, key: KT) -> VT:
-        return self.__data__[key]
+        return self.__data_dict__[key]
 
     def __contains__(self, key: KT) -> bool:
-        return key in self.__data__
+        return key in self.__data_dict__
 
     def __iter__(self) -> Iterator[KT]:
-        yield from self.__data__
+        yield from self.__data_dict__
 
     def __len__(self) -> int:
-        return len(self.__data__)
+        return len(self.__data_dict__)

@@ -51,9 +51,23 @@ __all__ = [
 
 
 class QualifiedType(Enum):
-    FULLY_QUALIFIED = "fully-qualified"
-    MINIMALLY_QUALIFIED = "minimally-qualified"
-    UNQUALIFIED = "unqualified"
+    """RGI_Emoji_Qualification — the status of emoji sequences
+
+    This is an enumerated property of strings, defined by the emoji-test.txt file [emoji-data].
+    It assigns one of the three values in ED-18, ED-18a, ED-19 to each emoji in ED-27 RGI emoji set and related sequences with missing variation selectors.
+    The property value names and short aliases are:
+
+    - Fully_Qualified, FQE
+    - Minimally_Qualified, MQE
+    - Unqualified, UQE
+
+    See also:
+        https://www.unicode.org/reports/tr51/#def_rgi_emoji_qualification
+    """
+
+    FULLY_QUALIFIED = "FQE"
+    MINIMALLY_QUALIFIED = "MQE"
+    UNQUALIFIED = "UQE"
 
 
 def initial_emoji_patterns():
@@ -474,8 +488,6 @@ def detect_qualified(s: str) -> QualifiedType:
         - https://www.unicode.org/reports/tr51/#def_minimally_qualified_emoji
         - https://www.unicode.org/reports/tr51/#def_unqualified_emoji
     """
-    if not s:
-        raise ValueError("Argument `s` should not be empty or null")
     if is_qualified_emoji_character(s, 0):
         n = len(s)
         if n == 1:

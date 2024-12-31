@@ -4,7 +4,7 @@ import re
 from enum import Enum
 from typing import Iterable, Iterator, MutableSequence, Optional, Sequence, Tuple, Union, final
 
-from .types import BaseDictContainer
+from .container import BaseDictContainer
 from .utils import code_point_to_regex, emoji_data_lines
 
 __all__ = [
@@ -138,9 +138,9 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
     def initial(cls):
         """Initial the class
 
-        Load Emoji Characters and it's properties from package data file into class internal dictionary
+        Load emoji characters and their properties from the package data file into the class's internal dictionary.
         """
-        if cls.__data__:  # pyright: ignore[reportGeneralTypeIssues]
+        if cls.__data_dict__:
             return
         for content, comment in emoji_data_lines("emoji-data.txt"):
             cps, property_text = (part.strip() for part in content.split(";", 1))
@@ -160,21 +160,33 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
 
     @classmethod
     def release(cls):
-        cls.__data__.clear()  # pyright: ignore[reportGeneralTypeIssues]
+        cls.__data_dict__.clear()
 
     @classmethod
     def items(cls) -> Iterator[Tuple[int, EmojiCharacter]]:
-        """Returns an iterator of all code-point -> emoji-character pairs of the class"""
+        """Return an iterator over all (code point, emoji character) pairs in the class.
+
+        Yields:
+            : A tuple containing a code point and its corresponding emoji character.
+        """
         return ((k, cls[k]) for k in cls)
 
     @classmethod
     def keys(cls) -> Iterator[int]:
-        """Returns an iterator of each emoji-character's key code-point of the class"""
+        """Return an iterator over all code points of emoji characters in the class.
+
+        Yields:
+            : The code point of an emoji character.
+        """
         yield from cls
 
     @classmethod
     def values(cls) -> Iterator[EmojiCharacter]:
-        """Returns an iterator of all emoji-characters of the class"""
+        """Return an iterator over all emoji characters in the class.
+
+        Yields:
+            : An emoji character instance.
+        """
         return (cls[k] for k in cls)
 
     def _add_property(self, val: EmojiCharProperty):
@@ -234,35 +246,35 @@ class EmojiCharacter(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeI
         return self._string
 
     @classmethod
-    def from_character(cls, c: str) -> EmojiCharacter:
-        """Get :class:`EmojiCharacter` instance from a single Emoji Unicode character
+    def from_character(cls, c: str) -> "EmojiCharacter":
+        """Get an :class:`EmojiCharacter` instance from a single Unicode emoji character.
 
         Args:
-            c: Emoji character
+            c (str): A single Unicode emoji character.
 
                 Note:
-                    ``c`` should be a **single** unicode character, that is: ``len(c) == 1``.
+                    ``c`` should be a **single** Unicode character, i.e., ``len(c) == 1``.
 
         Returns:
-            Instance returned from the class's internal dictionary
+            An instance retrieved from the class's internal dictionary.
 
         Raises:
-            KeyError: When character not found in the class' internal dictionary
+            KeyError: If the character is not found in the class's internal dictionary.
         """
         return cls[ord(c)]
 
     @classmethod
     def from_hex(cls, value: Union[int, str]) -> EmojiCharacter:
-        """Get an :class:`EmojiCharacter` instance by Emoji Unicode integer value or it's hex string
+        """Get an :class:`EmojiCharacter` instance by Emoji Unicode integer value or its hex string.
 
         Args:
-            value: Emoji Unicode, either integer value or hex string
+            value (Union[int, str]): Emoji Unicode, either an integer value or a hex string.
 
         Returns:
-            Instance returned from the class's internal dictionary
+            An instance retrieved from the class's internal dictionary.
 
         Raises:
-            KeyError: When code not found in the class' internal dictionary
+            KeyError: If the code is not found in the class's internal dictionary.
         """
         if isinstance(value, str):
             return cls[int(value, 16)]

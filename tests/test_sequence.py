@@ -37,7 +37,7 @@ class SequenceTestCase(unittest.TestCase):
     def test_qualified(self):
         for code_points, status, *_ in self.test_data:
             s = code_points_to_string(code_points)
-            if status in ("fully-qualified", "minimally-qualified", "unqualified"):
+            if status in ("FQE", "MQE", "UQE"):
                 self.assertEqual(
                     detect_qualified(s),
                     QualifiedType(status),
