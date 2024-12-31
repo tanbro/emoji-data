@@ -242,11 +242,11 @@ class EmojiSequence(metaclass=MetaClass):  # pyright: ignore[reportGeneralTypeIs
     @property
     def variation(self) -> Literal["emoji style", "text style", ""]:
         """``"emoji style"`` or ``"text style"`` of a variable sequence
-        
+
         Available for Emoji Variation Sequences for UTS #51.
         Used with Emoji Version 16.0 and subsequent minor revisions (if any).
         """
-        return self._variation # type: ignore
+        return self._variation  # type: ignore
 
     @property
     def characters(self) -> Sequence[EmojiCharacter]:

@@ -4,6 +4,30 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "build",
+            "type": "shell",
+            "command": "${command:python.interpreterPath} -m build",
+            "problemMatcher": [
+                "$python"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "test",
+            "type": "shell",
+            "command": "${command:python.interpreterPath} -m unittest",
+            "problemMatcher": [
+                "$python"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        },
+        {
             "label": "docs: build",
             "type": "shell",
             "command": "${command:python.interpreterPath} -m sphinx -j auto -d _build/doctrees . _build/html",
@@ -21,6 +45,22 @@
             "options": {
                 "cwd": "${workspaceFolder}/docs"
             },
+            "problemMatcher": [
+                "$python"
+            ]
+        },
+        {
+            "label": "lint",
+            "type": "shell",
+            "command": "${command:python.interpreterPath} -m ruff check --fix && ${command:python.interpreterPath} -m ruff format",
+            "problemMatcher": [
+                "$python"
+            ]
+        },
+        {
+            "label": "static type check",
+            "type": "shell",
+            "command": "${command:python.interpreterPath} -m mypy",
             "problemMatcher": [
                 "$python"
             ]

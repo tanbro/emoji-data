@@ -145,8 +145,7 @@ def initial_emoji_patterns():
 
 
 def release_emoji_patterns():
-    """Release emoji patterns dictionary
-    """
+    """Release emoji patterns dictionary"""
     global _EMOJI_PATTERNS
     _EMOJI_PATTERNS = {}
 

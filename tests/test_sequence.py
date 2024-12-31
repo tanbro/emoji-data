@@ -33,6 +33,7 @@ class SequenceTestCase(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         unload_emoji_data()
+
     def test_length(self):
         for code_points, *_ in self.test_data:
             s = code_points_to_string(code_points)
