@@ -19,17 +19,17 @@ Contents
    AUTHORS
 
 .. toctree::
-   :caption: API Reference
-   :titlesonly:
-
-   apidocs/modules
-
-.. toctree::
    :caption: Notebooks
    :glob:
    :titlesonly:
 
    notebooks/*
+
+.. toctree::
+   :caption: API Reference
+   :titlesonly:
+
+   apidocs/modules
 
 Indices and tables
 ------------------

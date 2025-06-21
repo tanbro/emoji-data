@@ -14,10 +14,9 @@ dependencies = ["importlib-resources; python_version<'3.9'"]
 
 keywords = ["emoji", "unicode"]
 
-license = { text = "AGPLv3+" }
+license = "GPL-3.0-or-later"
 
 classifiers = [
-  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
   # "Development Status :: 1 - Planning",
   # "Development Status :: 2 - Pre-Alpha",
   # "Development Status :: 3 - Alpha",
@@ -44,3 +43,22 @@ where = ["src"]
 
 [tool.setuptools_scm]
 write_to = "src/emoji_data/_version.py"
+
+[dependency-groups]
+dev = [
+    "coverage>=7.6.1",
+    "ipykernel>=6.29.5",
+    "mypy>=1.14.1",
+]
+docs = [
+    "furo>=2024.8.6",
+    "importlib-metadata>=8.5.0 ; python_version < '3.8'",
+    "linkify-it-py>=2.0.3",
+    "myst-parser>=3.0.1",
+    "nbsphinx>=0.9.7",
+    "sphinx>=7",
+    "sphinx-copybutton>=0.5.2",
+    "sphinx-inline-tabs>=2023.4.21",
+    "sphinx-tippy>=0.4.3",
+    "sphinx-version-warning>=1.1.2",
+]
