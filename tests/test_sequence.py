@@ -14,6 +14,7 @@ from emoji_data import (
     is_emoji_keycap_sequence,
     is_emoji_modifier_sequence,
     is_emoji_presentation_sequence,
+    is_emoji_zwj_sequence,  # 添加这一行
     load_emoji_data,
     unload_emoji_data,
 )
@@ -106,6 +107,12 @@ class SequenceTestCase(unittest.TestCase):
                     is_emoji_modifier_sequence(es.string),
                     f"wrong Emoji_Modifier_Sequence type_field detected: {es!r}",
                 )
+            # 添加对ZWJ序列的测试
+            elif es.type_field == "RGI_Emoji_ZWJ_Sequence":
+                self.assertTrue(
+                    is_emoji_zwj_sequence(es.string),
+                    f"wrong RGI_Emoji_ZWJ_Sequence type_field detected: {es!r}",
+                )
 
 
 class SequencePatternTestCase(unittest.TestCase):
@@ -171,6 +178,44 @@ class SequencePatternTestCase(unittest.TestCase):
         s = "".join(code_points_to_string(m) for m in emojis)
         cnt = sum(1 for _ in EmojiSequence.find(s))
         self.assertEqual(cnt, 2)
+
+    # 添加更多测试用例
+    def test_emoji_zwj_sequence(self):
+        # 测试ZWJ序列，如家庭表情符号
+        s = "👨‍👩‍👧"  # 家庭: 男人、女人、女孩
+        self.assertTrue(is_emoji_zwj_sequence(s))
+        self.assertEqual(len(EmojiSequence.find_all(s)), 1)
+
+    def test_emoji_flag_sequence(self):
+        # 测试国旗序列
+        s = "🇺🇸"  # 美国国旗
+        self.assertTrue(is_emoji_flag_sequence(s))
+        self.assertEqual(len(EmojiSequence.find_all(s)), 1)
+
+    def test_emoji_keycap_sequence(self):
+        # 测试按键序列
+        s = "1️⃣"  # 数字1按键
+        self.assertTrue(is_emoji_keycap_sequence(s))
+        self.assertEqual(len(EmojiSequence.find_all(s)), 1)
+
+    def test_emoji_modifier_sequence(self):
+        # 测试修饰符序列（如肤色）
+        s = "👍🏿"  # 深色拇指向上
+        self.assertTrue(is_emoji_modifier_sequence(s))
+        self.assertEqual(len(EmojiSequence.find_all(s)), 1)
+
+    def test_find_all_with_mixed_emojis(self):
+        # 测试在文本中查找所有类型的emoji
+        text = "Hello 👨‍👩‍👧 world! 🇺🇸 How are you? 1️⃣ and 👍🏿"
+        found_emojis = EmojiSequence.find_all(text)
+        self.assertEqual(len(found_emojis), 4)
+
+        # 检查找到的emoji
+        emoji_strings = [emoji[0].string for emoji in found_emojis]
+        self.assertIn("👨‍👩‍👧", emoji_strings)  # ZWJ序列
+        self.assertIn("🇺🇸", emoji_strings)  # 国旗序列
+        self.assertIn("1️⃣", emoji_strings)  # 按键序列
+        self.assertIn("👍🏿", emoji_strings)  # 修饰符序列
 
 
 if __name__ == "__main__":
