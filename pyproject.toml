@@ -1,6 +1,6 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = ["setuptools>=64", "setuptools-scm>=8"]
+requires = ["setuptools>=80", "setuptools-scm>=8"]
 
 [project]
 authors = [{ name = "liu xue yan", email = "liu_xue_yan@foxmail.com" }]
@@ -15,6 +15,7 @@ dependencies = ["importlib-resources; python_version<'3.9'"]
 keywords = ["emoji", "unicode"]
 
 license = "GPL-3.0-or-later"
+license-files = ["LICENSE.txt"]
 
 classifiers = [
   # "Development Status :: 1 - Planning",
@@ -46,19 +47,23 @@ write_to = "src/emoji_data/_version.py"
 
 [dependency-groups]
 dev = [
-    "coverage>=7.6.1",
-    "ipykernel>=6.29.5",
-    "mypy>=1.14.1",
+  { include-group = "docs" },
+  { include-group = "ipykernel" },
+  { include-group = "static-check" },
+  { include-group = "test" },
 ]
+test = ["coverage"]
 docs = [
-    "furo>=2024.8.6",
-    "importlib-metadata>=8.5.0 ; python_version < '3.8'",
-    "linkify-it-py>=2.0.3",
-    "myst-parser>=3.0.1",
-    "nbsphinx>=0.9.7",
-    "sphinx>=7",
-    "sphinx-copybutton>=0.5.2",
-    "sphinx-inline-tabs>=2023.4.21",
-    "sphinx-tippy>=0.4.3",
-    "sphinx-version-warning>=1.1.2",
+  "sphinx>=7",
+  "furo",
+  "importlib-metadata;python_version<'3.8'",
+  "linkify-it-py",
+  "myst-parser",
+  "nbsphinx",
+  "sphinx-copybutton",
+  "sphinx-inline-tabs",
+  "sphinx-tippy",
+  "sphinx-version-warning",
 ]
+ipykernel = ["ipykernel", "pip"]
+static-check = ["mypy"]

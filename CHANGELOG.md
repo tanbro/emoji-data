@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 0.4.1
+
+- 🌞 Highlights:
+  - Update to Emoji version 17.0
+- 🏗️ Build:
+  - Optimize `pyproject.toml`
+
 ## 0.4
 
 > 📅 **Date** 2024-12-06
