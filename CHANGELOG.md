@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## developing:
+
+- 🌞 Highlights:
+  - Update to Emoji version 17.0
+
 ## 0.4
 
 > 📅 **Date** 2024-12-06
