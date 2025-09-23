@@ -1,9 +1,11 @@
 # CHANGELOG
 
-## developing:
+## 0.4.1
 
 - 🌞 Highlights:
   - Update to Emoji version 17.0
+- 🏗️ Build:
+  - Optimize `pyproject.toml`
 
 ## 0.4
 
