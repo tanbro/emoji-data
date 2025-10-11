@@ -1,6 +1,8 @@
 # CHANGELOG
 
-## 0.5.0 (In development)
+## 0.5.0
+
+> 📅 **Date** 2025-10-11
 
 - 🌞 Highlights:
   - Update to Emoji version 17.0
