@@ -1,6 +1,22 @@
 # CHANGELOG
 
+## 0.5.0 (In development)
+
+- 🌞 Highlights:
+  - Update to Emoji version 17.0
+- 🆕 New:
+  - Add `is_basic_emoji_character` function to determine basic emoji characters
+  - Add `is_emoji_combining_sequence` function to determine emoji combining sequences
+- 📚 Documentation:
+  - Fix docstring format issues to comply with Sphinx standards
+- ⚠️ Breaking Changes:
+  - Drop support for Python 3.8
+- 🧪 Testing:
+  - Add Python 3.14 support in CI and test scripts
+
 ## 0.4.1
+
+> 📅 **Date** 2025-09-23
 
 - 🌞 Highlights:
   - Update to Emoji version 17.0
