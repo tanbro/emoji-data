@@ -54,6 +54,9 @@ __all__ = [
     "is_text_presentation_selector",
     "is_text_presentation_sequence",
     "is_qualified_emoji_character",
+    "is_basic_emoji",
+    "is_rgi_emoji_sequence",
+    "is_emoji_combining_sequence",
 ]
 
 
@@ -566,3 +569,64 @@ def detect_qualified(s: str) -> QualifiedType:
             return QualifiedType.FULLY_QUALIFIED
         return QualifiedType.MINIMALLY_QUALIFIED
     return QualifiedType.UNQUALIFIED
+
+
+def is_rgi_emoji_sequence(s: str) -> bool:
+    """RGI emoji sequence - Recommended for General Interchange emoji sequences
+
+    These are the only emoji sequences that are recommended for general interchange.
+
+    See also:
+        https://www.unicode.org/reports/tr51/#def_rgi
+    """
+    return (
+        (len(s) == 1 and is_basic_emoji(s))
+        or is_emoji_keycap_sequence(s)
+        or is_emoji_modifier_sequence(s)
+        or is_emoji_flag_sequence(s)
+        or is_emoji_tag_sequence(s)
+        or is_emoji_zwj_sequence(s)
+    )
+
+
+def is_basic_emoji(c: str) -> bool:
+    """basic emoji — Emoji characters excluding Emoji Components
+
+    ::
+
+        basic_emoji := emoji_character - emoji_component
+
+
+    - These characters are emoji characters but not emoji components.
+
+    See also:
+        https://www.unicode.org/reports/tr51/#def_basic_emoji
+    """
+    c = chr(ord(c))
+    return is_emoji_character(c) and not is_emoji_component(c)
+
+
+def is_emoji_combining_sequence(s: str) -> bool:
+    """Emoji combining sequence
+
+    An emoji combining sequence is a combination of:
+
+    1. A base emoji character
+    2. One or more combining characters (like skin tone modifiers)
+
+    This typically includes:
+
+    - Emoji modifier sequences (emoji + skin tone modifier)
+    - Emoji ZWJ sequences (emojis combined with Zero Width Joiner)
+    - Emoji presentation sequences
+    - Text presentation sequences
+
+    See also:
+        https://www.unicode.org/reports/tr51/#def_emoji_combining_sequence
+    """
+    return (
+        is_emoji_modifier_sequence(s)
+        or is_emoji_zwj_sequence(s)
+        or is_emoji_presentation_sequence(s)
+        or is_text_presentation_sequence(s)
+    )
