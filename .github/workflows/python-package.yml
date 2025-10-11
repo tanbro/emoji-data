@@ -28,66 +28,54 @@ jobs:
           fi
           echo "version=${PEP440_VERSION}" | tee -a $GITHUB_OUTPUT
 
-  check:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/checkout@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
         with:
+          enable-cache: true
           python-version: ${{ matrix.python-version }}
-          cache: pip # caching pip dependencies
-      - name: Install project and dependent tools
-        run: |
-          pip install -e . -r tests/requirements.txt coverage ruff
-      - name: Check with ruff
-        run: |
-          ruff check .
-      - name: Test with coverage
-        run: |
-          coverage run -m unittest -fcv
-          coverage report -m
-          coverage xml
-
-  build:
-    runs-on: ubuntu-latest
-    needs: [get-version-pep440, check]
-    if: needs.get-version-pep440.outputs.version != ''
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install project
+        run: uv sync --no-dev --group test --group typed
+      - name: Cache of Ruff and MyPY
+        uses: actions/cache@v4
         with:
-          cache: "pip" # caching pip dependencies
-      - name: Install builder
-        run: pip install build
-      - name: Build Python distribution
-        run: pyproject-build
-      - name: Upload dist to artifact
-        uses: actions/upload-artifact@v4
+          path: |
+            .ruff_cache
+            .mypy_cache
+          key: cache-mypy-ruff
+      - name: Lint check with ruff
+        uses: astral-sh/ruff-action@v3
+      - name: Static type check with mypy
+        run: uv run --no-dev mypy
+      - name: Unit test
+        run: |
+          uv run --no-dev coverage run -m unittest -fcv
+          uv run --no-dev coverage report -m
+          uv run --no-dev coverage xml
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          name: emoji_data-dist-${{ needs.get-version-pep440.outputs.version }}
-          path: dist
-          if-no-files-found: error
-          retention-days: 1
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   publish:
     runs-on: ubuntu-latest
-    needs: [get-version-pep440, build]
+    needs: [get-version-pep440, test]
     if: needs.get-version-pep440.outputs.version != ''
     steps:
-      - name: Download dist from artifact
-        uses: actions/download-artifact@v4
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
         with:
-          name: emoji_data-dist-${{needs.get-version-pep440.outputs.version}}
-          path: dist
-      - name: Publish package
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          enable-cache: true
+      - name: Build
+        run: uv build
+      - name: Publish
+        run: uv publish --token ${{ secrets.PYPI_API_TOKEN }}
