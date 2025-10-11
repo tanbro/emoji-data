@@ -29,13 +29,11 @@ Contents
    :caption: API Reference
    :titlesonly:
 
-   apidocs/modules
+   api/modules
 
 Indices and tables
 ------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
-
-.. .. furo has no search page!
-.. * :ref:`search`
+* :ref:`search`

@@ -47,23 +47,23 @@ write_to = "src/emoji_data/_version.py"
 
 [dependency-groups]
 dev = [
-  { include-group = "docs" },
-  { include-group = "ipykernel" },
-  { include-group = "static-check" },
   { include-group = "test" },
+  { include-group = "docs" },
+  { include-group = "typed" },
 ]
 test = ["coverage"]
+typed = ["mypy"]
 docs = [
-  "sphinx>=7",
-  "furo",
-  "importlib-metadata;python_version<'3.8'",
-  "linkify-it-py",
+  "importlib_metadata;python_version<'3.8'",
+  "Sphinx>=7",
   "myst-parser",
+  "sphinx-book-theme",
   "nbsphinx",
+  "linkify-it-py",
   "sphinx-copybutton",
   "sphinx-inline-tabs",
-  "sphinx-tippy",
+  "sphinx_tippy",
   "sphinx-version-warning",
+  "sphinx-autodoc-typehints",
 ]
-ipykernel = ["ipykernel", "pip"]
-static-check = ["mypy"]
+ipy = ["ipykernel"]

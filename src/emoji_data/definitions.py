@@ -5,6 +5,7 @@ Note:
 
 See also:
     http://www.unicode.org/reports/tr51/#Definitions
+
 """
 
 import re
@@ -69,11 +70,15 @@ class QualifiedType(Enum):
 
     See also:
         https://www.unicode.org/reports/tr51/#def_rgi_emoji_qualification
+
     """
 
     FULLY_QUALIFIED = "FQE"
     MINIMALLY_QUALIFIED = "MQE"
     UNQUALIFIED = "UQE"
+
+
+_EMOJI_PATTERNS: Mapping[str, Pattern[str]] = {}
 
 
 def initial_emoji_patterns():
@@ -154,9 +159,6 @@ def get_emoji_patterns() -> Mapping[str, Pattern[str]]:
     return _EMOJI_PATTERNS
 
 
-_EMOJI_PATTERNS: Mapping[str, Pattern[str]] = {}
-
-
 def is_emoji_character(c: str) -> bool:
     """detect emoji character
 
@@ -166,10 +168,12 @@ def is_emoji_character(c: str) -> bool:
 
         emoji_character := \\p{Emoji}
 
+
     - These characters are recommended for use as emoji.
 
     See also:
         https://unicode.org/reports/tr51/#Emoji_Characters
+
     """
     c = chr(ord(c))
     return _EMOJI_PATTERNS["EMOJI_CHARACTER"].fullmatch(c) is not None
@@ -185,6 +189,7 @@ def is_extended_pictographic_character(c: str) -> bool:
 
     See also:
         https://www.unicode.org/reports/tr51/#def_level1_emoji
+
     """
     c = chr(ord(c))
     return _EMOJI_PATTERNS["EXTENDED_PICTOGRAPHIC_CHARACTER"].fullmatch(c) is not None
@@ -198,6 +203,7 @@ def is_emoji_component(c: str) -> bool:
 
     See also:
         https://www.unicode.org/reports/tr51/#def_level2_emoji
+
     """
     c = chr(ord(c))
     return _EMOJI_PATTERNS["EMOJI_COMPONENT"].fullmatch(c) is not None
@@ -209,6 +215,7 @@ def is_default_emoji_presentation_character(c: str) -> bool:
     ::
 
         default_emoji_presentation_character := \\p{Emoji_Presentation}
+
 
     - These characters have the **Emoji_Presentation** property. See `Annex A: Emoji Properties and Data Files <https://unicode.org/reports/tr51/#Emoji_Properties_and_Data_Files>`_.
 
@@ -225,6 +232,7 @@ def is_default_text_presentation_character(c: str) -> bool:
     ::
 
         default_text_presentation_character := \\P{Emoji_Presentation}
+
 
     - These characters do not have the **Emoji_Presentation** property; that is, their **Emoji_Presentation** property value is **No**.
       See `Annex A: Emoji Properties and Data Files <https://unicode.org/reports/tr51/#Emoji_Properties_and_Data_Files>`_.
@@ -245,6 +253,7 @@ def is_text_presentation_selector(c: str) -> bool:
 
         text_presentation_selector := \\x{FE0E}
 
+
     See also:
         https://unicode.org/reports/tr51/#def_text_presentation_selector
     """
@@ -258,6 +267,7 @@ def is_text_presentation_sequence(s: str) -> bool:
     ::
 
         text_presentation_sequence := emoji_character text_presentation_selector
+
 
     - The only valid **text presentation sequences** are those listed in **emoji-variation-sequences.txt** [`emoji-data <https://unicode.org/reports/tr51/#emoji_data>`_].
 
@@ -276,6 +286,7 @@ def is_emoji_presentation_selector(c: str) -> bool:
 
         emoji_presentation_selector := \\x{FE0F}
 
+
     See also:
         https://unicode.org/reports/tr51/#def_emoji_presentation_selector
     """
@@ -289,6 +300,7 @@ def is_emoji_presentation_sequence(s: str) -> bool:
     ::
 
         emoji_presentation_sequence := emoji_character emoji_presentation_selector
+
 
     - The only valid **emoji presentation sequences** are those listed in **emoji-variation-sequences.txt** [`emoji-data <https://unicode.org/reports/tr51/#emoji_data>`_].
 
@@ -306,6 +318,7 @@ def is_emoji_modifier(c: str) -> bool:
 
         emoji_modifier := \\p{Emoji_Modifier}
 
+
     - These characters have the **Emoji_Modifier** property. See `Annex A: Emoji Properties and Data Files <https://unicode.org/reports/tr51/#Emoji_Properties_and_Data_Files>`_.
 
     See also:
@@ -322,6 +335,7 @@ def is_emoji_modifier_base(c: str) -> bool:
     ::
 
         emoji_modifier_base := \\p{Emoji_Modifier_Base}
+
 
     - These characters have the **Emoji_Modifier_Base property**. See `Annex A: Emoji Properties and Data Files <https://unicode.org/reports/tr51/#Emoji_Properties_and_Data_Files>`_.
     - They are also listed in `Characters Subject to Emoji Modifiers <https://unicode.org/reports/tr51/#Subject_Emoji_Modifiers>`_.
@@ -369,6 +383,7 @@ def is_emoji_flag_sequence(s: str) -> bool:
     See also:
         https://www.unicode.org/reports/tr51/#def_emoji_flag_sequence
 
+
     """
     return _EMOJI_PATTERNS["EMOJI_FLAG_SEQUENCE"].fullmatch(s) is not None
 
@@ -396,6 +411,7 @@ def is_emoji_tag_sequence(s: str) -> bool:
         tag_spec           := [\\x{E0020}-\\x{E007E}]+
         tag_end            := \\x{E007F}
 
+
     - The `tag_spec` consists of all characters from U+E0020 TAG SPACE to U+E007E TAG TILDE. Each tag_spec defines a particular visual variant to be applied to the tag_base character(s). Though tag_spec includes the values U+E0041 TAG LATIN CAPITAL LETTER A .. U+E005A TAG LATIN CAPITAL LETTER Z, they are not used currently and are reserved for future extensions.
     - The `tag_end` consists of the character U+E007F CANCEL TAG, and must be used to terminate the sequence.
     - A sequence of tag characters that is not part of an `emoji_tag_sequence` is not a well-formed **emoji tag sequence**.
@@ -411,6 +427,7 @@ def is_emoji_keycap_sequence(s: str) -> bool:
     — A sequence of the following form::
 
         emoji_keycap_sequence := [0-9#*] \\x{FE0F 20E3}
+
 
     - These sequences are in the **emoji-sequences.txt** file listed under the type_field **Emoji_Keycap_Sequence**
 
@@ -431,6 +448,7 @@ def is_emoji_core_sequence(s: str) -> bool:
         | emoji_modifier_sequence
         | emoji_flag_sequence
 
+
     See also:
         https://www.unicode.org/reports/tr51/#def_emoji_core_sequence
     """
@@ -444,6 +462,7 @@ def is_emoji_zwj_element(s: str) -> bool:
         emoji_zwj_element :=
             emoji_core_sequence
         | emoji_tag_sequence
+
 
     See also:
         https://www.unicode.org/reports/tr51/#def_emoji_zwj_element
@@ -462,6 +481,7 @@ def is_emoji_zwj_sequence(s: str) -> bool:
 
         ZWJ := \\x{200d}
 
+
     See also:
         https://www.unicode.org/reports/tr51/#def_emoji_zwj_sequence
     """
@@ -476,6 +496,7 @@ def is_emoji_sequence(s: str) -> bool:
             emoji_core_sequence
         | emoji_zwj_sequence
         | emoji_tag_sequence
+
 
     Note:
         all emoji sequences are single grapheme clusters: there is never a grapheme cluster boundary within an emoji sequence.
@@ -501,6 +522,7 @@ def is_qualified_emoji_character(s: str, i: int) -> bool:
 
     See also:
         http://www.unicode.org/reports/tr51/#def_qualified_emoji_character
+
     """
     c = s[i]
     if not is_emoji_character(c):
@@ -534,6 +556,7 @@ def detect_qualified(s: str) -> QualifiedType:
         - https://www.unicode.org/reports/tr51/#def_fully_qualified_emoji
         - https://www.unicode.org/reports/tr51/#def_minimally_qualified_emoji
         - https://www.unicode.org/reports/tr51/#def_unqualified_emoji
+
     """
     if is_qualified_emoji_character(s, 0):
         n = len(s)
