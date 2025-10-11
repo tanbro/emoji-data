@@ -5,7 +5,7 @@
 - 🌞 Highlights:
   - Update to Emoji version 17.0
 - 🆕 New:
-  - Add `is_basic_emoji` function to determine basic emoji characters
+  - Add `is_basic_emoji_character` function to determine basic emoji characters
   - Add `is_emoji_combining_sequence` function to determine emoji combining sequences
 - 📚 Documentation:
   - Fix docstring format issues to comply with Sphinx standards

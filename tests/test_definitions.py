@@ -9,8 +9,10 @@ from emoji_data.definitions import (
     detect_qualified,
     get_emoji_patterns,
     initial_emoji_patterns,
+    is_basic_emoji_character,
     is_default_emoji_presentation_character,
     is_emoji_character,
+    is_emoji_combining_sequence,
     is_emoji_component,
     is_emoji_core_sequence,
     is_emoji_flag_sequence,
@@ -193,6 +195,28 @@ class DefinitionsTestCase(unittest.TestCase):
         self.assertTrue(is_emoji_sequence("🇺🇸"))
         self.assertTrue(is_emoji_sequence("1️⃣"))
         self.assertTrue(is_emoji_sequence("👍🏿"))
+
+    def test_is_basic_emoji_character(self):
+        # 测试基本emoji
+        self.assertTrue(is_basic_emoji_character("😀"))  # 笑脸emoji
+        self.assertTrue(is_basic_emoji_character("🎉"))  # 派对emoji
+        self.assertTrue(is_basic_emoji_character("👍"))  # 竖拇指
+
+        # 测试非基本emoji（emoji组件）
+        self.assertFalse(is_basic_emoji_character("🏻"))  # 肤色修饰符
+        self.assertFalse(is_basic_emoji_character("🇺"))  # 区域指示符
+        self.assertFalse(is_basic_emoji_character("🇸"))  # 区域指示符
+        self.assertFalse(is_basic_emoji_character("\ufe0f"))  # emoji呈现选择器
+
+    def test_is_emoji_combining_sequence(self):
+        # 测试emoji组合序列
+        self.assertTrue(is_emoji_combining_sequence("👍🏿"))  # 修饰符序列
+        self.assertTrue(is_emoji_combining_sequence("👨‍👩‍👧"))  # ZWJ序列
+        self.assertTrue(is_emoji_combining_sequence("☺️"))  # emoji呈现序列
+
+        # 测试非组合序列
+        self.assertFalse(is_emoji_combining_sequence("A"))
+        self.assertFalse(is_emoji_combining_sequence("1"))
 
     def test_detect_qualified(self):
         # 测试合格类型检测

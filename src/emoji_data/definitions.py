@@ -54,7 +54,7 @@ __all__ = [
     "is_text_presentation_selector",
     "is_text_presentation_sequence",
     "is_qualified_emoji_character",
-    "is_basic_emoji",
+    "is_basic_emoji_character",
     "is_rgi_emoji_sequence",
     "is_emoji_combining_sequence",
 ]
@@ -580,7 +580,7 @@ def is_rgi_emoji_sequence(s: str) -> bool:
         https://www.unicode.org/reports/tr51/#def_rgi
     """
     return (
-        (len(s) == 1 and is_basic_emoji(s))
+        (len(s) == 1 and is_basic_emoji_character(s))
         or is_emoji_keycap_sequence(s)
         or is_emoji_modifier_sequence(s)
         or is_emoji_flag_sequence(s)
@@ -589,7 +589,7 @@ def is_rgi_emoji_sequence(s: str) -> bool:
     )
 
 
-def is_basic_emoji(c: str) -> bool:
+def is_basic_emoji_character(c: str) -> bool:
     """basic emoji — Emoji characters excluding Emoji Components
 
     ::
