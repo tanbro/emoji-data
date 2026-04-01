@@ -28,8 +28,7 @@ OUTPUT_DIR = Path(__file__).parent.parent / "src" / "emoji_data" / "data"
 
 
 def get_filename_from_response(response: httpx.Response, url: str) -> str:
-    """从 HTTP 响应头或 URL 中提取文件名"""
-    # 尝试从 Content-Disposition 头获取文件名
+    # Try to get file name from Content-Disposition header
     content_disposition = response.headers.get("content-disposition", "")
     if content_disposition:
         for part in content_disposition.split(";"):
@@ -38,7 +37,7 @@ def get_filename_from_response(response: httpx.Response, url: str) -> str:
                 filename = part.split("=", 1)[1].strip("\"'")
                 return unquote(filename)
 
-    # 如果没有 Content-Disposition，从 URL 中提取
+    # If not Content-Disposition，try that from URL
     return unquote(url.rsplit("/", 1)[-1])
 
 
@@ -48,7 +47,7 @@ async def download(
     progress: Progress,
     task_id: TaskID,
 ) -> None:
-    """下载单个文件"""
+    """Download a file"""
     try:
         async with client.stream("GET", url, follow_redirects=True) as response:
             response.raise_for_status()
@@ -66,13 +65,13 @@ async def download(
                     progress.update(task_id, advance=len(chunk))
 
     except httpx.HTTPStatusError as e:
-        progress.console.print(f"[red]下载失败 {url}: {e}[/red]")
+        progress.console.print(f"[red]Fail  {url}: {e}[/red]")
     except Exception as e:
-        progress.console.print(f"[red]错误 {url}: {e}[/red]")
+        progress.console.print(f"[red]Error {url}: {e}[/red]")
 
 
 async def main():
-    """并发下载所有文件"""
+    """download all files"""
     console = Console()
 
     progress = Progress(
@@ -85,7 +84,7 @@ async def main():
         console=console,
     )
 
-    timeout = httpx.Timeout(60.0, connect=10.0)
+    timeout = httpx.Timeout(300, connect=30)
     limits = httpx.Limits(max_keepalive_connections=5, max_connections=10)
 
     async with httpx.AsyncClient(timeout=timeout, limits=limits) as client:
