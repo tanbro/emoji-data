@@ -50,9 +50,11 @@ dev = [
   { include-group = "test" },
   { include-group = "docs" },
   { include-group = "typed" },
+  { include-group = "download" },
 ]
 test = ["coverage"]
 typed = ["mypy"]
+download = [ "httpx", "rich" ]
 docs = [
   "importlib_metadata;python_version<'3.8'",
   "Sphinx>=7",
